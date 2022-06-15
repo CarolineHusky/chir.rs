@@ -53,13 +53,20 @@
           ];
         };
       legacyPackages = let
-        inherit (builtins) mapAttrs;
+        inherit (builtins) mapAttrs replaceStrings;
+        inherit (pkgs.lib.attrsets) mapAttrs';
         pkg_unfixed = {
           inherit (rustPkgs) unknown;
           crates-io = rustPkgs."registry+https://github.com/rust-lang/crates.io-index";
         };
       in
-        mapAttrs (_: mapAttrs (_: mapAttrs (_: value: value {}))) pkg_unfixed;
+        mapAttrs (_:
+          mapAttrs (_:
+            mapAttrs' (key: value: {
+              name = replaceStrings ["." "+"] ["-" "-"] key;
+              value = value {};
+            })))
+        pkg_unfixed;
 
       nixosModules.default = import ./nixos {
         inherit inputs system;
