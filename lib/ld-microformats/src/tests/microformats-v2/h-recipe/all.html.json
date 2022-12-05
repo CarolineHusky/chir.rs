@@ -1,0 +1,50 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@type": "mf2:h-recipe",
+  "mf2:author": {
+    "@type": "mf2:h-card",
+    "mf2:name": "Glenn Jones",
+    "mf2:url": {
+      "@id": "http://glennjones.net/"
+    },
+    "mf2:value": "Glenn Jones"
+  },
+  "mf2:ingredient": [
+    "1 egg",
+    "60ml water",
+    "70ml milk",
+    "75g plain flour",
+    "Pinch of salt"
+  ],
+  "mf2:instructions": "<ol>\n            <li>Pre-heat oven to 230C or gas mark 8. Pour the vegetable oil evenly into 2 x 4-hole \n            Yorkshire pudding tins and place in the oven to heat through.</li> \n            \n            <li>To make the batter, add all the flour into a bowl and beat in the eggs until smooth. \n            Gradually add the milk and water while beating the mixture. It should be smooth and \n            without lumps. Finally add a pinch of salt.</li>\n            \n            <li>Make sure the oil is piping hot before pouring the batter evenly into the tins. \n            Place in the oven for 20-25 minutes until pudding have risen and look golden brown</li>\n        </ol>",
+  "mf2:name": "Yorkshire Puddings",
+  "mf2:nutrition": [
+    "Calories: 125",
+    "Cholesterol: 77mg",
+    "Fat: 3.2g"
+  ],
+  "mf2:photo": {
+    "@id": "http://codebits.glennjones.net/semantic/yorkshire-puddings.jpg"
+  },
+  "mf2:published": {
+    "@type": "schema:DateTime",
+    "@value": "2011-10-27"
+  },
+  "mf2:review": {
+    "@type": "mf2:h-review-aggregate",
+    "mf2:average": "4.5",
+    "mf2:count": "35",
+    "mf2:rating": "4.5 stars out 5 based on",
+    "mf2:value": "4.5 stars out 5 based on \n            35 reviews"
+  },
+  "mf2:summary": "Makes 6 good sized Yorkshire puddings, the way my mum taught me",
+  "mf2:yield": "6 good sized Yorkshire puddings"
+}

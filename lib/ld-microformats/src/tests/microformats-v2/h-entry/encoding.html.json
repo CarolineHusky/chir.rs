@@ -1,0 +1,14 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@type": "mf2:h-entry",
+  "mf2:content": "x&lt;y AT&amp;T &lt;b&gt;NotBold&lt;/b&gt; <b>Bold</b>",
+  "mf2:name": "x<y AT&T <b>NotBold</b> Bold"
+}

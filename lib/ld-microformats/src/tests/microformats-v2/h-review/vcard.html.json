@@ -1,0 +1,62 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@graph": [
+    {
+      "@type": "mf2:h-review",
+      "mf2:category": "crepe",
+      "mf2:description": "<p class=\"p-item h-card\">\n        <span class=\"p-name p-org\">Crepes on Cole</span> is one of the best little \n        creperies in <span class=\"p-adr h-adr\"><span class=\"p-locality\">San Francisco</span></span>.\n        Excellent food and service. Plenty of tables in a variety of sizes \n        for parties large and small.  Window seating makes for excellent \n        people watching to/from the N-Judah which stops right outside.  \n        I've had many fun social gatherings here, as well as gotten \n        plenty of work done thanks to neighborhood WiFi.\n        </p>",
+      "mf2:item": [
+        {
+          "@type": "mf2:h-card",
+          "mf2:adr": {
+            "@type": "mf2:h-adr",
+            "mf2:locality": "San Francisco",
+            "mf2:value": "San Francisco"
+          },
+          "mf2:name": "Crepes on Cole",
+          "mf2:org": "Crepes on Cole",
+          "mf2:value": "Crepes on Cole"
+        },
+        {
+          "@type": "mf2:h-card",
+          "mf2:adr": {
+            "@type": "mf2:h-adr",
+            "mf2:locality": "San Francisco",
+            "mf2:value": "San Francisco"
+          },
+          "mf2:name": "Crepes on Cole",
+          "mf2:org": "Crepes on Cole",
+          "mf2:value": "Crepes on Cole"
+        }
+      ],
+      "mf2:name": "Crepes on Cole is awesome",
+      "mf2:rating": "5",
+      "mf2:reviewed": {
+        "@type": "schema:DateTime",
+        "@value": "2005-04-18"
+      },
+      "mf2:reviewer": {
+        "@type": "mf2:h-card",
+        "mf2:name": "Tantek",
+        "mf2:value": "Tantek"
+      },
+      "mf2:url": {
+        "@id": "http://example.com/crepe"
+      }
+    },
+    {
+      "mf2:license": {
+        "@id": "http://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License",
+        "schema:description": "Creative Commons Attribution-ShareAlike License"
+      }
+    }
+  ]
+}

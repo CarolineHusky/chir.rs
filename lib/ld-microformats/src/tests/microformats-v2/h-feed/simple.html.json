@@ -1,0 +1,43 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@type": "mf2:h-feed",
+  "mf2:author": {
+    "@type": "mf2:h-card",
+    "mf2:name": "Tantek",
+    "mf2:url": {
+      "@id": "http://tantek.com/"
+    },
+    "mf2:value": "Tantek"
+  },
+  "mf2:child": {
+    "@type": "mf2:h-entry",
+    "mf2:content": "<p class=\"p-summary\">Last week the microformats.org community \n\t            celebrated its 7th birthday at a gathering hosted by Mozilla in \n\t            San Francisco and recognized accomplishments, challenges, and \n\t            opportunities.</p>\n\t\n\t        <p>The microformats tagline “humans first, machines second” \n\t            forms the basis of many of our \n\t            <a href=\"http://microformats.org/wiki/principles\">principles</a>, and \n\t            in that regard, we’d like to recognize a few people and \n\t            thank them for their years of volunteer service </p>",
+    "mf2:name": "microformats.org at 7",
+    "mf2:summary": [
+      "Last week the microformats.org community \n\t            celebrated its 7th birthday at a gathering hosted by Mozilla in \n\t            San Francisco and recognized accomplishments, challenges, and \n\t            opportunities.",
+      "Last week the microformats.org community \n\t            celebrated its 7th birthday at a gathering hosted by Mozilla in \n\t            San Francisco and recognized accomplishments, challenges, and \n\t            opportunities."
+    ],
+    "mf2:updated": {
+      "@type": "schema:DateTime",
+      "@value": "2012-06-25T17:08:26"
+    },
+    "mf2:url": {
+      "@id": "http://microformats.org/2012/06/25/microformats-org-at-7"
+    }
+  },
+  "mf2:name": "Microformats blog",
+  "mf2:photo": {
+    "@id": "https://indieweb.org/photo.jpeg"
+  },
+  "mf2:url": {
+    "@id": "http://microformats.org/blog"
+  }
+}

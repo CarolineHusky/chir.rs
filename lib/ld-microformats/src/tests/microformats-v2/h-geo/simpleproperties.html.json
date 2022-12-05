@@ -1,0 +1,15 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@type": "mf2:h-geo",
+  "mf2:latitude": "51.513458",
+  "mf2:longitude": "-0.14812",
+  "mf2:name": "The Bricklayer's Arms"
+}

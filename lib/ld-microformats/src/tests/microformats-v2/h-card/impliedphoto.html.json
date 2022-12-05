@@ -1,0 +1,100 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@graph": [
+    {
+      "@type": "mf2:h-card",
+      "mf2:child": {
+        "@type": "mf2:h-card",
+        "mf2:name": "Jane Doe",
+        "mf2:photo": {
+          "@type": "schema:ImageObject",
+          "schema:caption": "Jane Doe",
+          "schema:contentUrl": "https://indieweb.org/jane.jpeg"
+        }
+      }
+    },
+    {
+      "@type": "mf2:h-card",
+      "mf2:child": {
+        "@type": "mf2:h-card",
+        "mf2:name": "Jane Doe",
+        "mf2:photo": {
+          "@id": "https://indieweb.org/jane.jpeg"
+        }
+      }
+    },
+    {
+      "@type": "mf2:h-card",
+      "mf2:name": "Jane Doe",
+      "mf2:photo": {
+        "@type": "schema:ImageObject",
+        "schema:caption": "Jane Doe",
+        "schema:contentUrl": "https://indieweb.org/jane.jpeg"
+      }
+    },
+    {
+      "@type": "mf2:h-card",
+      "mf2:name": "Jane Doe",
+      "mf2:photo": {
+        "@id": "https://indieweb.org/jane.jpeg"
+      }
+    },
+    {
+      "@type": "mf2:h-card",
+      "mf2:name": "Jane Doe",
+      "mf2:photo": {
+        "@type": "schema:ImageObject",
+        "schema:caption": "Jane Doe",
+        "schema:contentUrl": "https://indieweb.org/jane.jpeg"
+      }
+    },
+    {
+      "@type": "mf2:h-card",
+      "mf2:name": "Jane Doe",
+      "mf2:photo": {
+        "@id": "https://indieweb.org/jane.jpeg"
+      }
+    },
+    {
+      "@type": "mf2:h-card",
+      "mf2:name": "Jane Doe",
+      "mf2:photo": {
+        "@type": "schema:ImageObject",
+        "schema:caption": "Jane Doe",
+        "schema:contentUrl": "https://indieweb.org/jane.jpeg"
+      }
+    },
+    {
+      "@type": "mf2:h-card",
+      "mf2:name": "Jane Doe",
+      "mf2:photo": {
+        "@id": "https://indieweb.org/jane.jpeg"
+      }
+    },
+    {
+      "@type": "mf2:h-card",
+      "mf2:name": "John Doe",
+      "mf2:url": {
+        "@id": "https://example.com/"
+      }
+    },
+    {
+      "@type": "mf2:h-card",
+      "mf2:name": "John Doe",
+      "mf2:photo": {
+        "@id": "https://example.com/photo.jpg"
+      },
+      "mf2:url": {
+        "@id": "https://example.com/"
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@type": "mf2:h-resume",
+  "mf2:contact": {
+    "@type": "mf2:h-card",
+    "mf2:title": "Director of the World Wide Web Foundation",
+    "mf2:value": "Director of the World Wide Web Foundation"
+  },
+  "mf2:education": {
+    "@type": [
+      "mf2:h-card",
+      "mf2:h-event"
+    ],
+    "mf2:description": "BA Hons (I) Physics",
+    "mf2:end": {
+      "@type": "schema:DateTime",
+      "@value": "1976-06"
+    },
+    "mf2:name": "The Queen's College, Oxford University",
+    "mf2:org": "The Queen's College, Oxford University",
+    "mf2:start": {
+      "@type": "schema:DateTime",
+      "@value": "1973-09"
+    },
+    "mf2:value": "The Queen's College, Oxford University"
+  },
+  "mf2:name": "Tim Berners-Lee",
+  "mf2:summary": "Invented the World Wide Web."
+}

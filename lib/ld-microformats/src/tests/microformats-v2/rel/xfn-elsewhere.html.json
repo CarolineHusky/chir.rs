@@ -1,0 +1,45 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "mf2:me": [
+    {
+      "@id": "http://delicious.com/glennjonesnet/",
+      "schema:description": "delicious"
+    },
+    {
+      "@id": "http://github.com/glennjones",
+      "schema:description": "github"
+    },
+    {
+      "@id": "http://lanyrd.com/people/glennjones/",
+      "schema:description": "lanyrd"
+    },
+    {
+      "@id": "http://twitter.com/glennjones",
+      "schema:description": "twitter"
+    },
+    {
+      "@id": "http://www.flickr.com/photos/glennjonesnet/",
+      "schema:description": "flickr"
+    },
+    {
+      "@id": "http://www.linkedin.com/in/glennjones",
+      "schema:description": "linkedin"
+    },
+    {
+      "@id": "http://www.slideshare.net/glennjones/presentations",
+      "schema:description": "slideshare"
+    },
+    {
+      "@id": "https://plus.google.com/u/0/105161464208920272734/about",
+      "schema:description": "google+"
+    }
+  ]
+}

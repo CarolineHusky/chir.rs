@@ -1,0 +1,19 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@type": "mf2:h-review-aggregate",
+  "mf2:item": {
+    "@type": "mf2:h-item",
+    "mf2:name": "Mediterranean Wraps",
+    "mf2:value": "Mediterranean Wraps"
+  },
+  "mf2:rating": "4.5",
+  "mf2:summary": "Customers flock to this small restaurant for their \n        tasty falafel and shawerma wraps and welcoming staff."
+}

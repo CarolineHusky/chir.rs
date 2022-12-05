@@ -1,0 +1,47 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@type": "mf2:h-event",
+  "mf2:name": "The party",
+  "mf2:start": [
+    {
+      "@type": "schema:DateTime",
+      "@value": "2013-03-14"
+    },
+    {
+      "@type": "schema:DateTime",
+      "@value": "2013-06-25 07:00:00"
+    },
+    {
+      "@type": "schema:DateTime",
+      "@value": "2013-06-26"
+    },
+    {
+      "@type": "schema:DateTime",
+      "@value": "2013-06-27"
+    },
+    {
+      "@type": "schema:DateTime",
+      "@value": "2013-06-28"
+    },
+    {
+      "@type": "schema:DateTime",
+      "@value": "2013-06-29"
+    },
+    {
+      "@type": "schema:DateTime",
+      "@value": "2013-07-01"
+    },
+    {
+      "@type": "schema:DateTime",
+      "@value": "2013-07-02"
+    }
+  ]
+}

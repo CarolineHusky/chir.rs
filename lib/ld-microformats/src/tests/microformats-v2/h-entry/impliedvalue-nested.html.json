@@ -1,0 +1,31 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@type": "mf2:h-entry",
+  "mf2:in-reply-to": {
+    "@type": "mf2:h-cite",
+    "mf2:author": {
+      "@type": "mf2:h-card",
+      "mf2:name": "Example Author",
+      "mf2:url": {
+        "@id": "http://example.com/"
+      },
+      "mf2:value": "Example Author"
+    },
+    "mf2:name": "Example Post",
+    "mf2:url": {
+      "@id": "http://example.com/post"
+    },
+    "mf2:value": {
+      "@id": "http://example.com/post"
+    }
+  },
+  "mf2:name": "Example Author\n                  Home\n            \n            Example Post"
+}

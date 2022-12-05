@@ -1,0 +1,16 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@type": "mf2:h-geo",
+  "mf2:altitude": "694",
+  "mf2:latitude": "54.155278",
+  "mf2:longitude": "-2.249722",
+  "mf2:name": "Pen-y-ghent"
+}

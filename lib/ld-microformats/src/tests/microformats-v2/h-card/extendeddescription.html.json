@@ -1,0 +1,32 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@type": "mf2:h-card",
+  "mf2:category": [
+    "Leadership",
+    "Strategy"
+  ],
+  "mf2:name": "Mitchell Baker",
+  "mf2:note": "Mitchell is responsible for setting the direction and scope of the Mozilla Foundation and its activities.",
+  "mf2:org": "Mozilla Foundation",
+  "mf2:photo": {
+    "@type": "schema:ImageObject",
+    "schema:caption": "photo of Mitchell",
+    "schema:contentUrl": "http://blog.mozilla.org/press/files/2012/04/mitchell-baker.jpg"
+  },
+  "mf2:url": [
+    {
+      "@id": "http://blog.lizardwrangler.com/"
+    },
+    {
+      "@id": "https://twitter.com/MitchellBaker"
+    }
+  ]
+}

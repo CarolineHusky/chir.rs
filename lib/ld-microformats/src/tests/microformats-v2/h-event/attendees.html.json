@@ -1,0 +1,40 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@type": "mf2:h-event",
+  "mf2:attendee": [
+    {
+      "@type": "mf2:h-card",
+      "mf2:name": "Brian Warner",
+      "mf2:value": "Brian Warner"
+    },
+    {
+      "@type": "mf2:h-card",
+      "mf2:name": "Kyle Machulis",
+      "mf2:value": "Kyle Machulis"
+    },
+    {
+      "@type": "mf2:h-card",
+      "mf2:name": "Tantek Çelik",
+      "mf2:value": "Tantek Çelik"
+    },
+    {
+      "@type": "mf2:h-card",
+      "mf2:name": "Sid Sutter",
+      "mf2:value": "Sid Sutter"
+    }
+  ],
+  "mf2:location": "San Francisco",
+  "mf2:name": "CPJ Online Press Freedom Summit",
+  "mf2:start": {
+    "@type": "schema:DateTime",
+    "@value": "2012-10-10"
+  }
+}

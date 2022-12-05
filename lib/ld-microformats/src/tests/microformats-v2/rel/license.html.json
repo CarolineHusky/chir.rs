@@ -1,0 +1,15 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "mf2:license": {
+    "@id": "http://creativecommons.org/licenses/by/2.5/",
+    "schema:description": "cc by 2.5"
+  }
+}

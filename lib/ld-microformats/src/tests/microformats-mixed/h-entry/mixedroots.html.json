@@ -1,0 +1,55 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@graph": [
+    {
+      "@type": "mf2:h-entry",
+      "mf2:author": {
+        "@type": "mf2:h-card",
+        "mf2:logo": {
+          "@type": "schema:ImageObject",
+          "schema:caption": "Aaron Parecki",
+          "schema:contentUrl": "https://aaronparecki.com/images/aaronpk.png"
+        },
+        "mf2:name": "Aaron Parecki",
+        "mf2:photo": {
+          "@type": "schema:ImageObject",
+          "schema:caption": "Aaron Parecki",
+          "schema:contentUrl": "https://aaronparecki.com/images/aaronpk.png"
+        },
+        "mf2:uid": {
+          "@id": "https://aaronparecki.com/"
+        },
+        "mf2:url": {
+          "@id": "https://aaronparecki.com/"
+        },
+        "mf2:value": "Aaron Parecki"
+      },
+      "mf2:category": [
+        "realtimeconf",
+        "realtimeconf"
+      ],
+      "mf2:content": "Did you play\n    <a href=\"http://twitter.com/playmapattack\">@playmapattack</a>at\n    <a href=\"http://aaronparecki.com/tag/realtimeconf\">#<span class=\"p-category\">realtimeconf</span></a>? Here is some more info about how we built it!\n    <a href=\"http://pdx.esri.com/blog/2013/10/17/introducting-mapattack/\"><span class=\"protocol\">http://</span>pdx.esri.com/blog/2013/10/17/introducting-mapattack/</a>",
+      "mf2:name": "Did you play\n    @playmapattackat\n    #realtimeconf? Here is some more info about how we built it!\n    http://pdx.esri.com/blog/2013/10/17/introducting-mapattack/"
+    },
+    {
+      "mf2:author": [
+        {
+          "@id": "https://aaronparecki.com/",
+          "schema:description": "aaronparecki.com"
+        },
+        {
+          "@id": "https://plus.google.com/117847912875913905493",
+          "schema:description": "Aaron Parecki"
+        }
+      ]
+    }
+  ]
+}

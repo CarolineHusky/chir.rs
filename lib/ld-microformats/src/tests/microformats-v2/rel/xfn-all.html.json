@@ -1,0 +1,79 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "mf2:acquaintance": {
+    "@id": "http://example.com/profile/jeo",
+    "schema:description": "jeo"
+  },
+  "mf2:child": {
+    "@id": "http://example.com/profile/harry",
+    "schema:description": "harry"
+  },
+  "mf2:co-worker": {
+    "@id": "http://example.com/profile/emily",
+    "schema:description": "emily"
+  },
+  "mf2:colleague": {
+    "@id": "http://example.com/profile/jack",
+    "schema:description": "jack"
+  },
+  "mf2:contact": {
+    "@id": "http://example.com/profile/lily",
+    "schema:description": "lily"
+  },
+  "mf2:crush": {
+    "@id": "http://example.com/profile/joshua",
+    "schema:description": "joshua"
+  },
+  "mf2:date": {
+    "@id": "http://example.com/profile/chloe",
+    "schema:description": "chloe"
+  },
+  "mf2:friend": {
+    "@id": "http://example.com/profile/jane",
+    "schema:description": "jane"
+  },
+  "mf2:kin": {
+    "@id": "http://example.com/profile/james",
+    "schema:description": "james"
+  },
+  "mf2:me": {
+    "@id": "http://example.com/profile/isla",
+    "schema:description": "isla"
+  },
+  "mf2:met": {
+    "@id": "http://example.com/profile/oliver",
+    "schema:description": "oliver"
+  },
+  "mf2:muse": {
+    "@id": "http://example.com/profile/ava",
+    "schema:description": "ava"
+  },
+  "mf2:neighbor": {
+    "@id": "http://example.com/profile/isabella",
+    "schema:description": "isabella"
+  },
+  "mf2:parent": {
+    "@id": "http://example.com/profile/sophia",
+    "schema:description": "sophia"
+  },
+  "mf2:sibling": {
+    "@id": "http://example.com/profile/charlie",
+    "schema:description": "charlie"
+  },
+  "mf2:spouse": {
+    "@id": "http://example.com/profile/olivia",
+    "schema:description": "olivia"
+  },
+  "mf2:sweetheart": {
+    "@id": "http://example.com/profile/alfie",
+    "schema:description": "alfie"
+  }
+}

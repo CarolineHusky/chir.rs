@@ -1,0 +1,39 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@graph": [
+    {
+      "@type": "mf2:h-entry",
+      "mf2:content": "This should not imply a p-name since it has an p-* property."
+    },
+    {
+      "@type": "mf2:h-entry",
+      "mf2:content": "<p>This should not imply a p-name since it has an e-* property.</p>"
+    },
+    {
+      "@type": "mf2:h-entry",
+      "mf2:like-of": {
+        "@type": "mf2:h-cite",
+        "mf2:name": "Microformats",
+        "mf2:url": {
+          "@id": "http://microformats.org/"
+        },
+        "mf2:value": {
+          "@id": "http://microformats.org/"
+        }
+      },
+      "mf2:name": "I really like Microformats\n  \n  This should not imply a p-name since it has a nested microformat."
+    },
+    {
+      "@type": "mf2:h-entry",
+      "mf2:name": "This should imply a p-name"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "@context": {
+    "@base": "https://indieweb.org/",
+    "@version": 1.1,
+    "mf": "http://microformats.org/profile#",
+    "relation": "http://purl.org/vocab/relationship/",
+    "schema": "https://schema.org/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xhtml": "http://www.w3.org/1999/xhtml/vocab/"
+  },
+  "@type": "mf2:h-review-aggregate",
+  "mf2:average": "9.9",
+  "mf2:best": "10",
+  "mf2:count": "62",
+  "mf2:item": {
+    "@type": "mf2:h-event",
+    "mf2:description": "A one day JavaScript Conference held in Brighton",
+    "mf2:name": "Fullfrontal",
+    "mf2:start": {
+      "@type": "schema:DateTime",
+      "@value": "2012-11-09"
+    },
+    "mf2:value": "Fullfrontal"
+  },
+  "mf2:rating": "9.9"
+}
