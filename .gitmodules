@@ -1,0 +1,3 @@
+[submodule "external/microformats/tests"]
+	path = external/microformats/tests
+	url = https://github.com/microformats/tests

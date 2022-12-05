@@ -49,6 +49,14 @@
             })
             cargo2nix.packages.${system}.cargo2nix
             statix
+            cargo-bloat
+            cargo-crev
+            cargo-deny
+            cargo-edit
+            cargo-outdated
+            cargo-tarpaulin
+            dhall
+            dhall-json
           ];
         };
       packages = pkgs.lib.mapAttrs (_: v: v {}) rustPkgs.workspace;

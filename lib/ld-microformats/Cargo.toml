@@ -1,0 +1,22 @@
+[package]
+name = "microformats-json-ld"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+authors = ["Charlotte 🦝 Delenk"]
+description = "Converts microformats to JSON-LD"
+repository = "https://git.chir.rs/darkkirb/chir.rs"
+keywords = ["nightly", "indieweb", "semantic-web", "microformats", "json-ld"]
+categories = ["encoding"]
+readme = "README.md"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+microformats = "0.3.0"
+serde_json = "1.0.85"
+thiserror = "1.0.34"
+
+[dev-dependencies]
+assert-json-diff = "2.0.2"
+mutants = "0.0.3"
