@@ -58,6 +58,7 @@
             dhall
             dhall-json
             gdb
+            sqlx-cli
           ];
         };
       packages = pkgs.lib.mapAttrs (_: v: v {}) rustPkgs.workspace;

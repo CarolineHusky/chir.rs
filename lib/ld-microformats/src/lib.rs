@@ -22,6 +22,9 @@ pub enum SerializeError {
     /// Returned when serde_json fails to encode the value
     #[error("Serde_json serialization error: {0}")]
     SerdeJson(#[from] serde_json::Error),
+    /// Returned when an unforseen error occurs
+    #[error("Unexpected error")]
+    Unexpected,
 }
 
 /// Shorthand for `Result<T, SerializeError>`
@@ -226,7 +229,7 @@ impl<T: LDSerializer> LDSerializer for HashMap<String, T> {
         let hm = self
             .iter()
             .map(|(k, v)| {
-                let key = format!("mf2:{}", k);
+                let key = format!("mf2:{k}");
                 let value = v.serialize()?;
                 Ok((key, value))
             })
@@ -242,10 +245,7 @@ impl<T: LDSerializer> LDSerializer for HashMap<String, T> {
 
 impl LDSerializer for types::Item {
     fn serialize(&self) -> Result<Value> {
-        let mut properties = match self.properties.serialize()? {
-            Value::Object(hm) => hm,
-            _ => unreachable!(),
-        };
+        let Value::Object(mut properties) = self.properties.serialize()? else { return Err(SerializeError::Unexpected); };
         properties.insert("@type".to_owned(), self.r#type.serialize()?);
         if !self.children.is_empty() {
             properties.insert("mf2:child".to_owned(), self.children.serialize()?);
@@ -368,7 +368,7 @@ impl LDSerializer for types::Document {
         let mut data = if graph.len() == 1 {
             match graph.get(0) {
                 Some(Value::Object(ref v)) => v.clone(),
-                _ => unreachable!(),
+                _ => return Err(SerializeError::Unexpected),
             }
         } else {
             let mut hm = Map::new();

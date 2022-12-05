@@ -1,4 +1,5 @@
 //! Test code
+#![allow(clippy::expect_used)]
 
 use std::fs;
 
@@ -106,7 +107,7 @@ const TEST_SOURCES: [&str; 96] = [
 
 #[cfg_attr(test, mutants::skip)]
 fn run_test(test_name: &str) {
-    println!("Running test {}", test_name);
+    println!("Running test {test_name}");
     let test_case = fs::File::open(format!(
         "../../external/microformats/tests/tests/{}",
         test_name
@@ -120,7 +121,7 @@ fn run_test(test_name: &str) {
     .to_value();
 
     let expected =
-        fs::read_to_string(format!("./src/tests/{}.json", test_name)).expect("test result file");
+        fs::read_to_string(format!("./src/tests/{test_name}.json")).expect("test result file");
     let value: Value = serde_json::from_str(&expected).expect("deserialization");
     assert_json_eq!(result, value);
 }
@@ -141,7 +142,7 @@ fn test_to_str() {
     .expect("successful parse")
     .to_str()
     .expect("valid serialization");
-    println!("{}", string);
+    println!("{string}");
     assert_eq!(
         string,
         r#"{"@context":{"@base":"https://indieweb.org/","@version":1.1,"mf":"http://microformats.org/profile#","relation":"http://purl.org/vocab/relationship/","schema":"https://schema.org/","vcard":"http://www.w3.org/2006/vcard/ns#","xhtml":"http://www.w3.org/1999/xhtml/vocab/"},"@type":"mf2:h-card","mf2:name":"Frances Berriman"}"#
