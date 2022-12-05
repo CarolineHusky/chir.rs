@@ -89,7 +89,7 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: lconv.info
+          path-to-lcov: ${{ github.workspace }}/lcov.info
   rustfmt:
     needs: coverage
     runs-on: ubuntu-latest
