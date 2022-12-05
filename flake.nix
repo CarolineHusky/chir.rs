@@ -57,6 +57,7 @@
             cargo-tarpaulin
             dhall
             dhall-json
+            gdb
           ];
         };
       packages = pkgs.lib.mapAttrs (_: v: v {}) rustPkgs.workspace;
