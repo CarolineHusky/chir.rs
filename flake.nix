@@ -37,7 +37,7 @@
       };
       rustPkgs = pkgs.rustBuilder.makePackageSet {
         packageFun = import ./Cargo.nix;
-        rustChannel = "1.60.0";
+        rustChannel = "1.65.0";
         packageOverrides = pkgs: pkgs.rustBuilder.overrides.all;
       };
     in rec {
@@ -48,30 +48,19 @@
               extensions = ["rust-src"];
             })
             cargo2nix.packages.${system}.cargo2nix
-            github-cli
             statix
           ];
         };
-      legacyPackages = let
-        inherit (builtins) mapAttrs replaceStrings;
-        inherit (pkgs.lib.attrsets) mapAttrs';
-        pkg_unfixed = {
-          inherit (rustPkgs) unknown;
-          crates-io = rustPkgs."registry+https://github.com/rust-lang/crates.io-index";
-        };
-      in
-        mapAttrs (_:
-          mapAttrs (_:
-            mapAttrs' (key: value: {
-              name = replaceStrings ["." "+"] ["-" "-"] key;
-              value = value {};
-            })))
-        pkg_unfixed;
+      packages = pkgs.lib.mapAttrs (_: v: v {}) rustPkgs.workspace;
 
       nixosModules.default = import ./nixos {
         inherit inputs system;
       };
-      hydraJobs = legacyPackages;
+      hydraJobs =
+        packages
+        // {
+          inherit devShells formatter;
+        };
       formatter = pkgs.alejandra;
     });
 }
