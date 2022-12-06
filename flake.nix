@@ -27,7 +27,7 @@
     cargo2nix,
     ...
   } @ inputs:
-    flake-utils.lib.eachSystem ["aarch64-linux" "x86_64-linux"] (system: let
+    flake-utils.lib.eachSystem ["x86_64-linux"] (system: let
       overlays = [
         cargo2nix.overlays.default
         (import rust-overlay)
@@ -58,7 +58,8 @@
             dhall
             dhall-json
             gdb
-            sqlx-cli
+            diesel-cli
+            sqlite
           ];
         };
       packages = pkgs.lib.mapAttrs (_: v: v {}) rustPkgs.workspace;

@@ -3,4 +3,4 @@ codegen-units = 1
 lto = true
 
 [workspace]
-members = ["lib/ld-microformats"]
+members = ["lib/ld-microformats", "components/auth"]
