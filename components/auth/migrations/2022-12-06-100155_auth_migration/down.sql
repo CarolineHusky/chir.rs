@@ -1,4 +1,4 @@
-DROP TABLE session_scopes;
-DROP TABLE user_sessions;
-DROP TABLE authenticators;
-DROP TABLE users;
+DROP TABLE auth_session_scopes;
+DROP TABLE auth_user_sessions;
+DROP TABLE auth_authenticators;
+DROP TABLE auth_users;
