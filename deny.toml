@@ -86,6 +86,9 @@ allow = [
     "LGPL-3.0",
     "BSD-2-Clause",
     "BlueOak-1.0.0",
+    "ISC",
+    "BSD-3-Clause",
+    "OpenSSL",
 ]
 # List of explicitly disallowed licenses
 # See https://spdx.org/licenses/ for list of possible licenses
@@ -115,30 +118,31 @@ confidence-threshold = 0.8
 # Allow 1 or more licenses on a per-crate basis, so that particular licenses
 # aren't accepted for every possible crate as with the normal allow list
 exceptions = [
-    # Each entry is the crate and version constraint, and its specific allow
-    # list
-    #{ allow = ["Zlib"], name = "adler32", version = "*" },
+    # Relicensing in process and the only contributor that hasn’t agreed did only fixed 2 typos
+    { allow = [
+        "AGPL-3.0",
+    ], name = "diesel-async", version = "*" },
 ]
 
 # Some crates don't have (easily) machine readable licensing information,
 # adding a clarification entry for it allows you to manually specify the
 # licensing information
-#[[licenses.clarify]]
+[[licenses.clarify]]
 # The name of the crate the clarification applies to
-#name = "ring"
+name = "ring"
 # The optional version constraint for the crate
-#version = "*"
+version = "*"
 # The SPDX expression for the license requirements of the crate
-#expression = "MIT AND ISC AND OpenSSL"
+expression = "MIT AND ISC AND OpenSSL"
 # One or more files in the crate's source used as the "source of truth" for
 # the license expression. If the contents match, the clarification will be used
 # when running the license check, otherwise the clarification will be ignored
 # and the crate will be checked normally, which may produce warnings or errors
 # depending on the rest of your configuration
-#license-files = [
-# Each entry is a crate relative path, and the (opaque) hash of its contents
-#{ path = "LICENSE", hash = 0xbd0eed23 }
-#]
+license-files = [
+    # Each entry is a crate relative path, and the (opaque) hash of its contents
+    { path = "LICENSE", hash = 0xbd0eed23 },
+]
 
 [licenses.private]
 # If true, ignores workspace crates that aren't published, or are only
