@@ -6,38 +6,30 @@
 
 use anyhow::Result;
 use axum::{routing::get, Router};
-use diesel::{
-    r2d2::{ConnectionManager, Pool},
-    PgConnection,
+use diesel_async::{
+    pooled_connection::{deadpool::Pool as DatabasePool, AsyncDieselConnectionManager},
+    AsyncPgConnection,
 };
-use std::{net::SocketAddr, path::Path, sync::Arc};
-
 use dotenvy::dotenv;
+use educe::Educe;
+use rusty_paseto::prelude::{Local, PasetoSymmetricKey, V4};
 use serde::{Deserialize, Serialize};
+use std::{net::SocketAddr, path::Path, sync::Arc};
 pub mod models;
 #[allow(missing_docs, clippy::missing_docs_in_private_items)]
 pub mod schema;
-
-/// Database configuration
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-pub struct DbConfig {
-    /// Database URL
-    pub db_url: String,
-    /// Maximum pool size
-    pub max_pool_size: u32,
-    /// Minimum idle connections to the database
-    pub min_pool_idle: Option<u32>,
-}
+pub mod token;
 
 /// Configuration structure
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Config {
     /// The database config
-    database: DbConfig,
+    database_url: String,
     /// The address to listen on
     listen_addr: SocketAddr,
+    /// The redis config
+    redis_url: String,
 }
 
 impl Config {
@@ -58,22 +50,28 @@ impl Config {
 }
 
 /// Shared state for the running server
-#[derive(Debug)]
-pub struct State {
+#[derive(Educe)]
+#[educe(Debug)]
+pub struct ServiceState {
     /// The database connection
-    database: Pool<ConnectionManager<PgConnection>>,
+    #[educe(Debug(ignore))]
+    database: DatabasePool<AsyncPgConnection>,
+    #[educe(Debug(ignore))]
+    /// The redis connection
+    redis: deadpool_redis::Pool,
+    #[educe(Debug(ignore))]
+    /// The PASETO signing key
+    paseto_key: PasetoSymmetricKey<V4, Local>,
 }
 
 /// Connects to the database
 ///
 /// # Errors
 /// returns an error if the connection to the database failed
-fn connect_to_database(config: &Config) -> Result<Pool<ConnectionManager<PgConnection>>> {
-    let manager = ConnectionManager::<PgConnection>::new(&config.database.db_url);
-    Ok(Pool::builder()
-        .max_size(config.database.max_pool_size)
-        .min_idle(config.database.min_pool_idle)
-        .build(manager)?)
+fn connect_to_database(config: &Config) -> Result<DatabasePool<AsyncPgConnection>> {
+    let config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(&config.database_url);
+    let pool = DatabasePool::builder(config).build()?;
+    Ok(pool)
 }
 
 #[tokio::main]
@@ -85,11 +83,19 @@ async fn main() -> Result<()> {
         .init();
     let config = Config::from_env()?;
 
-    let state = Arc::new(State {
+    let redis = deadpool_redis::Config::from_url(&config.redis_url)
+        .create_pool(Some(deadpool_redis::Runtime::Tokio1))?;
+
+    let state = Arc::new(ServiceState {
         database: connect_to_database(&config)?,
+        paseto_key: token::get_or_create_paseto_key(&redis).await,
+        redis,
     });
 
-    let app = Router::new().route("/", get(root)).with_state(state);
+    let app = Router::new()
+        .route("/", get(root))
+        .route("/get-token", get(token::test_issue))
+        .with_state(state);
 
     axum::Server::bind(&config.listen_addr)
         .serve(app.into_make_service())

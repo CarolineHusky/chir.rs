@@ -1,20 +1,14 @@
-let DatabaseConfig =
-      { Type =
-          { db_url : Text
-          , max_pool_size : Natural
-          , min_pool_idle : Optional Natural
-          }
-      , default = { max_pool_size = 10, min_pool_idle = None Natural }
-      }
-
 let BaseConfig =
-      { Type = { database : DatabaseConfig.Type, listen_addr : Text }
-      , default.database = DatabaseConfig.default
+      { Type =
+          { database_url : Text
+          , listen_addr : Text
+          , redis_url : Text
+          }
+        , default.listen_addr = "[::1]:5621"
       }
 
 in  BaseConfig::{
-    , database = DatabaseConfig::{
-      , db_url = "postgres:///darkkirb?host=/run/postgresql"
-      }
+    , database_url = "postgres:///darkkirb?host=/run/postgresql&user=darkkirb"
     , listen_addr = "[::1]:5621"
+    , redis_url = "redis://localhost/0"
     }

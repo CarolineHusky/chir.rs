@@ -57,7 +57,9 @@
             cargo-tarpaulin
             dhall
             dhall-json
+            dhall-lsp-server
             gdb
+            rnix-lsp
             diesel-cli
             sqlite
           ];

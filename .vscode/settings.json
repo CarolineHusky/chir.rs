@@ -48,5 +48,6 @@
         "-Dclippy::unwrap_used",
         "-Aclippy::type-repetition-in-bounds",
         "-Aclippy::trait-duplication-in-bounds"
-    ]
+    ],
+    "conventionalCommits.scopes": ["auth"]
 }

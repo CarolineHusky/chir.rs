@@ -109,8 +109,7 @@ const TEST_SOURCES: [&str; 96] = [
 fn run_test(test_name: &str) {
     println!("Running test {test_name}");
     let test_case = fs::File::open(format!(
-        "../../external/microformats/tests/tests/{}",
-        test_name
+        "../../external/microformats/tests/tests/{test_name}"
     ))
     .expect("Open test case file");
     let result = crate::MicroformatsConverter::from_reader(
