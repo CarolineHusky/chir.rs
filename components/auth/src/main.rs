@@ -95,6 +95,7 @@ async fn main() -> Result<()> {
     let app = Router::new()
         .route("/", get(root))
         .route("/get-token", get(token::test_issue))
+        .route("/token", get(token::validate))
         .with_state(state);
 
     axum::Server::bind(&config.listen_addr)

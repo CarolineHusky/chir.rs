@@ -8,7 +8,7 @@ use axum::{
     headers::Authorization,
     http::{request::Parts, StatusCode},
     response::{IntoResponse, Response},
-    RequestPartsExt, TypedHeader,
+    Json, RequestPartsExt, TypedHeader,
 };
 use chrono::{Months, SecondsFormat, Utc};
 use deadpool_redis::Pool;
@@ -279,4 +279,10 @@ pub async fn test_issue(State(state): State<Arc<ServiceState>>) -> Result<String
     issue_token(&state, "https://lotte.chir.rs/")
         .await
         .map_err(on_error)
+}
+
+/// Validates a token and returns information about the token
+#[allow(clippy::unused_async)]
+pub async fn validate(user: AuthenticatedUser) -> Json<AuthenticatedUser> {
+    Json(user)
 }
