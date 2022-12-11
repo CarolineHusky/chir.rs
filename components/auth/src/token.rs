@@ -15,7 +15,6 @@ use deadpool_redis::Pool;
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 use headers::authorization::Bearer;
-use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use redis::cmd;
 use rusty_paseto::prelude::{
     ExpirationClaim, IssuerClaim, Key, Local, PasetoBuilder, PasetoParser, PasetoSymmetricKey,
@@ -23,6 +22,7 @@ use rusty_paseto::prelude::{
 };
 use serde::{Deserialize, Serialize};
 use tracing::error;
+use uuid::Uuid;
 
 use crate::{models::UserSession, schema::auth_user_sessions, ServiceState};
 use anyhow::{anyhow, Result};
@@ -241,11 +241,7 @@ impl FromRequestParts<Arc<ServiceState>> for AuthenticatedUser {
 /// # Errors
 /// This function returns an error if the database connection fails
 async fn issue_token(state: &Arc<ServiceState>, user: &str) -> Result<String> {
-    let jti: String = thread_rng()
-        .sample_iter(&Alphanumeric)
-        .take(16)
-        .map(char::from)
-        .collect();
+    let jti = Uuid::new_v4().to_string();
     let mut db = state.database.get().await?;
     let now = Utc::now();
     let expire = now.checked_add_months(Months::new(1)).unwrap_or(now);

@@ -292,7 +292,6 @@ dependencies = [
  "dotenvy",
  "educe",
  "headers",
- "rand 0.8.5",
  "redis",
  "rusty_paseto",
  "serde",
@@ -301,6 +300,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+ "uuid",
 ]
 
 [[package]]
@@ -2499,6 +2499,16 @@ name = "utf-8"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09cc8ee72d2a9becf2f2febe0205bbed8fc6615b7cb429ad062dc7b7ddd036a9"
+
+[[package]]
+name = "uuid"
+version = "1.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "422ee0de9031b5b948b97a8fc04e3aa35230001a722ddd27943e0be31564ce4c"
+dependencies = [
+ "getrandom",
+ "rand 0.8.5",
+]
 
 [[package]]
 name = "valuable"

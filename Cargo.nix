@@ -527,7 +527,6 @@ in {
       dotenvy = rustPackages."registry+https://github.com/rust-lang/crates.io-index".dotenvy."0.15.6" {inherit profileName;};
       educe = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".educe."0.4.20" {profileName = "__noProfile";};
       headers = rustPackages."registry+https://github.com/rust-lang/crates.io-index".headers."0.3.8" {inherit profileName;};
-      rand = rustPackages."registry+https://github.com/rust-lang/crates.io-index".rand."0.8.5" {inherit profileName;};
       redis = rustPackages."registry+https://github.com/rust-lang/crates.io-index".redis."0.22.1" {inherit profileName;};
       rusty_paseto = rustPackages."registry+https://github.com/rust-lang/crates.io-index".rusty_paseto."0.4.0" {inherit profileName;};
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.149" {inherit profileName;};
@@ -536,6 +535,7 @@ in {
       tokio = rustPackages."registry+https://github.com/rust-lang/crates.io-index".tokio."1.23.0" {inherit profileName;};
       tracing = rustPackages."registry+https://github.com/rust-lang/crates.io-index".tracing."0.1.37" {inherit profileName;};
       tracing_subscriber = rustPackages."registry+https://github.com/rust-lang/crates.io-index".tracing-subscriber."0.3.16" {inherit profileName;};
+      uuid = rustPackages."registry+https://github.com/rust-lang/crates.io-index".uuid."1.2.2" {inherit profileName;};
     };
   });
 
@@ -4597,6 +4597,29 @@ in {
     src = fetchCratesIo {
       inherit name version;
       sha256 = "09cc8ee72d2a9becf2f2febe0205bbed8fc6615b7cb429ad062dc7b7ddd036a9";
+    };
+  });
+
+  "registry+https://github.com/rust-lang/crates.io-index".uuid."1.2.2" = overridableMkRustCrate (profileName: rec {
+    name = "uuid";
+    version = "1.2.2";
+    registry = "registry+https://github.com/rust-lang/crates.io-index";
+    src = fetchCratesIo {
+      inherit name version;
+      sha256 = "422ee0de9031b5b948b97a8fc04e3aa35230001a722ddd27943e0be31564ce4c";
+    };
+    features = builtins.concatLists [
+      ["default"]
+      ["fast-rng"]
+      ["getrandom"]
+      ["rand"]
+      ["rng"]
+      ["std"]
+      ["v4"]
+    ];
+    dependencies = {
+      getrandom = rustPackages."registry+https://github.com/rust-lang/crates.io-index".getrandom."0.2.8" {inherit profileName;};
+      rand = rustPackages."registry+https://github.com/rust-lang/crates.io-index".rand."0.8.5" {inherit profileName;};
     };
   });
 
