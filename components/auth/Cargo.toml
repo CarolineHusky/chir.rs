@@ -22,7 +22,7 @@ dotenvy = "0.15.6"
 educe = "0.4.20"
 headers = "0.3.8"
 rand = "0.8.5"
-redis = "0.22.1"
+redis = { version = "0.22.1" }
 rusty_paseto = { version = "0.4.0", default-features = false, features = [
     "v4_local",
     "batteries_included",

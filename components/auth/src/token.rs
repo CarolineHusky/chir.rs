@@ -78,12 +78,68 @@ pub async fn get_or_create_paseto_key(redis: &Pool) -> PasetoSymmetricKey<V4, Lo
 }
 
 /// Extractor for an authenticated user
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AuthenticatedUser {
     /// ID of the authenticated user
     id: String,
     /// Scopes that the user can access
     scopes: HashSet<String>,
+}
+
+impl ServiceState {
+    /// Attempts to load a cached token from redis
+    ///
+    /// # Errors
+    /// This function will return an error if connection to redis fails or
+    pub async fn get_cached_token(self: &Arc<Self>, jti: &str) -> Result<AuthenticatedUser> {
+        let mut conn = self.redis.get().await?;
+        let value: String = cmd("GET")
+            .arg(format!("auth/session:{jti}"))
+            .query_async(&mut conn)
+            .await?;
+        let sess = serde_json::from_str(&value)?;
+        Ok(sess)
+    }
+
+    /// Attempts to cache a token to redis
+    ///
+    /// # Errors
+    /// This function will return an error if connection to redis fails
+    pub async fn try_cache_token(
+        self: &Arc<Self>,
+        jti: &str,
+        user: &AuthenticatedUser,
+    ) -> Result<()> {
+        let mut conn = self.redis.get().await?;
+        let encoded = serde_json::to_string(user)?;
+        cmd("SET")
+            .arg(format!("auth/session:{jti}"))
+            .arg(encoded)
+            .arg("NX")
+            .arg("EX")
+            .arg(3600)
+            .query_async(&mut conn)
+            .await?;
+        Ok(())
+    }
+
+    /// Constructs a user session from the JTI
+    ///
+    /// # Errors
+    /// This function will return an error if the token is invalid or the database connection fails
+    pub async fn get_user_session(self: &Arc<Self>, jti: &str) -> Result<AuthenticatedUser> {
+        if let Ok(sess) = self.get_cached_token(jti).await {
+            return Ok(sess);
+        }
+        let token = get_token_info(self, jti).await?;
+        let scopes = get_token_scopes(self, jti).await?;
+        let sess = AuthenticatedUser {
+            id: token.user_id,
+            scopes,
+        };
+        self.try_cache_token(jti, &sess).await.ok();
+        Ok(sess)
+    }
 }
 
 /// Supported and required PASETO claims
@@ -168,20 +224,15 @@ impl FromRequestParts<Arc<ServiceState>> for AuthenticatedUser {
             return Err(on_error_response());
         }
 
-        let token = get_token_info(state, &claims.jti).await.map_err(on_error)?;
-
-        if claims.sub != token.user_id {
+        let sess = state
+            .get_user_session(&claims.jti)
+            .await
+            .map_err(on_error)?;
+        if sess.id != claims.sub {
             return Err(on_error_response());
         }
 
-        let scopes = get_token_scopes(state, &claims.jti)
-            .await
-            .map_err(on_error)?;
-
-        Ok(Self {
-            id: claims.sub.clone(),
-            scopes,
-        })
+        Ok(sess)
     }
 }
 
