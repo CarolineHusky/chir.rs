@@ -533,14 +533,15 @@ dependencies = [
 
 [[package]]
 name = "diesel-async"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "588383fa6d12fb17edf0fda88942222bbad070d185b5dcc3ac4d8354ce84b583"
+checksum = "5f9ff806825ea92f061cfca008f4885149a6c62b7f508d00d2c35c3d7522b946"
 dependencies = [
  "async-trait",
  "deadpool",
  "diesel",
  "futures",
+ "scoped-futures",
  "tokio",
  "tokio-postgres",
 ]
@@ -1867,6 +1868,16 @@ name = "ryu"
 version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4501abdff3ae82a1c1b477a17252eb69cee9e66eb915c1abaa4f44d873df9f09"
+
+[[package]]
+name = "scoped-futures"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "655305227172f0178a34e02386c3b72e9c0d247a3b5087442540dbeb74c95c9a"
+dependencies = [
+ "cfg-if",
+ "pin-utils",
+]
 
 [[package]]
 name = "scopeguard"
