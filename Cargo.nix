@@ -165,13 +165,13 @@ in {
     };
   });
 
-  "registry+https://github.com/rust-lang/crates.io-index".anyhow."1.0.66" = overridableMkRustCrate (profileName: rec {
+  "registry+https://github.com/rust-lang/crates.io-index".anyhow."1.0.68" = overridableMkRustCrate (profileName: rec {
     name = "anyhow";
-    version = "1.0.66";
+    version = "1.0.68";
     registry = "registry+https://github.com/rust-lang/crates.io-index";
     src = fetchCratesIo {
       inherit name version;
-      sha256 = "216261ddc8289130e551ddcd5ce8a064710c0d064a4d2895c67151c92b5443f6";
+      sha256 = "2cb2f989d18dd141ab8ae82f64d1a8cdd37e0840f73a406896cf5e99502fab61";
     };
     features = builtins.concatLists [
       ["backtrace"]
@@ -517,7 +517,7 @@ in {
     registry = "unknown";
     src = fetchCrateLocal (workspaceSrc + "/components/auth");
     dependencies = {
-      anyhow = rustPackages."registry+https://github.com/rust-lang/crates.io-index".anyhow."1.0.66" {inherit profileName;};
+      anyhow = rustPackages."registry+https://github.com/rust-lang/crates.io-index".anyhow."1.0.68" {inherit profileName;};
       async_trait = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".async-trait."0.1.59" {profileName = "__noProfile";};
       axum = rustPackages."registry+https://github.com/rust-lang/crates.io-index".axum."0.6.1" {inherit profileName;};
       chrono = rustPackages."registry+https://github.com/rust-lang/crates.io-index".chrono."0.4.23" {inherit profileName;};
