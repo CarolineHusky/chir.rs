@@ -11,7 +11,7 @@ categories = ["web-programming"]
 readme = "README.md"
 
 [dependencies]
-anyhow = { version = "1.0.66", features = ["backtrace"] }
+anyhow = { version = "1.0.68", features = ["backtrace"] }
 async-trait = "0.1.59"
 axum = { version = "0.6.1", features = ["headers", "macros"] }
 chrono = "0.4.23"
