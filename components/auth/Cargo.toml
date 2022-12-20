@@ -26,7 +26,7 @@ rusty_paseto = { version = "0.4.0", default-features = false, features = [
     "v4_local",
     "batteries_included",
 ] }
-serde = { version = "1.0.150", features = ["derive"] }
+serde = { version = "1.0.151", features = ["derive"] }
 serde_dhall = { version = "0.12.0", default-features = false }
 serde_json = "1.0.89"
 tokio = { version = "1.23.0", features = ["macros", "rt-multi-thread"] }
