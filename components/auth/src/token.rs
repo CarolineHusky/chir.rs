@@ -15,12 +15,18 @@ use deadpool_redis::Pool;
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 use headers::authorization::Bearer;
-use redis::cmd;
-use rusty_paseto::prelude::{
-    ExpirationClaim, IssuerClaim, Key, Local, PasetoBuilder, PasetoParser, PasetoSymmetricKey,
-    SubjectClaim, TokenIdentifierClaim, V4,
+use once_cell::sync::Lazy;
+use pasetors::{
+    claims::{Claims, ClaimsValidationRules},
+    keys::SymmetricKey,
+    local,
+    token::UntrustedToken,
+    version4::V4,
+    Local,
 };
+use redis::cmd;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use tracing::error;
 use uuid::Uuid;
 
@@ -31,7 +37,7 @@ use anyhow::{anyhow, Result};
 ///
 /// # Errors
 /// This function returns an error if loading the PASETO key fails.
-async fn load_paseto_key(redis: &Pool) -> Result<PasetoSymmetricKey<V4, Local>> {
+async fn load_paseto_key(redis: &Pool) -> Result<SymmetricKey<V4>> {
     let mut conn = redis.get().await?;
     let value: Vec<u8> = cmd("GET")
         .arg(&["paseto/key"])
@@ -43,19 +49,18 @@ async fn load_paseto_key(redis: &Pool) -> Result<PasetoSymmetricKey<V4, Local>> 
         }
         return Err(anyhow!("Invalid paseto key"));
     }
-    let key: Key<32> = Key::from(&value[..]);
-    Ok(PasetoSymmetricKey::from(key))
+    SymmetricKey::from(&value[..]).map_err(Into::into)
 }
 
 /// Saves a PASETO key to redis
 ///
 /// # Errors
 /// This function returns an error if the database already has a PASETO key stored.
-async fn store_paseto_key(redis: &Pool, key: &PasetoSymmetricKey<V4, Local>) -> Result<()> {
+async fn store_paseto_key(redis: &Pool, key: &SymmetricKey<V4>) -> Result<()> {
     let mut conn = redis.get().await?;
     cmd("SET")
         .arg("paseto/key")
-        .arg(key.as_ref())
+        .arg(key.as_bytes())
         .arg("NX")
         .query_async(&mut conn)
         .await?;
@@ -63,13 +68,12 @@ async fn store_paseto_key(redis: &Pool, key: &PasetoSymmetricKey<V4, Local>) -> 
 }
 
 /// Loads or Creates the PASETO key
-pub async fn get_or_create_paseto_key(redis: &Pool) -> PasetoSymmetricKey<V4, Local> {
+pub async fn get_or_create_paseto_key(redis: &Pool) -> SymmetricKey<V4> {
     loop {
         if let Ok(key) = load_paseto_key(redis).await {
             return key;
         }
-        if let Ok(new_key) = Key::try_new_random() {
-            let paseto_key = PasetoSymmetricKey::from(new_key);
+        if let Ok(paseto_key) = SymmetricKey::generate() {
             if store_paseto_key(redis, &paseto_key).await.is_ok() {
                 return paseto_key;
             }
@@ -201,6 +205,28 @@ async fn get_token_scopes(state: &Arc<ServiceState>, token_jti: &str) -> Result<
     Ok(res.into_iter().collect())
 }
 
+static VALIDATION_RULES: Lazy<ClaimsValidationRules> = Lazy::new(|| {
+    let mut validation_rules = ClaimsValidationRules::new();
+    validation_rules.validate_issuer_with("https://auth.chir.rs/");
+    validation_rules
+});
+
+trait ClaimsExt {
+    fn get_string_claim(&self, key: &str) -> Result<&str>;
+}
+
+impl ClaimsExt for Claims {
+    fn get_string_claim(&self, key: &str) -> Result<&str> {
+        match self.get_claim(key) {
+            Some(val) => match val.as_str() {
+                Some(val) => Ok(val),
+                None => Err(anyhow!("claim {} is not a string", key)),
+            },
+            None => Err(anyhow!("claim {} not found", key)),
+        }
+    }
+}
+
 #[async_trait]
 impl FromRequestParts<Arc<ServiceState>> for AuthenticatedUser {
     type Rejection = Response;
@@ -213,22 +239,25 @@ impl FromRequestParts<Arc<ServiceState>> for AuthenticatedUser {
             .await
             .map_err(IntoResponse::into_response)?;
 
-        let token = token.token();
-        let json = {
-            let mut parser: PasetoParser<'_, V4, Local> = PasetoParser::default();
-            parser.parse(token, &state.paseto_key).map_err(on_error)?
-        };
-        let claims: StandardClaims = serde_json::value::from_value(json).map_err(on_error)?;
-
-        if claims.iss != "https://auth.chir.rs/" {
-            return Err(on_error_response());
-        }
+        let untrusted_token =
+            UntrustedToken::<Local, V4>::try_from(token.token()).map_err(on_error)?;
+        let trusted_token = local::decrypt(
+            &state.paseto_key,
+            &untrusted_token,
+            &*VALIDATION_RULES,
+            None,
+            None,
+        )
+        .map_err(on_error)?;
+        let claims = trusted_token
+            .payload_claims()
+            .ok_or_else(|| on_error_response())?;
 
         let sess = state
-            .get_user_session(&claims.jti)
+            .get_user_session(claims.get_string_claim("jti").map_err(on_error)?)
             .await
             .map_err(on_error)?;
-        if sess.id != claims.sub {
+        if sess.id != claims.get_string_claim("sub").map_err(on_error)? {
             return Err(on_error_response());
         }
 
@@ -246,12 +275,15 @@ async fn issue_token(state: &Arc<ServiceState>, user: &str) -> Result<String> {
     let now = Utc::now();
     let expire = now.checked_add_months(Months::new(1)).unwrap_or(now);
     let expire_paseto = expire.to_rfc3339_opts(SecondsFormat::Secs, true);
-    let token = PasetoBuilder::<V4, Local>::default()
-        .set_claim(ExpirationClaim::try_from(expire_paseto)?)
-        .set_claim(IssuerClaim::from("https://auth.chir.rs/"))
-        .set_claim(SubjectClaim::from(user))
-        .set_claim(TokenIdentifierClaim::from(&jti[..]))
-        .build(&state.paseto_key)?;
+
+    let mut claims = Claims::new()?;
+    claims.issuer("https://auth.chir.rs/");
+    claims.subject(user);
+    claims.expiration(&expire_paseto);
+    claims.token_identifier(&jti);
+
+    let token = local::encrypt(&state.paseto_key, &claims, None, None)?;
+
     let db_session = UserSession {
         jti,
         user_id: user.to_owned(),

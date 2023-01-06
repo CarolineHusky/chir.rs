@@ -12,7 +12,7 @@ use diesel_async::{
 };
 use dotenvy::dotenv;
 use educe::Educe;
-use rusty_paseto::prelude::{Local, PasetoSymmetricKey, V4};
+use pasetors::{keys::SymmetricKey, version4::V4};
 use serde::{Deserialize, Serialize};
 use std::{net::SocketAddr, path::Path, sync::Arc};
 pub mod models;
@@ -61,7 +61,7 @@ pub struct ServiceState {
     redis: deadpool_redis::Pool,
     #[educe(Debug(ignore))]
     /// The PASETO signing key
-    paseto_key: PasetoSymmetricKey<V4, Local>,
+    paseto_key: SymmetricKey<V4>,
 }
 
 /// Connects to the database
