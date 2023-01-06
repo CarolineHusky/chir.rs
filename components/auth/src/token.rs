@@ -18,7 +18,7 @@ use headers::authorization::Bearer;
 use once_cell::sync::Lazy;
 use pasetors::{
     claims::{Claims, ClaimsValidationRules},
-    keys::SymmetricKey,
+    keys::{Generate, SymmetricKey},
     local,
     token::UntrustedToken,
     version4::V4,
@@ -26,7 +26,6 @@ use pasetors::{
 };
 use redis::cmd;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use tracing::error;
 use uuid::Uuid;
 
@@ -205,25 +204,31 @@ async fn get_token_scopes(state: &Arc<ServiceState>, token_jti: &str) -> Result<
     Ok(res.into_iter().collect())
 }
 
+/// The validation rules for token validation
 static VALIDATION_RULES: Lazy<ClaimsValidationRules> = Lazy::new(|| {
     let mut validation_rules = ClaimsValidationRules::new();
     validation_rules.validate_issuer_with("https://auth.chir.rs/");
     validation_rules
 });
 
+/// Extension trait for the [`Claims`] type
 trait ClaimsExt {
+    /// Attempts to read a string claim
+    ///
+    /// # Errors
+    /// This function returns an error if the claim does not exist or is not a string
     fn get_string_claim(&self, key: &str) -> Result<&str>;
 }
 
 impl ClaimsExt for Claims {
     fn get_string_claim(&self, key: &str) -> Result<&str> {
-        match self.get_claim(key) {
-            Some(val) => match val.as_str() {
-                Some(val) => Ok(val),
-                None => Err(anyhow!("claim {} is not a string", key)),
+        self.get_claim(key).map_or_else(
+            || Err(anyhow!("claim {} not found", key)),
+            |val| {
+                val.as_str()
+                    .map_or_else(|| Err(anyhow!("claim {} is not a string", key)), Ok)
             },
-            None => Err(anyhow!("claim {} not found", key)),
-        }
+        )
     }
 }
 
@@ -244,14 +249,14 @@ impl FromRequestParts<Arc<ServiceState>> for AuthenticatedUser {
         let trusted_token = local::decrypt(
             &state.paseto_key,
             &untrusted_token,
-            &*VALIDATION_RULES,
+            &VALIDATION_RULES,
             None,
             None,
         )
         .map_err(on_error)?;
         let claims = trusted_token
             .payload_claims()
-            .ok_or_else(|| on_error_response())?;
+            .ok_or_else(on_error_response)?;
 
         let sess = state
             .get_user_session(claims.get_string_claim("jti").map_err(on_error)?)
@@ -277,10 +282,10 @@ async fn issue_token(state: &Arc<ServiceState>, user: &str) -> Result<String> {
     let expire_paseto = expire.to_rfc3339_opts(SecondsFormat::Secs, true);
 
     let mut claims = Claims::new()?;
-    claims.issuer("https://auth.chir.rs/");
-    claims.subject(user);
-    claims.expiration(&expire_paseto);
-    claims.token_identifier(&jti);
+    claims.issuer("https://auth.chir.rs/")?;
+    claims.subject(user)?;
+    claims.expiration(&expire_paseto)?;
+    claims.token_identifier(&jti)?;
 
     let token = local::encrypt(&state.paseto_key, &claims, None, None)?;
 
