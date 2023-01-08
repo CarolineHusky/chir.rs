@@ -4,7 +4,7 @@ use std::{collections::HashSet, sync::Arc};
 
 use async_trait::async_trait;
 use axum::{
-    extract::{FromRequestParts, State},
+    extract::{FromRequestParts, Path, State},
     headers::Authorization,
     http::{request::Parts, StatusCode},
     response::{IntoResponse, Response},
@@ -26,8 +26,9 @@ use pasetors::{
 };
 use redis::cmd;
 use serde::{Deserialize, Serialize};
-use tracing::error;
-use uuid::Uuid;
+use serde_json::json;
+use tracing::{error, info};
+use uuid::{uuid, Uuid};
 
 use crate::{models::UserSession, schema::auth_user_sessions, ServiceState};
 use anyhow::{anyhow, Result};
@@ -87,6 +88,9 @@ pub struct AuthenticatedUser {
     id: String,
     /// Scopes that the user can access
     scopes: HashSet<String>,
+    /// Session ID of the session
+    #[serde(skip_serializing_if = "String::is_empty")]
+    session_id: String,
 }
 
 impl ServiceState {
@@ -139,38 +143,50 @@ impl ServiceState {
         let sess = AuthenticatedUser {
             id: token.user_id,
             scopes,
+            session_id: jti.to_owned(),
         };
         self.try_cache_token(jti, &sess).await.ok();
         Ok(sess)
     }
 }
 
-/// Supported and required PASETO claims
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct StandardClaims {
-    /// Issuer of the token
-    pub iss: String,
-    /// Subject of the token
-    pub sub: String,
-    /// Expiration time of the token
-    pub exp: String,
-    /// Time where the token starts being valid at
-    pub nbf: String,
-    /// Time the token has been issued at
-    pub iat: String,
-    /// The Token Identifier
-    pub jti: String,
-}
-
 /// The response returned on error
 fn on_error_response() -> Response {
-    (StatusCode::UNAUTHORIZED, "Unauthorized").into_response()
+    (
+        StatusCode::UNAUTHORIZED,
+        Json(json!({
+            "title": "Unauthorized",
+            "status": 401
+        })),
+    )
+        .into_response()
 }
 
 /// Maps the error
 fn on_error(e: impl std::fmt::Debug) -> Response {
     error!("{e:?}");
     on_error_response()
+}
+
+/// The response returned on error
+fn on_server_error_response() -> Response {
+    let incident_uuid = Uuid::new_v4();
+    error!("Incident UUID: {incident_uuid:?}");
+    (
+        StatusCode::INTERNAL_SERVER_ERROR,
+        Json(json!({
+            "title": "Internal Server Error",
+            "status": 500,
+            "incident_uuid": incident_uuid.to_string()
+        })),
+    )
+        .into_response()
+}
+
+/// Maps the error
+fn on_server_error(e: impl std::fmt::Debug) -> Response {
+    error!("{e:?}");
+    on_server_error_response()
 }
 
 /// Returns session information given a jti
@@ -311,11 +327,80 @@ async fn issue_token(state: &Arc<ServiceState>, user: &str) -> Result<String> {
 pub async fn test_issue(State(state): State<Arc<ServiceState>>) -> Result<String, Response> {
     issue_token(&state, "https://lotte.chir.rs/")
         .await
-        .map_err(on_error)
+        .map_err(on_server_error)
 }
 
 /// Validates a token and returns information about the token
 #[allow(clippy::unused_async)]
-pub async fn validate(user: AuthenticatedUser) -> Json<AuthenticatedUser> {
+pub async fn validate(mut user: AuthenticatedUser) -> Json<AuthenticatedUser> {
+    user.session_id = String::new();
     Json(user)
+}
+
+/// Deletes the current session
+///
+/// # Errors
+/// This function returns an error if the user cannot be logged out.
+pub async fn logout(
+    state: State<Arc<ServiceState>>,
+    user: AuthenticatedUser,
+) -> Result<(), Response> {
+    use crate::schema::auth_user_sessions::dsl::{auth_user_sessions, jti};
+    let mut db = state.database.get().await.map_err(on_server_error)?;
+    info!("{} logged out", user.session_id);
+    diesel::delete(auth_user_sessions.filter(jti.eq(&user.session_id)))
+        .execute(&mut db)
+        .await
+        .map_err(on_server_error)?;
+    let mut conn = state.redis.get().await.map_err(on_server_error)?;
+    cmd("DEL")
+        .arg(format!("auth/session:{}", user.session_id))
+        .query_async(&mut conn)
+        .await
+        .map_err(on_server_error)?;
+    Ok(())
+}
+
+/// Checks if the token has a scope
+///
+/// # Errors
+/// This function returns an error if the user is authenticated or does not have the needed scope
+#[allow(clippy::unused_async)]
+pub async fn validate_scope(
+    user: AuthenticatedUser,
+    Path(scope): Path<String>,
+) -> Result<(), Response> {
+    if user.scopes.contains(&scope) {
+        Ok(())
+    } else {
+        Err(on_error_response())
+    }
+}
+
+/// Removes a scope from the current user
+///
+/// # Errors
+/// This function returns 500 if revoking the scope fails
+pub async fn remove_scope(
+    state: State<Arc<ServiceState>>,
+    user: AuthenticatedUser,
+    Path(scope_name): Path<String>,
+) -> Result<(), Response> {
+    use crate::schema::auth_session_scopes::dsl::{auth_session_scopes, jti, scope};
+    let mut db = state.database.get().await.map_err(on_server_error)?;
+    diesel::delete(
+        auth_session_scopes
+            .filter(jti.eq(&user.session_id))
+            .filter(scope.eq(&scope_name)),
+    )
+    .execute(&mut db)
+    .await
+    .map_err(on_server_error)?;
+    let mut conn = state.redis.get().await.map_err(on_server_error)?;
+    cmd("DEL")
+        .arg(format!("auth/session:{}", user.session_id))
+        .query_async(&mut conn)
+        .await
+        .map_err(on_server_error)?;
+    Ok(())
 }

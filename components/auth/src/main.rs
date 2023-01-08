@@ -5,7 +5,10 @@
 //! Most of the endpoints are only used in the javascript of the web login UI, as for all other cases `IndieAuth` should be used.
 
 use anyhow::Result;
-use axum::{routing::get, Router};
+use axum::{
+    routing::{delete, get},
+    Router,
+};
 use diesel_async::{
     pooled_connection::{deadpool::Pool as DatabasePool, AsyncDieselConnectionManager},
     AsyncPgConnection,
@@ -96,6 +99,9 @@ async fn main() -> Result<()> {
         .route("/", get(root))
         .route("/get-token", get(token::test_issue))
         .route("/token", get(token::validate))
+        .route("/token", delete(token::logout))
+        .route("/scopes/:scope", get(token::validate_scope))
+        .route("/scopes/:scope", delete(token::remove_scope))
         .with_state(state);
 
     axum::Server::bind(&config.listen_addr)
