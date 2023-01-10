@@ -93,6 +93,45 @@ pub struct AuthenticatedUser {
     session_id: String,
 }
 
+impl AuthenticatedUser {
+    /// Logs out a session
+    ///
+    /// After this call, the session is no longer valid
+    ///
+    /// # Errors
+    /// This function returns an error if logging out fails
+    pub async fn logout(&self, state: &Arc<ServiceState>) -> Result<()> {
+        use crate::schema::auth_user_sessions::dsl::{auth_user_sessions, jti};
+        let mut db = state.database.get().await?;
+        info!("{} logged out", self.session_id);
+        diesel::delete(auth_user_sessions.filter(jti.eq(&self.session_id)))
+            .execute(&mut db)
+            .await?;
+        state.invalidate_user_session(&self.session_id).await?;
+        Ok(())
+    }
+
+    /// Removes a scope from a session
+    ///
+    /// After this call, the session will no longer have access to a specific scope
+    ///
+    /// # Errors
+    /// This function returns an error if removing the scope fails
+    pub async fn remove_scope(&self, state: &Arc<ServiceState>, scope_name: &str) -> Result<()> {
+        use crate::schema::auth_session_scopes::dsl::{auth_session_scopes, jti, scope};
+        let mut db = state.database.get().await?;
+        diesel::delete(
+            auth_session_scopes
+                .filter(jti.eq(&self.session_id))
+                .filter(scope.eq(&scope_name)),
+        )
+        .execute(&mut db)
+        .await?;
+        state.invalidate_user_session(&self.session_id).await?;
+        Ok(())
+    }
+}
+
 impl ServiceState {
     /// Attempts to load a cached token from redis
     ///
@@ -147,6 +186,19 @@ impl ServiceState {
         };
         self.try_cache_token(jti, &sess).await.ok();
         Ok(sess)
+    }
+
+    /// Invalidates the session cache for a specific user
+    ///
+    /// # Errors
+    /// This function will return an error if redis access failed
+    pub async fn invalidate_user_session(self: &Arc<Self>, jti: &str) -> Result<()> {
+        let mut conn = self.redis.get().await?;
+        cmd("DEL")
+            .arg(format!("auth/session:{jti}"))
+            .query_async(&mut conn)
+            .await?;
+        Ok(())
     }
 }
 
@@ -345,20 +397,7 @@ pub async fn logout(
     state: State<Arc<ServiceState>>,
     user: AuthenticatedUser,
 ) -> Result<(), Response> {
-    use crate::schema::auth_user_sessions::dsl::{auth_user_sessions, jti};
-    let mut db = state.database.get().await.map_err(on_server_error)?;
-    info!("{} logged out", user.session_id);
-    diesel::delete(auth_user_sessions.filter(jti.eq(&user.session_id)))
-        .execute(&mut db)
-        .await
-        .map_err(on_server_error)?;
-    let mut conn = state.redis.get().await.map_err(on_server_error)?;
-    cmd("DEL")
-        .arg(format!("auth/session:{}", user.session_id))
-        .query_async(&mut conn)
-        .await
-        .map_err(on_server_error)?;
-    Ok(())
+    user.logout(&state).await.map_err(on_server_error)
 }
 
 /// Checks if the token has a scope
@@ -386,21 +425,7 @@ pub async fn remove_scope(
     user: AuthenticatedUser,
     Path(scope_name): Path<String>,
 ) -> Result<(), Response> {
-    use crate::schema::auth_session_scopes::dsl::{auth_session_scopes, jti, scope};
-    let mut db = state.database.get().await.map_err(on_server_error)?;
-    diesel::delete(
-        auth_session_scopes
-            .filter(jti.eq(&user.session_id))
-            .filter(scope.eq(&scope_name)),
-    )
-    .execute(&mut db)
-    .await
-    .map_err(on_server_error)?;
-    let mut conn = state.redis.get().await.map_err(on_server_error)?;
-    cmd("DEL")
-        .arg(format!("auth/session:{}", user.session_id))
-        .query_async(&mut conn)
+    user.remove_scope(&state, &scope_name)
         .await
-        .map_err(on_server_error)?;
-    Ok(())
+        .map_err(on_server_error)
 }
