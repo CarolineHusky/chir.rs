@@ -6,7 +6,7 @@
 
 use anyhow::Result;
 use axum::{
-    routing::{delete, get},
+    routing::{delete, get, post},
     Router,
 };
 use diesel_async::{
@@ -18,7 +18,10 @@ use educe::Educe;
 use pasetors::{keys::SymmetricKey, version4::V4};
 use serde::{Deserialize, Serialize};
 use std::{net::SocketAddr, path::Path, sync::Arc};
+use tracing::info;
+use uuid::Uuid;
 pub mod models;
+pub mod opaque;
 #[allow(missing_docs, clippy::missing_docs_in_private_items)]
 pub mod schema;
 pub mod session;
@@ -66,6 +69,8 @@ pub struct ServiceState {
     #[educe(Debug(ignore))]
     /// The PASETO signing key
     paseto_key: SymmetricKey<V4>,
+    /// Registration key, needed for registering
+    registration_key: String,
 }
 
 /// Connects to the database
@@ -94,7 +99,10 @@ async fn main() -> Result<()> {
         database: connect_to_database(&config)?,
         paseto_key: token::get_or_create_paseto_key(&redis).await,
         redis,
+        registration_key: Uuid::new_v4().as_hyphenated().to_string(),
     });
+
+    info!("Register with registration key: {}", state.registration_key);
 
     let app = Router::new()
         .route("/", get(root))
@@ -110,6 +118,7 @@ async fn main() -> Result<()> {
             "/session/:session/:scope",
             delete(session::revoke_session_scope),
         )
+        .route("/register/step1", post(opaque::registration::step_1))
         .with_state(state);
 
     axum::Server::bind(&config.listen_addr)
