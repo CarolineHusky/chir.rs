@@ -21,6 +21,7 @@ jobs:
           extra_nix_config: |
             trusted-public-keys = nixcache:8KKuGz95Pk4UJ5W/Ni+pN+v+LDTkMMFV4yrGmAYgkDg= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
             substituters = https://cache.chir.rs/ https://cache.nixos.org/
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
       - run: echo yes | nix run github:cargo2nix/cargo2nix
       - run: nix fmt
       - uses: EndBug/add-and-commit@v9
