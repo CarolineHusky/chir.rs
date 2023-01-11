@@ -21,6 +21,7 @@ use std::{net::SocketAddr, path::Path, sync::Arc};
 pub mod models;
 #[allow(missing_docs, clippy::missing_docs_in_private_items)]
 pub mod schema;
+pub mod session;
 pub mod token;
 
 /// Configuration structure
@@ -102,6 +103,13 @@ async fn main() -> Result<()> {
         .route("/token", delete(token::logout))
         .route("/scopes/:scope", get(token::validate_scope))
         .route("/scopes/:scope", delete(token::remove_scope))
+        .route("/session", get(session::list_sessions))
+        .route("/session/:session", get(session::load_session))
+        .route("/session/:session", delete(session::revoke_session))
+        .route(
+            "/session/:session/:scope",
+            delete(session::revoke_session_scope),
+        )
         .with_state(state);
 
     axum::Server::bind(&config.listen_addr)

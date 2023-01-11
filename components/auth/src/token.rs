@@ -28,7 +28,7 @@ use redis::cmd;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tracing::{error, info};
-use uuid::{uuid, Uuid};
+use uuid::Uuid;
 
 use crate::{models::UserSession, schema::auth_user_sessions, ServiceState};
 use anyhow::{anyhow, Result};
@@ -89,7 +89,6 @@ pub struct AuthenticatedUser {
     /// Scopes that the user can access
     scopes: HashSet<String>,
     /// Session ID of the session
-    #[serde(skip_serializing_if = "String::is_empty")]
     session_id: String,
 }
 
@@ -130,6 +129,17 @@ impl AuthenticatedUser {
         state.invalidate_user_session(&self.session_id).await?;
         Ok(())
     }
+
+    /// Return whether or not the user has granted a scope
+    pub fn has_scope(&self, scope: impl AsRef<str>) -> bool {
+        self.scopes.contains(scope.as_ref())
+    }
+
+    /// Returns the user ID
+    #[must_use]
+    pub fn id(&self) -> &str {
+        &self.id
+    }
 }
 
 impl ServiceState {
@@ -145,6 +155,21 @@ impl ServiceState {
             .await?;
         let sess = serde_json::from_str(&value)?;
         Ok(sess)
+    }
+
+    /// List sessions of a user
+    ///
+    /// # Errors
+    /// This function will return an error if the list couldn’t be fetched
+    pub async fn list_user_sessions(self: &Arc<Self>, user_id_str: &str) -> Result<Vec<String>> {
+        use crate::schema::auth_user_sessions::dsl::{auth_user_sessions, jti, user_id};
+        let mut db = self.database.get().await?;
+        let res = auth_user_sessions
+            .select(jti)
+            .filter(user_id.eq(&user_id_str))
+            .load(&mut db)
+            .await?;
+        Ok(res.into_iter().collect())
     }
 
     /// Attempts to cache a token to redis
@@ -167,6 +192,26 @@ impl ServiceState {
             .query_async(&mut conn)
             .await?;
         Ok(())
+    }
+
+    /// Constructs a user session from the JTI and the expected user ID
+    ///
+    /// # Errors
+    /// This function will return an error if the token is invalid or the database connection fails
+    pub async fn get_session_for_user(
+        self: &Arc<Self>,
+        jti: &str,
+        user: &str,
+    ) -> Result<AuthenticatedUser> {
+        let sess = self.get_user_session(jti).await?;
+        if sess.id() != user {
+            return Err(anyhow!(
+                "Session for user {} is not for user {}",
+                user,
+                sess.id()
+            ));
+        }
+        Ok(sess)
     }
 
     /// Constructs a user session from the JTI
@@ -203,7 +248,8 @@ impl ServiceState {
 }
 
 /// The response returned on error
-fn on_error_response() -> Response {
+#[must_use]
+pub fn on_error_response() -> Response {
     (
         StatusCode::UNAUTHORIZED,
         Json(json!({
@@ -215,13 +261,13 @@ fn on_error_response() -> Response {
 }
 
 /// Maps the error
-fn on_error(e: impl std::fmt::Debug) -> Response {
+pub fn on_error(e: impl std::fmt::Debug) -> Response {
     error!("{e:?}");
     on_error_response()
 }
 
 /// The response returned on error
-fn on_server_error_response() -> Response {
+pub fn on_server_error_response() -> Response {
     let incident_uuid = Uuid::new_v4();
     error!("Incident UUID: {incident_uuid:?}");
     (
@@ -236,7 +282,7 @@ fn on_server_error_response() -> Response {
 }
 
 /// Maps the error
-fn on_server_error(e: impl std::fmt::Debug) -> Response {
+pub fn on_server_error(e: impl std::fmt::Debug) -> Response {
     error!("{e:?}");
     on_server_error_response()
 }
@@ -384,8 +430,7 @@ pub async fn test_issue(State(state): State<Arc<ServiceState>>) -> Result<String
 
 /// Validates a token and returns information about the token
 #[allow(clippy::unused_async)]
-pub async fn validate(mut user: AuthenticatedUser) -> Json<AuthenticatedUser> {
-    user.session_id = String::new();
+pub async fn validate(user: AuthenticatedUser) -> Json<AuthenticatedUser> {
     Json(user)
 }
 
@@ -409,7 +454,7 @@ pub async fn validate_scope(
     user: AuthenticatedUser,
     Path(scope): Path<String>,
 ) -> Result<(), Response> {
-    if user.scopes.contains(&scope) {
+    if user.has_scope(scope) {
         Ok(())
     } else {
         Err(on_error_response())
