@@ -4,9 +4,10 @@ use crate::schema::{auth_authenticators, auth_session_scopes, auth_user_sessions
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use educe::Educe;
+use serde::{Deserialize, Serialize};
 
 /// Database model for local users.
-#[derive(Queryable, Identifiable, Educe, Insertable)]
+#[derive(Queryable, Identifiable, Educe, Insertable, Serialize, Deserialize)]
 #[diesel(table_name = auth_users)]
 #[non_exhaustive]
 #[educe(Debug)]
@@ -21,7 +22,7 @@ pub struct User {
 }
 
 /// Authenticator device for a local user
-#[derive(Queryable, Identifiable, Associations, Educe, Insertable)]
+#[derive(Queryable, Identifiable, Associations, Educe, Insertable, Serialize, Deserialize)]
 #[diesel(belongs_to(User))]
 #[diesel(table_name = auth_authenticators)]
 #[non_exhaustive]
@@ -37,7 +38,7 @@ pub struct Authenticator {
 }
 
 /// User session
-#[derive(Queryable, Identifiable, Associations, Debug, Insertable)]
+#[derive(Queryable, Identifiable, Associations, Debug, Insertable, Serialize, Deserialize)]
 #[diesel(belongs_to(User))]
 #[diesel(table_name = auth_user_sessions)]
 #[non_exhaustive]
@@ -54,7 +55,7 @@ pub struct UserSession {
 }
 
 /// Scopes associated with a session
-#[derive(Queryable, Identifiable, Associations, Debug, Insertable)]
+#[derive(Queryable, Identifiable, Associations, Debug, Insertable, Serialize, Deserialize)]
 #[diesel(belongs_to(UserSession, foreign_key = jti))]
 #[diesel(table_name = auth_session_scopes)]
 #[non_exhaustive]

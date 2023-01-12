@@ -119,6 +119,7 @@ async fn main() -> Result<()> {
             delete(session::revoke_session_scope),
         )
         .route("/register/step1", post(opaque::registration::step_1))
+        .route("/register/step2", post(opaque::registration::step_2))
         .with_state(state);
 
     axum::Server::bind(&config.listen_addr)
