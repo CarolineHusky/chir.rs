@@ -335,13 +335,13 @@ in {
     };
   });
 
-  "registry+https://github.com/rust-lang/crates.io-index".axum."0.6.1" = overridableMkRustCrate (profileName: rec {
+  "registry+https://github.com/rust-lang/crates.io-index".axum."0.6.2" = overridableMkRustCrate (profileName: rec {
     name = "axum";
-    version = "0.6.1";
+    version = "0.6.2";
     registry = "registry+https://github.com/rust-lang/crates.io-index";
     src = fetchCratesIo {
       inherit name version;
-      sha256 = "08b108ad2665fa3f6e6a517c3d80ec3e77d224c47d605167aefaa5d7ef97fa48";
+      sha256 = "1304eab461cf02bd70b083ed8273388f9724c549b316ba3d1e213ce0e9e7fb7e";
     };
     features = builtins.concatLists [
       ["default"]
@@ -358,8 +358,8 @@ in {
     ];
     dependencies = {
       async_trait = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".async-trait."0.1.61" {profileName = "__noProfile";};
-      axum_core = rustPackages."registry+https://github.com/rust-lang/crates.io-index".axum-core."0.3.0" {inherit profileName;};
-      axum_macros = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".axum-macros."0.3.0" {profileName = "__noProfile";};
+      axum_core = rustPackages."registry+https://github.com/rust-lang/crates.io-index".axum-core."0.3.1" {inherit profileName;};
+      axum_macros = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".axum-macros."0.3.1" {profileName = "__noProfile";};
       bitflags = rustPackages."registry+https://github.com/rust-lang/crates.io-index".bitflags."1.3.2" {inherit profileName;};
       bytes = rustPackages."registry+https://github.com/rust-lang/crates.io-index".bytes."1.3.0" {inherit profileName;};
       futures_util = rustPackages."registry+https://github.com/rust-lang/crates.io-index".futures-util."0.3.25" {inherit profileName;};
@@ -389,13 +389,13 @@ in {
     };
   });
 
-  "registry+https://github.com/rust-lang/crates.io-index".axum-core."0.3.0" = overridableMkRustCrate (profileName: rec {
+  "registry+https://github.com/rust-lang/crates.io-index".axum-core."0.3.1" = overridableMkRustCrate (profileName: rec {
     name = "axum-core";
-    version = "0.3.0";
+    version = "0.3.1";
     registry = "registry+https://github.com/rust-lang/crates.io-index";
     src = fetchCratesIo {
       inherit name version;
-      sha256 = "79b8558f5a0581152dc94dcd289132a1d377494bdeafcd41869b3258e3e2ad92";
+      sha256 = "f487e40dc9daee24d8a1779df88522f159a54a980f99cfbe43db0be0bd3444a8";
     };
     dependencies = {
       async_trait = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".async-trait."0.1.61" {profileName = "__noProfile";};
@@ -412,13 +412,13 @@ in {
     };
   });
 
-  "registry+https://github.com/rust-lang/crates.io-index".axum-macros."0.3.0" = overridableMkRustCrate (profileName: rec {
+  "registry+https://github.com/rust-lang/crates.io-index".axum-macros."0.3.1" = overridableMkRustCrate (profileName: rec {
     name = "axum-macros";
-    version = "0.3.0";
+    version = "0.3.1";
     registry = "registry+https://github.com/rust-lang/crates.io-index";
     src = fetchCratesIo {
       inherit name version;
-      sha256 = "e4df0fc33ada14a338b799002f7e8657711422b25d4e16afb032708d6b185621";
+      sha256 = "cc7d7c3e69f305217e317a28172aab29f275667f2e1c15b87451e134fe27c7b1";
     };
     dependencies = {
       heck = rustPackages."registry+https://github.com/rust-lang/crates.io-index".heck."0.4.0" {inherit profileName;};
@@ -616,7 +616,7 @@ in {
       anyhow = rustPackages."registry+https://github.com/rust-lang/crates.io-index".anyhow."1.0.68" {inherit profileName;};
       argon2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".argon2."0.4.1" {inherit profileName;};
       async_trait = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".async-trait."0.1.61" {profileName = "__noProfile";};
-      axum = rustPackages."registry+https://github.com/rust-lang/crates.io-index".axum."0.6.1" {inherit profileName;};
+      axum = rustPackages."registry+https://github.com/rust-lang/crates.io-index".axum."0.6.2" {inherit profileName;};
       chir_rs_auth_model = rustPackages."unknown".chir-rs-auth-model."0.1.0" {inherit profileName;};
       chrono = rustPackages."registry+https://github.com/rust-lang/crates.io-index".chrono."0.4.23" {inherit profileName;};
       deadpool_redis = rustPackages."registry+https://github.com/rust-lang/crates.io-index".deadpool-redis."0.11.1" {inherit profileName;};
@@ -2168,6 +2168,7 @@ in {
     features = builtins.concatLists [
       ["default"]
       ["http1"]
+      ["runtime"]
       ["server"]
       ["socket2"]
       ["stream"]
