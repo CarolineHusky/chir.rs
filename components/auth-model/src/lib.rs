@@ -1,7 +1,9 @@
 //! The types for the `chir-rs-auth` crate
 
 use serde::{Deserialize, Serialize};
-use webauthn_rs::prelude::{CreationChallengeResponse, RegisterPublicKeyCredential};
+use webauthn_rs::prelude::{
+    CreationChallengeResponse, RegisterPublicKeyCredential, RequestChallengeResponse,
+};
 
 /// Request structure for the first registration step
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -62,4 +64,20 @@ pub struct RegistrationStep4Request {
     pub continuation_token: String,
     /// Registration
     pub registration: RegisterPublicKeyCredential,
+}
+
+/// Request structure for the first login step
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LoginStep1Request {
+    /// User ID
+    pub user_id: String,
+}
+
+/// Response structure for the first login step
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct LoginStep1Response {
+    /// The challenge to sign
+    pub challenge: RequestChallengeResponse,
+    /// Token used for the next request
+    pub next_token: String,
 }

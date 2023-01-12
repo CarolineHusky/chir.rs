@@ -123,6 +123,7 @@ async fn main() -> Result<()> {
         .route("/register/step2", post(opaque::registration::step_2))
         .route("/register/step3", post(webauthn::registration::step_3))
         .route("/register/step4", post(webauthn::registration::step_4))
+        .route("/login/step1", post(webauthn::login::step_1))
         .with_state(state);
 
     axum::Server::bind(&config.listen_addr)

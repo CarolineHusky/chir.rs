@@ -3,6 +3,7 @@ use once_cell::sync::Lazy;
 use uuid::{uuid, Uuid};
 use webauthn_rs::{prelude::Url, Webauthn, WebauthnBuilder};
 
+pub mod login;
 pub mod registration;
 
 /// The UUID used for calculating the User UUID for webauthn.
@@ -11,8 +12,8 @@ const WEBAUTHN_BASE_UUID: Uuid = uuid!("c9e64359-f227-48bd-8cc8-717a1d690d4b");
 /// The static webauthn structure
 #[allow(clippy::expect_used)]
 static WEBAUTHN: Lazy<Webauthn> = Lazy::new(|| {
-    let rp_id = "https://auth.chir.rs";
-    let rp_origin = Url::parse(rp_id).expect("Valid URL");
+    let rp_id = "auth.chir.rs";
+    let rp_origin = Url::parse("https://auth.chir.rs/").expect("Valid URL");
     WebauthnBuilder::new(rp_id, &rp_origin)
         .expect("Invalid configuration")
         .rp_name("Raccoon Authenticator")
