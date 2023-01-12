@@ -26,6 +26,7 @@ pub mod opaque;
 pub mod schema;
 pub mod session;
 pub mod token;
+pub mod webauthn;
 
 /// Configuration structure
 #[derive(Clone, Debug, Deserialize, Serialize)]
