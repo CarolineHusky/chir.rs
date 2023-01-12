@@ -348,6 +348,7 @@ dependencies = [
  "argon2",
  "async-trait",
  "axum",
+ "chir-rs-auth-model",
  "chrono",
  "deadpool-redis",
  "diesel",
@@ -367,6 +368,14 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "uuid",
+ "webauthn-rs",
+]
+
+[[package]]
+name = "chir-rs-auth-model"
+version = "0.1.0"
+dependencies = [
+ "serde",
  "webauthn-rs",
 ]
 

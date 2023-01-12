@@ -4,9 +4,12 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use axum::{extract::State, response::Response, Json};
+use chir_rs_auth_model::{
+    RegistrationStep1Request, RegistrationStep1Response, RegistrationStep2Request,
+    RegistrationStep2Response,
+};
 use opaque_ke::{RegistrationRequest, RegistrationUpload, ServerRegistration};
 use redis::cmd;
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
@@ -84,34 +87,14 @@ impl ServiceState {
     }
 }
 
-/// Request structure for the first registration step
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Step1Request {
-    /// Token used for registration
-    pub registration_token: String,
-    /// User ID of choice
-    pub user_id: String,
-    /// OPAQUE registration start request
-    pub registration_message: Vec<u8>,
-}
-
-/// Response structure for the first registration step
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Step1Response {
-    /// OPAQUE registration start response
-    pub registration_message: Vec<u8>,
-    /// Token used for the next request
-    pub next_token: String,
-}
-
 /// Route for the first registration step
 ///
 /// # Errors
 /// this function returns an error if registration fails, or if the client isn’t authorized to request a registration
 pub async fn step_1(
     state: State<Arc<ServiceState>>,
-    Json(request): Json<Step1Request>,
-) -> Result<Json<Step1Response>, Response> {
+    Json(request): Json<RegistrationStep1Request>,
+) -> Result<Json<RegistrationStep1Response>, Response> {
     if request.registration_token != state.registration_key {
         return Err(on_error_response());
     }
@@ -119,26 +102,10 @@ pub async fn step_1(
         .start_opaque_registration(&request.user_id, &request.registration_message)
         .await
         .map_err(on_error)?;
-    Ok(Json(Step1Response {
+    Ok(Json(RegistrationStep1Response {
         registration_message,
         next_token,
     }))
-}
-
-/// Request structure for the second registration step
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Step2Request {
-    /// Token used for continuing the registration
-    pub continuation_token: String,
-    /// OPAQUE credential upload
-    pub credential_upload: Vec<u8>,
-}
-
-/// Response structure for the second registration step
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Step2Response {
-    /// Token used for the next request
-    pub next_token: String,
 }
 
 /// Route for the second registration step
@@ -147,11 +114,11 @@ pub struct Step2Response {
 /// this function returns an error if registration fails, or if the client isn’t authorized to request a registration
 pub async fn step_2(
     state: State<Arc<ServiceState>>,
-    Json(request): Json<Step2Request>,
-) -> Result<Json<Step2Response>, Response> {
+    Json(request): Json<RegistrationStep2Request>,
+) -> Result<Json<RegistrationStep2Response>, Response> {
     let next_token = state
         .continue_opaque_registration(&request.continuation_token, &request.credential_upload)
         .await
         .map_err(on_error)?;
-    Ok(Json(Step2Response { next_token }))
+    Ok(Json(RegistrationStep2Response { next_token }))
 }

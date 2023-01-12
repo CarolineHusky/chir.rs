@@ -5,6 +5,7 @@ args @ {
   rootFeatures ? [
     "microformats-json-ld/default"
     "chir-rs-auth/default"
+    "chir-rs-auth-model/default"
   ],
   rustPackages,
   buildRustPackages,
@@ -52,6 +53,7 @@ in {
   workspace = {
     microformats-json-ld = rustPackages.unknown.microformats-json-ld."0.1.0";
     chir-rs-auth = rustPackages.unknown.chir-rs-auth."0.1.0";
+    chir-rs-auth-model = rustPackages.unknown.chir-rs-auth-model."0.1.0";
   };
   "registry+https://github.com/rust-lang/crates.io-index".abnf."0.12.0" = overridableMkRustCrate (profileName: rec {
     name = "abnf";
@@ -615,6 +617,7 @@ in {
       argon2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".argon2."0.4.1" {inherit profileName;};
       async_trait = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".async-trait."0.1.61" {profileName = "__noProfile";};
       axum = rustPackages."registry+https://github.com/rust-lang/crates.io-index".axum."0.6.1" {inherit profileName;};
+      chir_rs_auth_model = rustPackages."unknown".chir-rs-auth-model."0.1.0" {inherit profileName;};
       chrono = rustPackages."registry+https://github.com/rust-lang/crates.io-index".chrono."0.4.23" {inherit profileName;};
       deadpool_redis = rustPackages."registry+https://github.com/rust-lang/crates.io-index".deadpool-redis."0.11.1" {inherit profileName;};
       diesel = rustPackages."registry+https://github.com/rust-lang/crates.io-index".diesel."2.0.2" {inherit profileName;};
@@ -634,6 +637,17 @@ in {
       tracing = rustPackages."registry+https://github.com/rust-lang/crates.io-index".tracing."0.1.37" {inherit profileName;};
       tracing_subscriber = rustPackages."registry+https://github.com/rust-lang/crates.io-index".tracing-subscriber."0.3.16" {inherit profileName;};
       uuid = rustPackages."registry+https://github.com/rust-lang/crates.io-index".uuid."1.2.2" {inherit profileName;};
+      webauthn_rs = rustPackages."registry+https://github.com/rust-lang/crates.io-index".webauthn-rs."0.4.8" {inherit profileName;};
+    };
+  });
+
+  "unknown".chir-rs-auth-model."0.1.0" = overridableMkRustCrate (profileName: rec {
+    name = "chir-rs-auth-model";
+    version = "0.1.0";
+    registry = "unknown";
+    src = fetchCrateLocal (workspaceSrc + "/components/auth-model");
+    dependencies = {
+      serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
       webauthn_rs = rustPackages."registry+https://github.com/rust-lang/crates.io-index".webauthn-rs."0.4.8" {inherit profileName;};
     };
   });

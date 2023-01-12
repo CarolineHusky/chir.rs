@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use axum::{extract::State, response::Response, Json};
+use chir_rs_auth_model::{RegistrationStep3Request, RegistrationStep3Response};
 use redis::cmd;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -48,35 +49,19 @@ impl ServiceState {
     }
 }
 
-/// Request structure for the third registration step
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Step3Request {
-    /// Token returned from the previous step
-    pub continuation_token: String,
-}
-
-/// Response structure for the third registration step
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Step3Response {
-    /// The registration challenge to sign
-    pub challenge: CreationChallengeResponse,
-    /// Token used for the next request
-    pub next_token: String,
-}
-
 /// Route for the third registration step
 ///
 /// # Errors
 /// this function returns an error if registration fails, or if the client isn’t authorized to request a registration
 pub async fn step_3(
     state: State<Arc<ServiceState>>,
-    Json(request): Json<Step3Request>,
-) -> Result<Json<Step3Response>, Response> {
+    Json(request): Json<RegistrationStep3Request>,
+) -> Result<Json<RegistrationStep3Response>, Response> {
     let (challenge, next_token) = state
         .start_webauthn_registration(&request.continuation_token)
         .await
         .map_err(on_error)?;
-    Ok(Json(Step3Response {
+    Ok(Json(RegistrationStep3Response {
         challenge,
         next_token,
     }))
