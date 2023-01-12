@@ -62,6 +62,8 @@
             rnix-lsp
             diesel-cli
             sqlite
+            pkg-config
+            openssl
           ];
         };
       packages = pkgs.lib.mapAttrs (_: v: v {}) rustPkgs.workspace;
