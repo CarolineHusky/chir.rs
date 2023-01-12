@@ -27,7 +27,7 @@
     cargo2nix,
     ...
   } @ inputs:
-    flake-utils.lib.eachSystem ["x86_64-linux"] (system: let
+    flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux"] (system: let
       overlays = [
         cargo2nix.overlays.default
         (import rust-overlay)
@@ -43,28 +43,35 @@
     in rec {
       devShells.default = with pkgs;
         mkShell {
-          buildInputs = [
-            (rust-bin.nightly.latest.default.override {
-              extensions = ["rust-src"];
-            })
-            cargo2nix.packages.${system}.cargo2nix
-            statix
-            cargo-bloat
-            cargo-crev
-            cargo-deny
-            cargo-edit
-            cargo-outdated
-            cargo-tarpaulin
-            dhall
-            dhall-json
-            dhall-lsp-server
-            gdb
-            rnix-lsp
-            diesel-cli
-            sqlite
-            pkg-config
-            openssl
-          ];
+          buildInputs =
+            [
+              (rust-bin.nightly.latest.default.override {
+                extensions = ["rust-src"];
+              })
+              cargo2nix.packages.${system}.cargo2nix
+              statix
+              cargo-bloat
+              cargo-crev
+              cargo-deny
+              cargo-edit
+              cargo-outdated
+              dhall
+              dhall-json
+              dhall-lsp-server
+              gdb
+              rnix-lsp
+              diesel-cli
+              sqlite
+              pkg-config
+              openssl
+            ]
+            ++ (
+              if system == "x86_64-linux"
+              then [
+                cargo-tarpaulin
+              ]
+              else []
+            );
         };
       packages = pkgs.lib.mapAttrs (_: v: v {}) rustPkgs.workspace;
 
