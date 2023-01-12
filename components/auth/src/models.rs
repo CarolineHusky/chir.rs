@@ -22,7 +22,7 @@ pub struct User {
 }
 
 /// Authenticator device for a local user
-#[derive(Queryable, Identifiable, Associations, Educe, Insertable, Serialize, Deserialize)]
+#[derive(Queryable, Identifiable, Associations, Educe, Serialize, Deserialize)]
 #[diesel(belongs_to(User))]
 #[diesel(table_name = auth_authenticators)]
 #[non_exhaustive]
@@ -30,6 +30,18 @@ pub struct User {
 pub struct Authenticator {
     /// ID of the authenticator
     pub id: i32,
+    /// User ID the authenticator belongs to
+    pub user_id: String,
+    /// The webauthn registration of the authenticator
+    #[educe(Debug(ignore))]
+    pub webauthn_registration: String,
+}
+
+/// Authenticator device for a local user
+#[derive(Insertable, Educe, Serialize, Deserialize)]
+#[educe(Debug)]
+#[diesel(table_name = auth_authenticators)]
+pub struct AuthenticatorInsert {
     /// User ID the authenticator belongs to
     pub user_id: String,
     /// The webauthn registration of the authenticator
