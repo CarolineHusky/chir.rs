@@ -19,6 +19,10 @@ impl opaque_ke::CipherSuite for CipherSuite {
     type Ksf = argon2::Argon2<'static>;
 }
 
+/// Loads the OPAQUE configuration from the database, or creates a new one if it does not exist.
+///
+/// # Errors
+/// This function will return an error if the database could not be accessed.
 pub async fn get_opaque_server_setup(
     db: &DatabasePool<AsyncPgConnection>,
 ) -> Result<ServerSetup<CipherSuite>> {

@@ -1,4 +1,5 @@
 //! Key-Value actions
+#![allow(clippy::module_name_repetitions)]
 
 use anyhow::Result;
 use diesel::prelude::*;
@@ -8,11 +9,15 @@ use diesel_async::{
 
 use crate::models::KeyValue;
 
+/// Retrieves a value from the database
+///
+/// # Errors
+/// This function will return an error if the request fails
 pub async fn get_kv(
     db: &DatabasePool<AsyncPgConnection>,
-    key: impl AsRef<[u8]>,
+    key: impl AsRef<[u8]> + Send + Sync,
 ) -> Result<Option<Vec<u8>>> {
-    use crate::schema::auth_kv::dsl::*;
+    use crate::schema::auth_kv::dsl::{auth_kv, kv_key, kv_value};
     let mut db = db.get().await?;
     let result = auth_kv
         .select(kv_value)
@@ -23,12 +28,16 @@ pub async fn get_kv(
     Ok(result)
 }
 
+/// Inserts or updates a value in the database
+///
+/// # Errors
+/// This function will return an error if the request fails
 pub async fn upsert_kv(
     db: &DatabasePool<AsyncPgConnection>,
-    key: impl AsRef<[u8]>,
-    value: impl AsRef<[u8]>,
+    key: impl AsRef<[u8]> + Send + Sync,
+    value: impl AsRef<[u8]> + Send + Sync,
 ) -> Result<()> {
-    use crate::schema::auth_kv::dsl::*;
+    use crate::schema::auth_kv::dsl::{auth_kv, kv_key, kv_value};
     let val = KeyValue {
         kv_key: key.as_ref().to_vec(),
         kv_value: value.as_ref().to_vec(),
@@ -44,12 +53,16 @@ pub async fn upsert_kv(
     Ok(())
 }
 
+/// Inserts a value into the database
+///
+/// # Errors
+/// This function will return an error if the request fails, or the value already exists
 pub async fn insert_kv(
     db: &DatabasePool<AsyncPgConnection>,
-    key: impl AsRef<[u8]>,
-    value: impl AsRef<[u8]>,
+    key: impl AsRef<[u8]> + Send + Sync,
+    value: impl AsRef<[u8]> + Send + Sync,
 ) -> Result<()> {
-    use crate::schema::auth_kv::dsl::*;
+    use crate::schema::auth_kv::dsl::auth_kv;
     let val = KeyValue {
         kv_key: key.as_ref().to_vec(),
         kv_value: value.as_ref().to_vec(),
@@ -62,13 +75,17 @@ pub async fn insert_kv(
     Ok(())
 }
 
+/// Makes sure that a value exists, and returns it
+///
+/// # Errors
+/// This function will return an error if the request fails, or if the code for the init value returns an error
 pub async fn ensure_kv<F>(
     db: &DatabasePool<AsyncPgConnection>,
-    key: impl AsRef<[u8]>,
+    key: impl AsRef<[u8]> + Send + Sync,
     init: F,
 ) -> Result<Vec<u8>>
 where
-    F: Fn() -> Result<Vec<u8>>,
+    F: Fn() -> Result<Vec<u8>> + Send + Sync,
 {
     let key = key.as_ref();
     loop {

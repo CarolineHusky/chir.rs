@@ -2,7 +2,10 @@
 
 use std::sync::Arc;
 
-use crate::{token::on_error, ServiceState};
+use crate::{
+    token::{on_error, on_server_error},
+    ServiceState,
+};
 use anyhow::Result;
 use axum::{extract::State, response::Response, Json};
 use chir_rs_auth_model::{
@@ -19,8 +22,14 @@ use webauthn_rs::prelude::{
 use super::WEBAUTHN;
 
 impl ServiceState {
+    /// Lists the registered webauthn devices for a user
+    ///
+    /// # Errors
+    /// This function return an error if the request fails.
     pub async fn get_webauthn_devices(self: &Arc<Self>, user: &str) -> Result<Vec<SecurityKey>> {
-        use crate::schema::auth_authenticators::dsl::*;
+        use crate::schema::auth_authenticators::dsl::{
+            auth_authenticators, user_id, webauthn_registration,
+        };
         let mut db = self.database.get().await?;
         let res = auth_authenticators
             .select(webauthn_registration)
@@ -33,12 +42,18 @@ impl ServiceState {
             .collect::<Result<Vec<SecurityKey>, _>>()?)
     }
 
+    /// Retrieves a specific webauthn device for a user
+    ///
+    /// # Errors
+    /// This function returns an error if the request fails, or the corresponding device does not exist.
     pub async fn get_webauthn_device(
         self: &Arc<Self>,
         user: &str,
         auth_id: &[u8],
     ) -> Result<SecurityKey> {
-        use crate::schema::auth_authenticators::dsl::*;
+        use crate::schema::auth_authenticators::dsl::{
+            auth_authenticators, id, user_id, webauthn_registration,
+        };
         let mut db = self.database.get().await?;
         let res: String = auth_authenticators
             .select(webauthn_registration)
@@ -49,12 +64,16 @@ impl ServiceState {
         Ok(serde_json::from_str(&res)?)
     }
 
+    /// Updates a webauthn device based on the authentication result
+    ///
+    /// # Errors
+    /// This function returns an error if the request fails, or the corresponding device does not exist.
     pub async fn update_authenticator(
         self: &Arc<Self>,
         user: &str,
         auth_result: AuthenticationResult,
     ) -> Result<()> {
-        use crate::schema::auth_authenticators::dsl::*;
+        use crate::schema::auth_authenticators::dsl::{auth_authenticators, webauthn_registration};
         let mut authenticator = self
             .get_webauthn_device(user, auth_result.cred_id().as_ref())
             .await?;
@@ -69,6 +88,10 @@ impl ServiceState {
         Ok(())
     }
 
+    /// Starts webauthn authentication
+    ///
+    /// # Errors
+    /// This function returns an error if database access fails.
     pub async fn start_webauthn_authentication(
         self: &Arc<Self>,
         user_id: &str,
@@ -88,6 +111,10 @@ impl ServiceState {
         Ok((challenge, req_uuid))
     }
 
+    /// Completes webauthn authentication
+    ///
+    /// # Errors
+    /// This function returns an error if database access fails, or the authentication
     pub async fn finish_webauthn_authentication(
         self: &Arc<Self>,
         continuation_token: &str,
@@ -113,6 +140,10 @@ impl ServiceState {
     }
 }
 
+/// Performs the first step of the authentication process.
+///
+/// # Errors
+/// Returns an error if something goes wrong.
 pub async fn step_1(
     state: State<Arc<ServiceState>>,
     Json(request): Json<LoginStep1Request>,
@@ -120,13 +151,17 @@ pub async fn step_1(
     let (challenge, next_token) = state
         .start_webauthn_authentication(&request.user_id)
         .await
-        .map_err(on_error)?;
+        .map_err(on_server_error)?;
     Ok(Json(LoginStep1Response {
         challenge,
         next_token,
     }))
 }
 
+/// Performs the second step of the authentication process.
+///
+/// # Errors
+/// Returns an error if authentication fails, or there is a server error
 pub async fn step_2(
     state: State<Arc<ServiceState>>,
     Json(request): Json<LoginStep2Request>,
