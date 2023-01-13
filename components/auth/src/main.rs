@@ -116,7 +116,6 @@ async fn main() -> Result<()> {
 
     let app = Router::new()
         .route("/", get(root))
-        .route("/get-token", get(token::test_issue))
         .route("/token", get(token::validate))
         .route("/token", delete(token::logout))
         .route("/scopes/:scope", get(token::validate_scope))
@@ -135,6 +134,8 @@ async fn main() -> Result<()> {
         .route("/login/step1", post(webauthn::login::step_1))
         .route("/login/step2", post(webauthn::login::step_2))
         .route("/login/step3", post(opaque::login::step_3))
+        .route("/login/step4", post(opaque::login::step_4))
+        .route("/login/step5", post(opaque::login::step_5))
         .with_state(state);
 
     axum::Server::bind(&config.listen_addr)

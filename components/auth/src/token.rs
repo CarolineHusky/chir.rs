@@ -32,7 +32,12 @@ use serde_json::json;
 use tracing::{error, info};
 use uuid::Uuid;
 
-use crate::{kv::ensure_kv, models::UserSession, schema::auth_user_sessions, ServiceState};
+use crate::{
+    kv::ensure_kv,
+    models::{SessionScope, UserSession},
+    schema::{auth_session_scopes, auth_user_sessions},
+    ServiceState,
+};
 
 /// Loads or Creates the PASETO key
 ///
@@ -214,6 +219,53 @@ impl ServiceState {
             .await?;
         Ok(())
     }
+
+    /// Issues a token to a user
+    ///
+    /// # Errors
+    /// This function returns an error if the database connection fails
+    pub async fn issue_token(self: &Arc<Self>, user: &str, scopes: &[String]) -> Result<String> {
+        let jti = Uuid::new_v4().to_string();
+        let mut db = self.database.get().await?;
+        let now = Utc::now();
+        let expire = now.checked_add_months(Months::new(1)).unwrap_or(now);
+        let expire_paseto = expire.to_rfc3339_opts(SecondsFormat::Secs, true);
+
+        let mut claims = Claims::new()?;
+        claims.issuer("https://auth.chir.rs/")?;
+        claims.subject(user)?;
+        claims.expiration(&expire_paseto)?;
+        claims.token_identifier(&jti)?;
+
+        let token = local::encrypt(&self.paseto_key, &claims, None, None)?;
+
+        let db_session = UserSession {
+            jti: jti.clone(),
+            user_id: user.to_owned(),
+            exp_at: expire,
+            reauth_after: None,
+        };
+
+        diesel::insert_into(auth_user_sessions::table)
+            .values(db_session)
+            .execute(&mut db)
+            .await?;
+
+        diesel::insert_into(auth_session_scopes::table)
+            .values(
+                scopes
+                    .iter()
+                    .map(|v| SessionScope {
+                        jti: jti.clone(),
+                        scope: v.clone(),
+                    })
+                    .collect::<Vec<_>>(),
+            )
+            .execute(&mut db)
+            .await?;
+
+        Ok(token)
+    }
 }
 
 /// The response returned on error
@@ -351,50 +403,6 @@ impl FromRequestParts<Arc<ServiceState>> for AuthenticatedUser {
 
         Ok(sess)
     }
-}
-
-/// Issues a token to a user
-///
-/// # Errors
-/// This function returns an error if the database connection fails
-async fn issue_token(state: &Arc<ServiceState>, user: &str) -> Result<String> {
-    let jti = Uuid::new_v4().to_string();
-    let mut db = state.database.get().await?;
-    let now = Utc::now();
-    let expire = now.checked_add_months(Months::new(1)).unwrap_or(now);
-    let expire_paseto = expire.to_rfc3339_opts(SecondsFormat::Secs, true);
-
-    let mut claims = Claims::new()?;
-    claims.issuer("https://auth.chir.rs/")?;
-    claims.subject(user)?;
-    claims.expiration(&expire_paseto)?;
-    claims.token_identifier(&jti)?;
-
-    let token = local::encrypt(&state.paseto_key, &claims, None, None)?;
-
-    let db_session = UserSession {
-        jti,
-        user_id: user.to_owned(),
-        exp_at: expire,
-        reauth_after: None,
-    };
-
-    diesel::insert_into(auth_user_sessions::table)
-        .values(db_session)
-        .execute(&mut db)
-        .await?;
-
-    Ok(token)
-}
-
-/// Debug endpoint for creating a dummy token
-///
-/// # Errors
-/// This function returns an error if the token cannot be created.
-pub async fn test_issue(State(state): State<Arc<ServiceState>>) -> Result<String, Response> {
-    issue_token(&state, "https://lotte.chir.rs/")
-        .await
-        .map_err(on_server_error)
 }
 
 /// Validates a token and returns information about the token

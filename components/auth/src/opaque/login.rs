@@ -4,13 +4,19 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use axum::{extract::State, response::Response, Json};
-use chir_rs_auth_model::{LoginStep3Request, LoginStep3Response};
+use base64::{engine::general_purpose, Engine as _};
+use chir_rs_auth_model::{
+    LoginStep3Request, LoginStep3Response, LoginStep4Request, LoginStep4Response,
+    LoginStep5Request, LoginStep5Response,
+};
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 use opaque_ke::{
-    CredentialRequest, Identifiers, ServerLogin, ServerLoginStartParameters, ServerRegistration,
+    CredentialFinalization, CredentialRequest, Identifiers, ServerLogin,
+    ServerLoginStartParameters, ServerRegistration,
 };
 use redis::cmd;
+use sha2::{Digest, Sha256};
 use uuid::Uuid;
 
 use crate::{token::on_error, ServiceState};
@@ -92,6 +98,66 @@ impl ServiceState {
             .await?;
         Ok((login.message.serialize().to_vec(), req_uuid))
     }
+
+    /// Completes an OPAQUE login
+    ///
+    /// # Errors
+    /// This function returns an error if the authentication was unsuccessful.
+    pub async fn finish_opaque_login(
+        self: &Arc<Self>,
+        continuation_token: &str,
+        login_response: &[u8],
+        code_challenge: &str,
+        scopes: &[String],
+    ) -> Result<String> {
+        let mut conn = self.redis.get().await?;
+        let state_json: String = cmd("GETDEL")
+            .arg(format!("login/step3:{continuation_token}"))
+            .query_async(&mut conn)
+            .await?;
+        let (server_login_serialized, user_id): (Vec<u8>, String) =
+            serde_json::from_str(&state_json)?;
+        let server_login = ServerLogin::<CipherSuite>::deserialize(&server_login_serialized)?;
+        let credential_finalization = CredentialFinalization::deserialize(login_response)?;
+        // TODO: do something with the session key maybe
+        server_login.finish(credential_finalization)?;
+        let token = self.issue_token(&user_id, scopes).await?;
+        let new_state = (code_challenge, token);
+        let req_uuid = Uuid::new_v4().as_hyphenated().to_string();
+        cmd("SET")
+            .arg(format!("login/step4:{req_uuid}"))
+            .arg(serde_json::to_string(&new_state)?)
+            .arg("EX")
+            .arg(300)
+            .query_async(&mut conn)
+            .await?;
+        Ok(req_uuid)
+    }
+
+    /// Retrieves a token from the access code
+    ///
+    /// # Errors
+    /// This function returns an error if the authentication was unsuccessful.
+    pub async fn get_access_token(
+        self: &Arc<Self>,
+        access_code: &str,
+        code_verifier: &str,
+    ) -> Result<String> {
+        let mut conn = self.redis.get().await?;
+        let state_json: String = cmd("GETDEL")
+            .arg(format!("login/step4:{access_code}"))
+            .query_async(&mut conn)
+            .await?;
+        let (code_challenge, token): (String, _) = serde_json::from_str(&state_json)?;
+        let mut hasher = Sha256::new();
+        hasher.update(code_verifier.as_bytes());
+        let digest = hasher.finalize();
+        let received_challenge = general_purpose::URL_SAFE_NO_PAD.encode(digest);
+        if code_challenge != received_challenge {
+            anyhow::bail!("Invalid challenge");
+        }
+        Ok(token)
+    }
 }
 
 /// Performs the third step of the authentication process.
@@ -111,4 +177,39 @@ pub async fn step_3(
         credential_response,
         next_token,
     }))
+}
+
+/// Performs the fourth step of the authentication process.
+///
+/// # Errors
+/// Returns an error if the authentication process fails.
+pub async fn step_4(
+    state: State<Arc<ServiceState>>,
+    Json(request): Json<LoginStep4Request>,
+) -> Result<Json<LoginStep4Response>, Response> {
+    let next_token = state
+        .finish_opaque_login(
+            &request.continuation_token,
+            &request.credential_finalization,
+            &request.code_challenge,
+            &request.scopes,
+        )
+        .await
+        .map_err(on_error)?;
+    Ok(Json(LoginStep4Response { next_token }))
+}
+
+/// Performs the fifth step of the authentication process.
+///
+/// # Errors
+/// Returns an error if the authentication process fails.
+pub async fn step_5(
+    state: State<Arc<ServiceState>>,
+    Json(request): Json<LoginStep5Request>,
+) -> Result<Json<LoginStep5Response>, Response> {
+    let access_token = state
+        .get_access_token(&request.access_code, &request.code_verifier)
+        .await
+        .map_err(on_error)?;
+    Ok(Json(LoginStep5Response { access_token }))
 }

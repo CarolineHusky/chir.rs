@@ -477,6 +477,20 @@ in {
     ];
   });
 
+  "registry+https://github.com/rust-lang/crates.io-index".base64."0.21.0" = overridableMkRustCrate (profileName: rec {
+    name = "base64";
+    version = "0.21.0";
+    registry = "registry+https://github.com/rust-lang/crates.io-index";
+    src = fetchCratesIo {
+      inherit name version;
+      sha256 = "a4a4ddaa51a5bc52a6948f74c06d20aaaddb71924eab79b8c97a8c556e942d6a";
+    };
+    features = builtins.concatLists [
+      ["default"]
+      ["std"]
+    ];
+  });
+
   "registry+https://github.com/rust-lang/crates.io-index".base64ct."1.5.3" = overridableMkRustCrate (profileName: rec {
     name = "base64ct";
     version = "1.5.3";
@@ -617,6 +631,7 @@ in {
       argon2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".argon2."0.4.1" {inherit profileName;};
       async_trait = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".async-trait."0.1.61" {profileName = "__noProfile";};
       axum = rustPackages."registry+https://github.com/rust-lang/crates.io-index".axum."0.6.2" {inherit profileName;};
+      base64 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".base64."0.21.0" {inherit profileName;};
       chir_rs_auth_model = rustPackages."unknown".chir-rs-auth-model."0.1.0" {inherit profileName;};
       chrono = rustPackages."registry+https://github.com/rust-lang/crates.io-index".chrono."0.4.23" {inherit profileName;};
       deadpool_redis = rustPackages."registry+https://github.com/rust-lang/crates.io-index".deadpool-redis."0.11.1" {inherit profileName;};
@@ -633,6 +648,7 @@ in {
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
       serde_dhall = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_dhall."0.12.0" {inherit profileName;};
       serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {inherit profileName;};
+      sha2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".sha2."0.10.6" {inherit profileName;};
       tokio = rustPackages."registry+https://github.com/rust-lang/crates.io-index".tokio."1.24.1" {inherit profileName;};
       tracing = rustPackages."registry+https://github.com/rust-lang/crates.io-index".tracing."0.1.37" {inherit profileName;};
       tracing_subscriber = rustPackages."registry+https://github.com/rust-lang/crates.io-index".tracing-subscriber."0.3.16" {inherit profileName;};

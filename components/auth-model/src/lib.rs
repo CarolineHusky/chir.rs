@@ -116,3 +116,39 @@ pub struct LoginStep3Response {
     /// Token used for the next request
     pub next_token: String,
 }
+
+/// Request structure for the fourth login step
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LoginStep4Request {
+    /// Token returned from the previous step
+    pub continuation_token: String,
+    /// The OPAQUE credential finalization
+    pub credential_finalization: Vec<u8>,
+    /// Code challenge for OAuth
+    pub code_challenge: String,
+    /// Requested scopes
+    pub scopes: Vec<String>,
+}
+
+/// Response structure for the fourth login step
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LoginStep4Response {
+    /// Token used for the next request
+    pub next_token: String,
+}
+
+/// Request structure for the final login step
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LoginStep5Request {
+    /// Token returned from the previous step
+    pub access_code: String,
+    /// Code verifier for oauth
+    pub code_verifier: String,
+}
+
+/// Response structure for the final login step
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LoginStep5Response {
+    /// Access token
+    pub access_token: String,
+}
