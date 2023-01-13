@@ -83,7 +83,7 @@ pub struct LoginStep1Response {
     pub next_token: String,
 }
 
-/// Request structure for the first login step
+/// Request structure for the second login step
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LoginStep2Request {
     /// Token returned from the previous step
@@ -92,9 +92,27 @@ pub struct LoginStep2Request {
     pub credential: PublicKeyCredential,
 }
 
-/// Response structure for the first login step
+/// Response structure for the second login step
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LoginStep2Response {
+    /// Token used for the next request
+    pub next_token: String,
+}
+
+/// Request structure for the third login step
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LoginStep3Request {
+    /// Token returned from the previous step
+    pub continuation_token: String,
+    /// The OPAQUE credential request
+    pub credential_request: Vec<u8>,
+}
+
+/// Response structure for the third login step
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LoginStep3Response {
+    /// The OPAQUE credential response
+    pub credential_response: Vec<u8>,
     /// Token used for the next request
     pub next_token: String,
 }

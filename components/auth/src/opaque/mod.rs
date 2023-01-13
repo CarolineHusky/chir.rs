@@ -6,6 +6,7 @@ use opaque_ke::ServerSetup;
 
 use crate::kv::ensure_kv;
 
+pub mod login;
 pub mod registration;
 
 /// The ciphersuite used by OPAQUE
