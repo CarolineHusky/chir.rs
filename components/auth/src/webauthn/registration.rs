@@ -16,7 +16,7 @@ use webauthn_rs::prelude::{
 };
 
 use crate::{
-    models::{AuthenticatorInsert, User},
+    models::{Authenticator, User},
     token::on_error,
     ServiceState,
 };
@@ -81,7 +81,8 @@ impl ServiceState {
             .values(&user)
             .execute(&mut db)
             .await?;
-        let authenticator = AuthenticatorInsert {
+        let authenticator = Authenticator {
+            id: security_key.cred_id().0.clone(),
             user_id: user.id,
             webauthn_registration: serde_json::to_string(&security_key)?,
         };

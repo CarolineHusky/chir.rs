@@ -2,7 +2,7 @@
 
 diesel::table! {
     auth_authenticators (id) {
-        id -> Int4,
+        id -> Bytea,
         user_id -> Text,
         webauthn_registration -> Text,
     }

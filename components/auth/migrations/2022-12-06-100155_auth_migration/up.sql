@@ -4,7 +4,7 @@ CREATE TABLE auth_users (
     activated BOOLEAN NOT NULL
 );
 CREATE TABLE auth_authenticators (
-    id INTEGER GENERATED ALWAYS AS IDENTITY,
+    id BYTEA NOT NULL,
     user_id TEXT NOT NULL,
     webauthn_registration TEXT NOT NULL,
     PRIMARY KEY (id),

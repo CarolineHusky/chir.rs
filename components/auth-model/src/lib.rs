@@ -2,7 +2,8 @@
 
 use serde::{Deserialize, Serialize};
 use webauthn_rs::prelude::{
-    CreationChallengeResponse, RegisterPublicKeyCredential, RequestChallengeResponse,
+    CreationChallengeResponse, PublicKeyCredential, RegisterPublicKeyCredential,
+    RequestChallengeResponse,
 };
 
 /// Request structure for the first registration step
@@ -78,6 +79,22 @@ pub struct LoginStep1Request {
 pub struct LoginStep1Response {
     /// The challenge to sign
     pub challenge: RequestChallengeResponse,
+    /// Token used for the next request
+    pub next_token: String,
+}
+
+/// Request structure for the first login step
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct LoginStep2Request {
+    /// Token returned from the previous step
+    pub continuation_token: String,
+    /// The public key credential
+    pub credential: PublicKeyCredential,
+}
+
+/// Response structure for the first login step
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LoginStep2Response {
     /// Token used for the next request
     pub next_token: String,
 }
