@@ -2,6 +2,7 @@
 
 use std::{collections::HashSet, sync::Arc};
 
+use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use axum::{
     extract::{FromRequestParts, Path, State},
@@ -11,9 +12,10 @@ use axum::{
     Json, RequestPartsExt, TypedHeader,
 };
 use chrono::{Months, SecondsFormat, Utc};
-use deadpool_redis::Pool;
 use diesel::prelude::*;
-use diesel_async::RunQueryDsl;
+use diesel_async::{
+    pooled_connection::deadpool::Pool as DatabasePool, AsyncPgConnection, RunQueryDsl,
+};
 use headers::authorization::Bearer;
 use once_cell::sync::Lazy;
 use pasetors::{
@@ -30,55 +32,22 @@ use serde_json::json;
 use tracing::{error, info};
 use uuid::Uuid;
 
-use crate::{models::UserSession, schema::auth_user_sessions, ServiceState};
-use anyhow::{anyhow, Result};
-
-/// Attempts to load the paseto key from redis
-///
-/// # Errors
-/// This function returns an error if loading the PASETO key fails.
-async fn load_paseto_key(redis: &Pool) -> Result<SymmetricKey<V4>> {
-    let mut conn = redis.get().await?;
-    let value: Vec<u8> = cmd("GET")
-        .arg(&["paseto/key"])
-        .query_async(&mut conn)
-        .await?;
-    if value.len() != 32 {
-        if !value.is_empty() {
-            cmd("DEL").arg("paseto/key").query_async(&mut conn).await?;
-        }
-        return Err(anyhow!("Invalid paseto key"));
-    }
-    SymmetricKey::from(&value[..]).map_err(Into::into)
-}
-
-/// Saves a PASETO key to redis
-///
-/// # Errors
-/// This function returns an error if the database already has a PASETO key stored.
-async fn store_paseto_key(redis: &Pool, key: &SymmetricKey<V4>) -> Result<()> {
-    let mut conn = redis.get().await?;
-    cmd("SET")
-        .arg("paseto/key")
-        .arg(key.as_bytes())
-        .arg("NX")
-        .query_async(&mut conn)
-        .await?;
-    Ok(())
-}
+use crate::{kv::ensure_kv, models::UserSession, schema::auth_user_sessions, ServiceState};
 
 /// Loads or Creates the PASETO key
-pub async fn get_or_create_paseto_key(redis: &Pool) -> SymmetricKey<V4> {
-    loop {
-        if let Ok(key) = load_paseto_key(redis).await {
-            return key;
-        }
-        if let Ok(paseto_key) = SymmetricKey::generate() {
-            if store_paseto_key(redis, &paseto_key).await.is_ok() {
-                return paseto_key;
-            }
-        }
-    }
+///
+/// # Errors
+/// This function returns an error if loading or generating the PASETO key fails.
+pub async fn get_or_create_paseto_key(
+    db: &DatabasePool<AsyncPgConnection>,
+) -> Result<SymmetricKey<V4>> {
+    let key = ensure_kv(db, b"paseto/key", || {
+        SymmetricKey::generate()
+            .map(|v| v.as_bytes().to_vec())
+            .map_err(Into::into)
+    })
+    .await?;
+    SymmetricKey::from(&key[..]).map_err(Into::into)
 }
 
 /// Extractor for an authenticated user

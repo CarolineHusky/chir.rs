@@ -15,11 +15,14 @@ use diesel_async::{
 };
 use dotenvy::dotenv;
 use educe::Educe;
+use opaque::CipherSuite;
+use opaque_ke::ServerSetup;
 use pasetors::{keys::SymmetricKey, version4::V4};
 use serde::{Deserialize, Serialize};
 use std::{net::SocketAddr, path::Path, sync::Arc};
 use tracing::info;
 use uuid::Uuid;
+pub mod kv;
 pub mod models;
 pub mod opaque;
 #[allow(missing_docs, clippy::missing_docs_in_private_items)]
@@ -70,6 +73,9 @@ pub struct ServiceState {
     #[educe(Debug(ignore))]
     /// The PASETO signing key
     paseto_key: SymmetricKey<V4>,
+    /// The OPAQUE server setup
+    #[educe(Debug(ignore))]
+    server_setup: ServerSetup<CipherSuite>,
     /// Registration key, needed for registering
     registration_key: String,
 }
@@ -96,9 +102,12 @@ async fn main() -> Result<()> {
     let redis = deadpool_redis::Config::from_url(&config.redis_url)
         .create_pool(Some(deadpool_redis::Runtime::Tokio1))?;
 
+    let database = connect_to_database(&config)?;
+
     let state = Arc::new(ServiceState {
-        database: connect_to_database(&config)?,
-        paseto_key: token::get_or_create_paseto_key(&redis).await,
+        paseto_key: token::get_or_create_paseto_key(&database).await?,
+        server_setup: opaque::get_opaque_server_setup(&database).await?,
+        database,
         redis,
         registration_key: Uuid::new_v4().as_hyphenated().to_string(),
     });

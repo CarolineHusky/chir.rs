@@ -1,13 +1,10 @@
 //! OPAQUE support logic
 
-use std::sync::Arc;
-
 use anyhow::Result;
+use diesel_async::{pooled_connection::deadpool::Pool as DatabasePool, AsyncPgConnection};
 use opaque_ke::ServerSetup;
-use redis::cmd;
-use tracing::warn;
 
-use crate::ServiceState;
+use crate::kv::ensure_kv;
 
 pub mod registration;
 
@@ -22,42 +19,13 @@ impl opaque_ke::CipherSuite for CipherSuite {
     type Ksf = argon2::Argon2<'static>;
 }
 
-impl ServiceState {
-    /// Fetches the server setup info from redis
-    async fn fetch_opaque_server_setup(self: &Arc<Self>) -> Result<ServerSetup<CipherSuite>> {
-        let mut conn = self.redis.get().await?;
-
-        let value: Vec<u8> = cmd("GET")
-            .arg(&["opaque/setup"])
-            .query_async(&mut conn)
-            .await?;
-        Ok(ServerSetup::deserialize(&value)?)
-    }
-
-    /// Stores the server setup, returning an error if it already exists
-    async fn set_server_setup(
-        self: &Arc<Self>,
-        server_setup: ServerSetup<CipherSuite>,
-    ) -> Result<()> {
-        let mut conn = self.redis.get().await?;
-        let setup = server_setup.serialize();
-        cmd("SET")
-            .arg("opaque/setup")
-            .arg(setup.as_slice())
-            .arg("NX")
-            .query_async(&mut conn)
-            .await?;
-        Ok(())
-    }
-    /// Loads or generate server setup info
-    pub async fn get_opaque_server_setup(self: &Arc<Self>) -> ServerSetup<CipherSuite> {
-        loop {
-            if let Ok(server_setup) = self.fetch_opaque_server_setup().await {
-                return server_setup;
-            }
-            warn!("No key found. Assuming initial setup");
-            let server_setup = ServerSetup::new(&mut rand::thread_rng());
-            self.set_server_setup(server_setup).await.ok();
-        }
-    }
+pub async fn get_opaque_server_setup(
+    db: &DatabasePool<AsyncPgConnection>,
+) -> Result<ServerSetup<CipherSuite>> {
+    let setup = ensure_kv(db, b"opaque/setup", || {
+        let server_setup = ServerSetup::<CipherSuite>::new(&mut rand::thread_rng());
+        Ok(server_setup.serialize().to_vec())
+    })
+    .await?;
+    ServerSetup::deserialize(&setup).map_err(Into::into)
 }

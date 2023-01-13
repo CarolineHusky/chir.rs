@@ -9,6 +9,13 @@ diesel::table! {
 }
 
 diesel::table! {
+    auth_kv (kv_key) {
+        kv_key -> Bytea,
+        kv_value -> Bytea,
+    }
+}
+
+diesel::table! {
     auth_session_scopes (jti, scope) {
         jti -> Text,
         scope -> Text,
@@ -38,6 +45,7 @@ diesel::joinable!(auth_user_sessions -> auth_users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     auth_authenticators,
+    auth_kv,
     auth_session_scopes,
     auth_user_sessions,
     auth_users,

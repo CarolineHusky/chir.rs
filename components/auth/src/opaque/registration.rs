@@ -32,10 +32,10 @@ impl ServiceState {
         user_id: &str,
         registration_message: &[u8],
     ) -> Result<(String, Vec<u8>)> {
-        let server_setup = self.get_opaque_server_setup().await;
+        let server_setup = &self.server_setup;
         let registration_request = RegistrationRequest::deserialize(registration_message)?;
         let server_registration_start_result = ServerRegistration::<CipherSuite>::start(
-            &server_setup,
+            server_setup,
             registration_request,
             user_id.as_bytes(),
         )?;

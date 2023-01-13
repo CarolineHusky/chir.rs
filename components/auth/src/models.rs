@@ -1,10 +1,24 @@
 //! Database models for the auth service
 
-use crate::schema::{auth_authenticators, auth_session_scopes, auth_user_sessions, auth_users};
+use crate::schema::{
+    auth_authenticators, auth_kv, auth_session_scopes, auth_user_sessions, auth_users,
+};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use educe::Educe;
 use serde::{Deserialize, Serialize};
+
+/// Database model for the key-value store
+#[derive(Debug, Queryable, Identifiable, Insertable, Serialize, Deserialize)]
+#[diesel(table_name = auth_kv)]
+#[non_exhaustive]
+#[diesel(primary_key(kv_key))]
+pub struct KeyValue {
+    /// The key
+    pub kv_key: Vec<u8>,
+    /// The value
+    pub kv_value: Vec<u8>,
+}
 
 /// Database model for local users.
 #[derive(Queryable, Identifiable, Educe, Insertable, Serialize, Deserialize)]
