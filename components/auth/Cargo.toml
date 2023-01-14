@@ -19,8 +19,14 @@ base64 = "0.21.0"
 chir-rs-auth-model = { path = "../auth-model" }
 chrono = { version = "0.4.23", features = ["serde"] }
 deadpool-redis = { version = "0.11.1", features = ["serde"] }
-diesel = { version = "2.0.2", features = ["time", "serde_json", "chrono"] }
+diesel = { version = "2.0.2", features = [
+    "time",
+    "serde_json",
+    "chrono",
+    "postgres",
+] }
 diesel-async = { version = "0.2.0", features = ["postgres", "deadpool"] }
+diesel_migrations = { version = "2.0.0", features = ["postgres"] }
 dotenvy = "0.15.6"
 educe = "0.4.20"
 headers = "0.3.8"

@@ -80,6 +80,22 @@ pub struct ServiceState {
     registration_key: String,
 }
 
+/// Migrate the database, blocking
+///
+/// # Errors
+/// This function returns an error if the database could not be migrated.
+#[allow(clippy::expect_used)]
+fn migrate_database(config: &Config) -> Result<()> {
+    use diesel::prelude::*;
+    use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+    /// Migrations to run
+    const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
+    PgConnection::establish(&config.database_url)?
+        .run_pending_migrations(MIGRATIONS)
+        .expect("Unable to run migrations");
+    Ok(())
+}
+
 /// Connects to the database
 ///
 /// # Errors
@@ -98,6 +114,8 @@ async fn main() -> Result<()> {
         .with_env_filter(tracing_subscriber::filter::EnvFilter::from_default_env())
         .init();
     let config = Config::from_env()?;
+
+    migrate_database(&config)?;
 
     let redis = deadpool_redis::Config::from_url(&config.redis_url)
         .create_pool(Some(deadpool_redis::Runtime::Tokio1))?;
