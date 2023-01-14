@@ -2,54 +2,47 @@
 #![allow(clippy::module_name_repetitions)]
 
 use anyhow::Result;
-use diesel::prelude::*;
-use diesel_async::{
-    pooled_connection::deadpool::Pool as DatabasePool, AsyncPgConnection, RunQueryDsl,
-};
-
-use crate::models::KeyValue;
+use sqlx::{query, PgPool};
 
 /// Retrieves a value from the database
 ///
 /// # Errors
 /// This function will return an error if the request fails
-pub async fn get_kv(
-    db: &DatabasePool<AsyncPgConnection>,
-    key: impl AsRef<[u8]> + Send + Sync,
-) -> Result<Option<Vec<u8>>> {
-    use crate::schema::auth_kv::dsl::{auth_kv, kv_key, kv_value};
-    let mut db = db.get().await?;
-    let result = auth_kv
-        .select(kv_value)
-        .filter(kv_key.eq(key.as_ref()))
-        .first::<Vec<u8>>(&mut db)
-        .await
-        .optional()?;
-    Ok(result)
+#[allow(clippy::missing_panics_doc)]
+#[allow(clippy::panic)]
+pub async fn get_kv(db: &PgPool, key: impl AsRef<[u8]> + Send + Sync) -> Result<Option<Vec<u8>>> {
+    let result = query!(
+        "SELECT kv_value FROM auth_kv WHERE kv_key = $1",
+        key.as_ref()
+    )
+    .fetch_optional(db)
+    .await?;
+    Ok(result.map(|v| v.kv_value))
 }
 
 /// Inserts or updates a value in the database
 ///
 /// # Errors
 /// This function will return an error if the request fails
+#[allow(clippy::missing_panics_doc)]
+#[allow(clippy::panic)]
 pub async fn upsert_kv(
-    db: &DatabasePool<AsyncPgConnection>,
+    db: &PgPool,
     key: impl AsRef<[u8]> + Send + Sync,
     value: impl AsRef<[u8]> + Send + Sync,
 ) -> Result<()> {
-    use crate::schema::auth_kv::dsl::{auth_kv, kv_key, kv_value};
-    let val = KeyValue {
-        kv_key: key.as_ref().to_vec(),
-        kv_value: value.as_ref().to_vec(),
-    };
-    let mut db = db.get().await?;
-    diesel::insert_into(auth_kv)
-        .values(&val)
-        .on_conflict(kv_key)
-        .do_update()
-        .set(kv_value.eq(&val.kv_value))
-        .execute(&mut db)
-        .await?;
+    query!(
+        r#"
+        INSERT INTO auth_kv (kv_key, kv_value)
+            VALUES ($1, $2)
+        ON CONFLICT (kv_key)
+        DO UPDATE SET kv_value = $2
+        "#,
+        key.as_ref(),
+        value.as_ref()
+    )
+    .execute(db)
+    .await?;
     Ok(())
 }
 
@@ -57,21 +50,23 @@ pub async fn upsert_kv(
 ///
 /// # Errors
 /// This function will return an error if the request fails, or the value already exists
+#[allow(clippy::missing_panics_doc)]
+#[allow(clippy::panic)]
 pub async fn insert_kv(
-    db: &DatabasePool<AsyncPgConnection>,
+    db: &PgPool,
     key: impl AsRef<[u8]> + Send + Sync,
     value: impl AsRef<[u8]> + Send + Sync,
 ) -> Result<()> {
-    use crate::schema::auth_kv::dsl::auth_kv;
-    let val = KeyValue {
-        kv_key: key.as_ref().to_vec(),
-        kv_value: value.as_ref().to_vec(),
-    };
-    let mut db = db.get().await?;
-    diesel::insert_into(auth_kv)
-        .values(&val)
-        .execute(&mut db)
-        .await?;
+    query!(
+        r#"
+        INSERT INTO auth_kv (kv_key, kv_value)
+            VALUES ($1, $2)
+        "#,
+        key.as_ref(),
+        value.as_ref()
+    )
+    .execute(db)
+    .await?;
     Ok(())
 }
 
@@ -80,7 +75,7 @@ pub async fn insert_kv(
 /// # Errors
 /// This function will return an error if the request fails, or if the code for the init value returns an error
 pub async fn ensure_kv<F>(
-    db: &DatabasePool<AsyncPgConnection>,
+    db: &PgPool,
     key: impl AsRef<[u8]> + Send + Sync,
     init: F,
 ) -> Result<Vec<u8>>

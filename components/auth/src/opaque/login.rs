@@ -9,14 +9,13 @@ use chir_rs_auth_model::{
     LoginStep3Request, LoginStep3Response, LoginStep4Request, LoginStep4Response,
     LoginStep5Request, LoginStep5Response,
 };
-use diesel::prelude::*;
-use diesel_async::RunQueryDsl;
 use opaque_ke::{
     CredentialFinalization, CredentialRequest, Identifiers, ServerLogin,
     ServerLoginStartParameters, ServerRegistration,
 };
 use redis::cmd;
 use sha2::{Digest, Sha256};
+use sqlx::query;
 use uuid::Uuid;
 
 use crate::{token::on_error, ServiceState};
@@ -36,22 +35,23 @@ impl ServiceState {
     ///
     /// # Errors
     /// This function returns an error if the access fails
+    #[allow(clippy::missing_panics_doc)]
+    #[allow(clippy::panic)]
     pub async fn get_registration_for_user(
         self: &Arc<Self>,
         user_id: &str,
     ) -> Result<Option<ServerRegistration<CipherSuite>>> {
-        use crate::schema::auth_users::dsl::{auth_users, id, password_file};
-        let mut db = self.database.get().await?;
-        let res_serialized = auth_users
-            .select(password_file)
-            .filter(id.eq(user_id))
-            .first::<Vec<u8>>(&mut db)
-            .await
-            .optional()?;
+        let res_serialized = query!(
+            "SELECT password_file FROM auth_users WHERE id = $1 AND activated = $2",
+            user_id,
+            true
+        )
+        .fetch_optional(&self.database)
+        .await?;
 
         if let Some(serialized) = res_serialized {
             Ok(Some(ServerRegistration::deserialize(
-                serialized.as_slice(),
+                serialized.password_file.as_slice(),
             )?))
         } else {
             Ok(None)

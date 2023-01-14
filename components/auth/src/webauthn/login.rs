@@ -11,9 +11,8 @@ use axum::{extract::State, response::Response, Json};
 use chir_rs_auth_model::{
     LoginStep1Request, LoginStep1Response, LoginStep2Request, LoginStep2Response,
 };
-use diesel::prelude::*;
-use diesel_async::RunQueryDsl;
 use redis::cmd;
+use sqlx::query;
 use uuid::Uuid;
 use webauthn_rs::prelude::{
     AuthenticationResult, PublicKeyCredential, RequestChallengeResponse, SecurityKey,
@@ -26,19 +25,18 @@ impl ServiceState {
     ///
     /// # Errors
     /// This function return an error if the request fails.
+    #[allow(clippy::missing_panics_doc)]
+    #[allow(clippy::panic)]
     pub async fn get_webauthn_devices(self: &Arc<Self>, user: &str) -> Result<Vec<SecurityKey>> {
-        use crate::schema::auth_authenticators::dsl::{
-            auth_authenticators, user_id, webauthn_registration,
-        };
-        let mut db = self.database.get().await?;
-        let res = auth_authenticators
-            .select(webauthn_registration)
-            .filter(user_id.eq(user))
-            .load(&mut db)
-            .await?;
+        let res = query!(
+            "SELECT webauthn_registration FROM auth_authenticators WHERE user_id = $1",
+            user
+        )
+        .fetch_all(&self.database)
+        .await?;
         Ok(res
             .into_iter()
-            .map(|x: String| serde_json::from_str::<SecurityKey>(&x))
+            .map(|x| serde_json::from_value::<SecurityKey>(x.webauthn_registration))
             .collect::<Result<Vec<SecurityKey>, _>>()?)
     }
 
@@ -46,45 +44,58 @@ impl ServiceState {
     ///
     /// # Errors
     /// This function returns an error if the request fails, or the corresponding device does not exist.
+    #[allow(clippy::missing_panics_doc)]
+    #[allow(clippy::panic)]
     pub async fn get_webauthn_device(
         self: &Arc<Self>,
         user: &str,
         auth_id: &[u8],
     ) -> Result<SecurityKey> {
-        use crate::schema::auth_authenticators::dsl::{
-            auth_authenticators, id, user_id, webauthn_registration,
-        };
-        let mut db = self.database.get().await?;
-        let res: String = auth_authenticators
-            .select(webauthn_registration)
-            .filter(user_id.eq(user))
-            .filter(id.eq(auth_id))
-            .first(&mut db)
-            .await?;
-        Ok(serde_json::from_str(&res)?)
+        let res = query!(
+            r#"
+            SELECT webauthn_registration
+            FROM auth_authenticators
+            WHERE user_id = $1 AND id = $2
+            "#,
+            user,
+            auth_id
+        )
+        .fetch_one(&self.database)
+        .await?;
+        Ok(serde_json::from_value(res.webauthn_registration)?)
     }
 
     /// Updates a webauthn device based on the authentication result
     ///
     /// # Errors
     /// This function returns an error if the request fails, or the corresponding device does not exist.
+    #[allow(clippy::missing_panics_doc)]
+    #[allow(clippy::panic)]
     pub async fn update_authenticator(
         self: &Arc<Self>,
         user: &str,
         auth_result: AuthenticationResult,
     ) -> Result<()> {
-        use crate::schema::auth_authenticators::dsl::{auth_authenticators, webauthn_registration};
         let mut authenticator = self
             .get_webauthn_device(user, auth_result.cred_id().as_ref())
             .await?;
         if authenticator.update_credential(&auth_result) != Some(true) {
             return Ok(());
         }
-        let mut db = self.database.get().await?;
-        diesel::update(auth_authenticators.find(auth_result.cred_id().as_ref()))
-            .set(webauthn_registration.eq(serde_json::to_string(&auth_result)?))
-            .execute(&mut db)
-            .await?;
+        query!(
+            r#"
+            UPDATE auth_authenticators
+            SET webauthn_registration = $1
+            WHERE user_id = $2
+            AND id = $3
+            "#,
+            serde_json::to_value(&auth_result)?,
+            user,
+            auth_result.cred_id().0
+        )
+        .execute(&self.database)
+        .await?;
+
         Ok(())
     }
 

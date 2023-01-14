@@ -11,11 +11,7 @@ use axum::{
     response::{IntoResponse, Response},
     Json, RequestPartsExt, TypedHeader,
 };
-use chrono::{Months, SecondsFormat, Utc};
-use diesel::prelude::*;
-use diesel_async::{
-    pooled_connection::deadpool::Pool as DatabasePool, AsyncPgConnection, RunQueryDsl,
-};
+use chrono::{DateTime, Months, SecondsFormat, Utc};
 use headers::authorization::Bearer;
 use once_cell::sync::Lazy;
 use pasetors::{
@@ -29,23 +25,17 @@ use pasetors::{
 use redis::cmd;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use sqlx::{query, query_as, PgPool};
 use tracing::{error, info};
 use uuid::Uuid;
 
-use crate::{
-    kv::ensure_kv,
-    models::{SessionScope, UserSession},
-    schema::{auth_session_scopes, auth_user_sessions},
-    ServiceState,
-};
+use crate::{kv::ensure_kv, models::UserSession, ServiceState};
 
 /// Loads or Creates the PASETO key
 ///
 /// # Errors
 /// This function returns an error if loading or generating the PASETO key fails.
-pub async fn get_or_create_paseto_key(
-    db: &DatabasePool<AsyncPgConnection>,
-) -> Result<SymmetricKey<V4>> {
+pub async fn get_or_create_paseto_key(db: &PgPool) -> Result<SymmetricKey<V4>> {
     let key = ensure_kv(db, b"paseto/key", || {
         SymmetricKey::generate()
             .map(|v| v.as_bytes().to_vec())
@@ -63,7 +53,7 @@ pub struct AuthenticatedUser {
     /// Scopes that the user can access
     scopes: HashSet<String>,
     /// Session ID of the session
-    session_id: String,
+    session_id: Uuid,
 }
 
 impl AuthenticatedUser {
@@ -73,13 +63,18 @@ impl AuthenticatedUser {
     ///
     /// # Errors
     /// This function returns an error if logging out fails
+    #[allow(clippy::missing_panics_doc)]
+    #[allow(clippy::panic)]
     pub async fn logout(&self, state: &Arc<ServiceState>) -> Result<()> {
-        use crate::schema::auth_user_sessions::dsl::{auth_user_sessions, jti};
-        let mut db = state.database.get().await?;
         info!("{} logged out", self.session_id);
-        diesel::delete(auth_user_sessions.filter(jti.eq(&self.session_id)))
-            .execute(&mut db)
-            .await?;
+        query!(
+            "DELETE FROM auth_user_sessions WHERE user_id = $1 AND jti = $2",
+            &self.id,
+            &self.session_id
+        )
+        .execute(&state.database)
+        .await?;
+
         state.invalidate_user_session(&self.session_id).await?;
         Ok(())
     }
@@ -90,17 +85,25 @@ impl AuthenticatedUser {
     ///
     /// # Errors
     /// This function returns an error if removing the scope fails
+    #[allow(clippy::missing_panics_doc)]
+    #[allow(clippy::panic)]
     pub async fn remove_scope(&self, state: &Arc<ServiceState>, scope_name: &str) -> Result<()> {
-        use crate::schema::auth_session_scopes::dsl::{auth_session_scopes, jti, scope};
-        let mut db = state.database.get().await?;
-        diesel::delete(
-            auth_session_scopes
-                .filter(jti.eq(&self.session_id))
-                .filter(scope.eq(&scope_name)),
+        query!(
+            r#"
+            DELETE FROM auth_session_scopes
+                USING auth_user_sessions
+                WHERE auth_user_sessions.jti = $1
+                    AND auth_session_scopes.jti = $1
+                    AND auth_session_scopes.scope = $2
+                    AND auth_user_sessions.user_id = $3
+            "#,
+            &self.session_id,
+            &scope_name,
+            &self.id
         )
-        .execute(&mut db)
+        .execute(&state.database)
         .await?;
-        state.invalidate_user_session(&self.session_id).await?;
+
         Ok(())
     }
 
@@ -121,7 +124,8 @@ impl ServiceState {
     ///
     /// # Errors
     /// This function will return an error if connection to redis fails or
-    pub async fn get_cached_token(self: &Arc<Self>, jti: &str) -> Result<AuthenticatedUser> {
+    pub async fn get_cached_token(self: &Arc<Self>, jti: &Uuid) -> Result<AuthenticatedUser> {
+        let jti = jti.as_hyphenated().to_string();
         let mut conn = self.redis.get().await?;
         let value: String = cmd("GET")
             .arg(format!("auth/session:{jti}"))
@@ -135,15 +139,16 @@ impl ServiceState {
     ///
     /// # Errors
     /// This function will return an error if the list couldn’t be fetched
-    pub async fn list_user_sessions(self: &Arc<Self>, user_id_str: &str) -> Result<Vec<String>> {
-        use crate::schema::auth_user_sessions::dsl::{auth_user_sessions, jti, user_id};
-        let mut db = self.database.get().await?;
-        let res = auth_user_sessions
-            .select(jti)
-            .filter(user_id.eq(&user_id_str))
-            .load(&mut db)
-            .await?;
-        Ok(res.into_iter().collect())
+    #[allow(clippy::missing_panics_doc)]
+    #[allow(clippy::panic)]
+    pub async fn list_user_sessions(self: &Arc<Self>, user_id: &str) -> Result<Vec<Uuid>> {
+        let res = query!(
+            "SELECT jti FROM auth_user_sessions WHERE user_id = $1",
+            user_id
+        )
+        .fetch_all(&self.database)
+        .await?;
+        Ok(res.into_iter().map(|r| r.jti).collect::<Vec<_>>())
     }
 
     /// Attempts to cache a token to redis
@@ -152,9 +157,10 @@ impl ServiceState {
     /// This function will return an error if connection to redis fails
     pub async fn try_cache_token(
         self: &Arc<Self>,
-        jti: &str,
+        jti: &Uuid,
         user: &AuthenticatedUser,
     ) -> Result<()> {
+        let jti = jti.as_hyphenated().to_string();
         let mut conn = self.redis.get().await?;
         let encoded = serde_json::to_string(user)?;
         cmd("SET")
@@ -174,7 +180,7 @@ impl ServiceState {
     /// This function will return an error if the token is invalid or the database connection fails
     pub async fn get_session_for_user(
         self: &Arc<Self>,
-        jti: &str,
+        jti: &Uuid,
         user: &str,
     ) -> Result<AuthenticatedUser> {
         let sess = self.get_user_session(jti).await?;
@@ -192,7 +198,7 @@ impl ServiceState {
     ///
     /// # Errors
     /// This function will return an error if the token is invalid or the database connection fails
-    pub async fn get_user_session(self: &Arc<Self>, jti: &str) -> Result<AuthenticatedUser> {
+    pub async fn get_user_session(self: &Arc<Self>, jti: &Uuid) -> Result<AuthenticatedUser> {
         if let Ok(sess) = self.get_cached_token(jti).await {
             return Ok(sess);
         }
@@ -201,7 +207,7 @@ impl ServiceState {
         let sess = AuthenticatedUser {
             id: token.user_id,
             scopes,
-            session_id: jti.to_owned(),
+            session_id: *jti,
         };
         self.try_cache_token(jti, &sess).await.ok();
         Ok(sess)
@@ -211,7 +217,8 @@ impl ServiceState {
     ///
     /// # Errors
     /// This function will return an error if redis access failed
-    pub async fn invalidate_user_session(self: &Arc<Self>, jti: &str) -> Result<()> {
+    pub async fn invalidate_user_session(self: &Arc<Self>, jti: &Uuid) -> Result<()> {
+        let jti = jti.as_hyphenated().to_string();
         let mut conn = self.redis.get().await?;
         cmd("DEL")
             .arg(format!("auth/session:{jti}"))
@@ -224,9 +231,10 @@ impl ServiceState {
     ///
     /// # Errors
     /// This function returns an error if the database connection fails
+    #[allow(clippy::missing_panics_doc)]
+    #[allow(clippy::panic)]
     pub async fn issue_token(self: &Arc<Self>, user: &str, scopes: &[String]) -> Result<String> {
-        let jti = Uuid::new_v4().to_string();
-        let mut db = self.database.get().await?;
+        let jti = Uuid::new_v4();
         let now = Utc::now();
         let expire = now.checked_add_months(Months::new(1)).unwrap_or(now);
         let expire_paseto = expire.to_rfc3339_opts(SecondsFormat::Secs, true);
@@ -235,34 +243,40 @@ impl ServiceState {
         claims.issuer("https://auth.chir.rs/")?;
         claims.subject(user)?;
         claims.expiration(&expire_paseto)?;
-        claims.token_identifier(&jti)?;
+        claims.token_identifier(&jti.as_hyphenated().to_string())?;
 
         let token = local::encrypt(&self.paseto_key, &claims, None, None)?;
 
-        let db_session = UserSession {
-            jti: jti.clone(),
-            user_id: user.to_owned(),
-            exp_at: expire,
-            reauth_after: None,
-        };
+        let mut tx = self.database.begin().await?;
 
-        diesel::insert_into(auth_user_sessions::table)
-            .values(db_session)
-            .execute(&mut db)
-            .await?;
+        query!(
+            r#"
+                INSERT INTO auth_user_sessions
+                    (jti, user_id, exp_at, reauth_after)
+                VALUES ($1, $2, $3, $4)
+            "#,
+            jti,
+            user,
+            expire,
+            None::<DateTime<Utc>>
+        )
+        .execute(&mut tx)
+        .await?;
 
-        diesel::insert_into(auth_session_scopes::table)
-            .values(
-                scopes
-                    .iter()
-                    .map(|v| SessionScope {
-                        jti: jti.clone(),
-                        scope: v.clone(),
-                    })
-                    .collect::<Vec<_>>(),
+        for scope in scopes {
+            query!(
+                r#"
+                    INSERT INTO auth_session_scopes
+                        (jti, scope)
+                    VALUES ($1, $2)
+                "#,
+                jti,
+                scope
             )
-            .execute(&mut db)
+            .execute(&mut tx)
             .await?;
+        }
+        tx.commit().await?;
 
         Ok(token)
     }
@@ -312,14 +326,20 @@ pub fn on_server_error(e: impl std::fmt::Debug) -> Response {
 ///
 /// # Errors
 /// This function returns an error if the token doesn’t exist
-#[allow(clippy::wildcard_imports)]
-async fn get_token_info(state: &Arc<ServiceState>, token_jti: &str) -> Result<UserSession> {
-    use crate::schema::auth_user_sessions::dsl::*;
-    let mut db = state.database.get().await?;
-    let res = auth_user_sessions
-        .filter(jti.eq(token_jti))
-        .first(&mut db)
-        .await?;
+#[allow(clippy::missing_panics_doc)]
+#[allow(clippy::panic)]
+async fn get_token_info(state: &Arc<ServiceState>, token_jti: &Uuid) -> Result<UserSession> {
+    let res = query_as!(
+        UserSession,
+        r#"
+            SELECT * FROM auth_user_sessions
+            WHERE jti = $1
+            LIMIT 1
+        "#,
+        token_jti
+    )
+    .fetch_one(&state.database)
+    .await?;
     Ok(res)
 }
 
@@ -327,16 +347,19 @@ async fn get_token_info(state: &Arc<ServiceState>, token_jti: &str) -> Result<Us
 ///
 /// # Errors
 /// This function returns an error if the connection to the database fails
-#[allow(clippy::wildcard_imports)]
-async fn get_token_scopes(state: &Arc<ServiceState>, token_jti: &str) -> Result<HashSet<String>> {
-    use crate::schema::auth_session_scopes::dsl::*;
-    let mut db = state.database.get().await?;
-    let res = auth_session_scopes
-        .select(scope)
-        .filter(jti.eq(token_jti))
-        .load(&mut db)
-        .await?;
-    Ok(res.into_iter().collect())
+#[allow(clippy::missing_panics_doc)]
+#[allow(clippy::panic)]
+async fn get_token_scopes(state: &Arc<ServiceState>, token_jti: &Uuid) -> Result<HashSet<String>> {
+    let res = query!(
+        r#"
+            SELECT scope FROM auth_session_scopes
+            WHERE jti = $1
+        "#,
+        token_jti
+    )
+    .fetch_all(&state.database)
+    .await?;
+    Ok(res.into_iter().map(|v| v.scope).collect())
 }
 
 /// The validation rules for token validation
@@ -393,10 +416,10 @@ impl FromRequestParts<Arc<ServiceState>> for AuthenticatedUser {
             .payload_claims()
             .ok_or_else(on_error_response)?;
 
-        let sess = state
-            .get_user_session(claims.get_string_claim("jti").map_err(on_error)?)
-            .await
-            .map_err(on_error)?;
+        let jti = claims.get_string_claim("jti").map_err(on_error)?;
+        let jti = Uuid::parse_str(jti).map_err(on_error)?;
+
+        let sess = state.get_user_session(&jti).await.map_err(on_error)?;
         if sess.id != claims.get_string_claim("sub").map_err(on_error)? {
             return Err(on_error_response());
         }

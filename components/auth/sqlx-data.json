@@ -1,0 +1,286 @@
+{
+  "db": "PostgreSQL",
+  "12fb0e563e67c2416eaee8719a490931768e8ba6df96081357e44b63e0277b0d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Text"
+        ]
+      }
+    },
+    "query": "\n                    INSERT INTO auth_session_scopes\n                        (jti, scope)\n                    VALUES ($1, $2)\n                "
+  },
+  "1c268dc66e825bf2d1194e3d109f885712aa244d225a5853c40146713e151bec": {
+    "describe": {
+      "columns": [
+        {
+          "name": "kv_value",
+          "ordinal": 0,
+          "type_info": "Bytea"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea"
+        ]
+      }
+    },
+    "query": "SELECT kv_value FROM auth_kv WHERE kv_key = $1"
+  },
+  "31c2a33c87bde4a523bcca0b5f96bfd20ffcfd372e3341c7febd5c7a399f231d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Jsonb",
+          "Text",
+          "Bytea"
+        ]
+      }
+    },
+    "query": "\n            UPDATE auth_authenticators\n            SET webauthn_registration = $1\n            WHERE user_id = $2\n            AND id = $3\n            "
+  },
+  "39d5de1b2009bb0fc9d3583abb3e5cfd48d53cb6b8792d6a59c47c8b74799733": {
+    "describe": {
+      "columns": [
+        {
+          "name": "jti",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "exp_at",
+          "ordinal": 2,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "reauth_after",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n            SELECT * FROM auth_user_sessions\n            WHERE jti = $1\n            LIMIT 1\n        "
+  },
+  "4b333d74eec90edd7233958f1c339fbd20d5937c1ba2ee6165798eff9d6e5f51": {
+    "describe": {
+      "columns": [
+        {
+          "name": "jti",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT jti FROM auth_user_sessions WHERE user_id = $1"
+  },
+  "4d41c32fe398f3a168063bdea127de361d0628570fc4fd80f8ff55b74cf1ff2f": {
+    "describe": {
+      "columns": [
+        {
+          "name": "webauthn_registration",
+          "ordinal": 0,
+          "type_info": "Jsonb"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT webauthn_registration FROM auth_authenticators WHERE user_id = $1"
+  },
+  "6b839bb34dc043976b0e991906a1c5e430344a1326aba70bcc59acf9458a7164": {
+    "describe": {
+      "columns": [
+        {
+          "name": "webauthn_registration",
+          "ordinal": 0,
+          "type_info": "Jsonb"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Bytea"
+        ]
+      }
+    },
+    "query": "\n            SELECT webauthn_registration\n            FROM auth_authenticators\n            WHERE user_id = $1 AND id = $2\n            "
+  },
+  "78cc4de01353fa070fc27a050465f53cbc2c4e8129cb6fc71fc6e71f09855cf4": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Text",
+          "Timestamptz",
+          "Timestamptz"
+        ]
+      }
+    },
+    "query": "\n                INSERT INTO auth_user_sessions\n                    (jti, user_id, exp_at, reauth_after)\n                VALUES ($1, $2, $3, $4)\n            "
+  },
+  "96cea581fa2ddc88d15e02aff78c41a9564947b5d8eb7534eaf0e20843ce2ed8": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "DELETE FROM auth_user_sessions WHERE user_id = $1 AND jti = $2"
+  },
+  "a629ef99c42bdc7cd9b48aaad3c34027c044e902e1a2968d082de3d125ca3f35": {
+    "describe": {
+      "columns": [
+        {
+          "name": "scope",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n            SELECT scope FROM auth_session_scopes\n            WHERE jti = $1\n        "
+  },
+  "c29c5f5adfc2bae865ae670e6ba41869e787585d92611621f268453f124d00a5": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Text",
+          "Text"
+        ]
+      }
+    },
+    "query": "\n            DELETE FROM auth_session_scopes\n                USING auth_user_sessions\n                WHERE auth_user_sessions.jti = $1\n                    AND auth_session_scopes.jti = $1\n                    AND auth_session_scopes.scope = $2\n                    AND auth_user_sessions.user_id = $3\n            "
+  },
+  "d1b1ee535bbff7dd06655ce27696e17ae5f8b495eef3ad32ea2c3024b2dc4d93": {
+    "describe": {
+      "columns": [
+        {
+          "name": "password_file",
+          "ordinal": 0,
+          "type_info": "Bytea"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Bool"
+        ]
+      }
+    },
+    "query": "SELECT password_file FROM auth_users WHERE id = $1 AND activated = $2"
+  },
+  "d1eb826ddb981be67a26eeaa493344b2802e4e77ac75e1e24d0c1c238131f9f6": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Bytea"
+        ]
+      }
+    },
+    "query": "\n        INSERT INTO auth_kv (kv_key, kv_value)\n            VALUES ($1, $2)\n        ON CONFLICT (kv_key)\n        DO UPDATE SET kv_value = $2\n        "
+  },
+  "d5d1260b77cc56ef0ad5c6a439eae11958dd9e8697a6914a0c593aa198de070b": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text",
+          "Jsonb"
+        ]
+      }
+    },
+    "query": "\n                INSERT INTO auth_authenticators\n                    (id, user_id, webauthn_registration)\n                VALUES\n                    ($1, $2, $3)\n            "
+  },
+  "eb5e4e21e9faef249870195cd63ef607c75f14e1345e94cdb9a134fd752a7f6d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Bytea"
+        ]
+      }
+    },
+    "query": "\n        INSERT INTO auth_kv (kv_key, kv_value)\n            VALUES ($1, $2)\n        "
+  },
+  "f7e8accc5a5ce7f3375899a57372b7cce1631e6b5bf5262428888dc2e2b57e4e": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Bytea",
+          "Bool"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO auth_users\n                (id, password_file, activated)\n            VALUES\n                ($1, $2, $3)\n        "
+  }
+}

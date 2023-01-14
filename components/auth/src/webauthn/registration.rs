@@ -7,19 +7,15 @@ use axum::{extract::State, response::Response, Json};
 use chir_rs_auth_model::{
     RegistrationStep3Request, RegistrationStep3Response, RegistrationStep4Request,
 };
-use diesel_async::RunQueryDsl;
 use redis::cmd;
+use sqlx::query;
 use uuid::Uuid;
 use webauthn_rs::prelude::{
     AuthenticatorAttachment, CreationChallengeResponse, RegisterPublicKeyCredential,
     SecurityKeyRegistration,
 };
 
-use crate::{
-    models::{Authenticator, User},
-    token::on_error,
-    ServiceState,
-};
+use crate::{models::User, token::on_error, ServiceState};
 
 impl ServiceState {
     /// Starts webauthn token registration
@@ -61,12 +57,13 @@ impl ServiceState {
     ///
     /// # Errors
     /// Function returns an error if registering the authenticator failed
+    #[allow(clippy::missing_panics_doc)]
+    #[allow(clippy::panic)]
     pub async fn finish_webauthn_registration(
         self: &Arc<Self>,
         continuation_token: &str,
         registration: RegisterPublicKeyCredential,
     ) -> Result<()> {
-        use crate::schema::{auth_authenticators, auth_users};
         let mut conn = self.redis.get().await?;
         let state_json: String = cmd("GETDEL")
             .arg(format!("registration/step3:{continuation_token}"))
@@ -76,20 +73,36 @@ impl ServiceState {
             serde_json::from_str(&state_json)?;
         let security_key =
             super::WEBAUTHN.finish_securitykey_registration(&registration, &registration_state)?;
-        let mut db = self.database.get().await?;
-        diesel::insert_into(auth_users::table)
-            .values(&user)
-            .execute(&mut db)
-            .await?;
-        let authenticator = Authenticator {
-            id: security_key.cred_id().0.clone(),
-            user_id: user.id,
-            webauthn_registration: serde_json::to_string(&security_key)?,
-        };
-        diesel::insert_into(auth_authenticators::table)
-            .values(&authenticator)
-            .execute(&mut db)
-            .await?;
+        let mut tx = self.database.begin().await?;
+
+        query!(
+            r#"
+            INSERT INTO auth_users
+                (id, password_file, activated)
+            VALUES
+                ($1, $2, $3)
+        "#,
+            user.id,
+            user.password_file,
+            user.activated
+        )
+        .execute(&mut tx)
+        .await?;
+
+        query!(
+            r#"
+                INSERT INTO auth_authenticators
+                    (id, user_id, webauthn_registration)
+                VALUES
+                    ($1, $2, $3)
+            "#,
+            security_key.cred_id().0,
+            user.id,
+            serde_json::to_value(&registration)?
+        )
+        .execute(&mut tx)
+        .await?;
+        tx.commit().await?;
         Ok(())
     }
 }

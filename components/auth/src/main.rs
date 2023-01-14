@@ -9,24 +9,19 @@ use axum::{
     routing::{delete, get, post},
     Router,
 };
-use diesel_async::{
-    pooled_connection::{deadpool::Pool as DatabasePool, AsyncDieselConnectionManager},
-    AsyncPgConnection,
-};
 use dotenvy::dotenv;
 use educe::Educe;
 use opaque::CipherSuite;
 use opaque_ke::ServerSetup;
 use pasetors::{keys::SymmetricKey, version4::V4};
 use serde::{Deserialize, Serialize};
+use sqlx::{postgres::PgPoolOptions, PgPool};
 use std::{net::SocketAddr, path::Path, sync::Arc};
 use tracing::info;
 use uuid::Uuid;
 pub mod kv;
 pub mod models;
 pub mod opaque;
-#[allow(missing_docs, clippy::missing_docs_in_private_items)]
-pub mod schema;
 pub mod session;
 pub mod token;
 pub mod webauthn;
@@ -66,7 +61,7 @@ impl Config {
 pub struct ServiceState {
     /// The database connection
     #[educe(Debug(ignore))]
-    database: DatabasePool<AsyncPgConnection>,
+    database: PgPool,
     #[educe(Debug(ignore))]
     /// The redis connection
     redis: deadpool_redis::Pool,
@@ -85,14 +80,8 @@ pub struct ServiceState {
 /// # Errors
 /// This function returns an error if the database could not be migrated.
 #[allow(clippy::expect_used)]
-fn migrate_database(config: &Config) -> Result<()> {
-    use diesel::prelude::*;
-    use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-    /// Migrations to run
-    const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
-    PgConnection::establish(&config.database_url)?
-        .run_pending_migrations(MIGRATIONS)
-        .expect("Unable to run migrations");
+async fn migrate_database(pool: &PgPool) -> Result<()> {
+    sqlx::migrate!().run(pool).await?;
     Ok(())
 }
 
@@ -100,9 +89,12 @@ fn migrate_database(config: &Config) -> Result<()> {
 ///
 /// # Errors
 /// returns an error if the connection to the database failed
-fn connect_to_database(config: &Config) -> Result<DatabasePool<AsyncPgConnection>> {
-    let config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(&config.database_url);
-    let pool = DatabasePool::builder(config).build()?;
+async fn connect_to_database(config: &Config) -> Result<PgPool> {
+    let pool = PgPoolOptions::new()
+        .max_connections(10)
+        .connect(&config.database_url)
+        .await?;
+    migrate_database(&pool).await?;
     Ok(pool)
 }
 
@@ -115,12 +107,10 @@ async fn main() -> Result<()> {
         .init();
     let config = Config::from_env()?;
 
-    migrate_database(&config)?;
-
     let redis = deadpool_redis::Config::from_url(&config.redis_url)
         .create_pool(Some(deadpool_redis::Runtime::Tokio1))?;
 
-    let database = connect_to_database(&config)?;
+    let database = connect_to_database(&config).await?;
 
     let state = Arc::new(ServiceState {
         paseto_key: token::get_or_create_paseto_key(&database).await?,

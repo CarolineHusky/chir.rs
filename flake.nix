@@ -60,7 +60,7 @@
               dhall-lsp-server
               gdb
               rnix-lsp
-              diesel-cli
+              sqlx-cli
               sqlite
               pkg-config
               openssl

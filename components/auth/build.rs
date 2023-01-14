@@ -1,6 +1,7 @@
-//! Build script for auth-chir-rs
+//! auth-chir-rs build script
 
-/// Build script for auth-chir-rs
+/// Auth-chir-rs build script
 fn main() {
+    // trigger recompilation when a new migration is added
     println!("cargo:rerun-if-changed=migrations");
 }
