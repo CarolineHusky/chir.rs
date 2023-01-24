@@ -13,7 +13,7 @@ readme = "README.md"
 [dependencies]
 anyhow = { version = "1.0.68", features = ["backtrace"] }
 argon2 = { version = "0.4.1", features = ["parallel", "rayon", "zeroize"] }
-async-trait = "0.1.61"
+async-trait = "0.1.63"
 axum = { version = "0.6.2", features = ["headers", "macros"] }
 base64 = "0.21.0"
 chir-rs-auth-model = { path = "../auth-model" }
