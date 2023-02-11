@@ -324,7 +324,7 @@ in {
     };
     dependencies = {
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
-      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {inherit profileName;};
+      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" {inherit profileName;};
     };
   });
 
@@ -418,7 +418,7 @@ in {
       percent_encoding = rustPackages."registry+https://github.com/rust-lang/crates.io-index".percent-encoding."2.2.0" {inherit profileName;};
       pin_project_lite = rustPackages."registry+https://github.com/rust-lang/crates.io-index".pin-project-lite."0.2.9" {inherit profileName;};
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
-      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {inherit profileName;};
+      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" {inherit profileName;};
       serde_path_to_error = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_path_to_error."0.1.8" {inherit profileName;};
       serde_urlencoded = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_urlencoded."0.7.1" {inherit profileName;};
       sync_wrapper = rustPackages."registry+https://github.com/rust-lang/crates.io-index".sync_wrapper."0.1.1" {inherit profileName;};
@@ -563,7 +563,7 @@ in {
     dependencies = {
       base64 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".base64."0.13.1" {inherit profileName;};
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
-      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {inherit profileName;};
+      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" {inherit profileName;};
     };
   });
 
@@ -691,7 +691,7 @@ in {
       redis = rustPackages."registry+https://github.com/rust-lang/crates.io-index".redis."0.22.3" {inherit profileName;};
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
       serde_dhall = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_dhall."0.12.1" {inherit profileName;};
-      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {inherit profileName;};
+      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" {inherit profileName;};
       sha2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".sha2."0.10.6" {inherit profileName;};
       sqlx = rustPackages."registry+https://github.com/rust-lang/crates.io-index".sqlx."0.6.2" {inherit profileName;};
       tokio = rustPackages."registry+https://github.com/rust-lang/crates.io-index".tokio."1.25.0" {inherit profileName;};
@@ -838,7 +838,7 @@ in {
       hex = rustPackages."registry+https://github.com/rust-lang/crates.io-index".hex."0.4.3" {inherit profileName;};
       openssl = rustPackages."registry+https://github.com/rust-lang/crates.io-index".openssl."0.10.45" {inherit profileName;};
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
-      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {inherit profileName;};
+      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" {inherit profileName;};
       tracing = rustPackages."registry+https://github.com/rust-lang/crates.io-index".tracing."0.1.37" {inherit profileName;};
       url = rustPackages."registry+https://github.com/rust-lang/crates.io-index".url."2.3.1" {inherit profileName;};
       uuid = rustPackages."registry+https://github.com/rust-lang/crates.io-index".uuid."1.3.0" {inherit profileName;};
@@ -2463,7 +2463,7 @@ in {
       phf_codegen = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".phf_codegen."0.7.24" {profileName = "__noProfile";};
       serde = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {profileName = "__noProfile";};
       serde_derive = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_derive."1.0.152" {profileName = "__noProfile";};
-      serde_json = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {profileName = "__noProfile";};
+      serde_json = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" {profileName = "__noProfile";};
       string_cache_codegen = buildRustPackages."registry+https://github.com/rust-lang/crates.io-index".string_cache_codegen."0.4.4" {profileName = "__noProfile";};
     };
   });
@@ -2552,7 +2552,7 @@ in {
       log = rustPackages."registry+https://github.com/rust-lang/crates.io-index".log."0.4.17" {inherit profileName;};
       regex = rustPackages."registry+https://github.com/rust-lang/crates.io-index".regex."1.7.0" {inherit profileName;};
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
-      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {inherit profileName;};
+      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" {inherit profileName;};
       thiserror = rustPackages."registry+https://github.com/rust-lang/crates.io-index".thiserror."1.0.38" {inherit profileName;};
       url = rustPackages."registry+https://github.com/rust-lang/crates.io-index".url."2.3.1" {inherit profileName;};
     };
@@ -2565,7 +2565,7 @@ in {
     src = fetchCrateLocal (workspaceSrc + "/lib/ld-microformats");
     dependencies = {
       microformats = rustPackages."registry+https://github.com/rust-lang/crates.io-index".microformats."0.3.0" {inherit profileName;};
-      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {inherit profileName;};
+      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" {inherit profileName;};
       thiserror = rustPackages."registry+https://github.com/rust-lang/crates.io-index".thiserror."1.0.38" {inherit profileName;};
     };
     devDependencies = {
@@ -3094,7 +3094,7 @@ in {
       getrandom = rustPackages."registry+https://github.com/rust-lang/crates.io-index".getrandom."0.2.8" {inherit profileName;};
       orion = rustPackages."registry+https://github.com/rust-lang/crates.io-index".orion."0.17.3" {inherit profileName;};
       regex = rustPackages."registry+https://github.com/rust-lang/crates.io-index".regex."1.7.0" {inherit profileName;};
-      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {inherit profileName;};
+      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" {inherit profileName;};
       subtle = rustPackages."registry+https://github.com/rust-lang/crates.io-index".subtle."2.4.1" {inherit profileName;};
       time = rustPackages."registry+https://github.com/rust-lang/crates.io-index".time."0.3.17" {inherit profileName;};
       zeroize = rustPackages."registry+https://github.com/rust-lang/crates.io-index".zeroize."1.5.7" {inherit profileName;};
@@ -4236,13 +4236,13 @@ in {
     };
   });
 
-  "registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" = overridableMkRustCrate (profileName: rec {
+  "registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" = overridableMkRustCrate (profileName: rec {
     name = "serde_json";
-    version = "1.0.91";
+    version = "1.0.93";
     registry = "registry+https://github.com/rust-lang/crates.io-index";
     src = fetchCratesIo {
       inherit name version;
-      sha256 = "877c235533714907a8c2464236f5c4b2a17262ef1bd71f38f35ea592c8da6883";
+      sha256 = "cad406b69c91885b5107daf2c29572f6c8cdb3c66826821e286c533490c0bc76";
     };
     features = builtins.concatLists [
       ["default"]
@@ -4526,7 +4526,7 @@ in {
       rustls = rustPackages."registry+https://github.com/rust-lang/crates.io-index".rustls."0.20.8" {inherit profileName;};
       rustls_pemfile = rustPackages."registry+https://github.com/rust-lang/crates.io-index".rustls-pemfile."1.0.2" {inherit profileName;};
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
-      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {inherit profileName;};
+      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" {inherit profileName;};
       sha1 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".sha1."0.10.5" {inherit profileName;};
       sha2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".sha2."0.10.6" {inherit profileName;};
       smallvec = rustPackages."registry+https://github.com/rust-lang/crates.io-index".smallvec."1.10.0" {inherit profileName;};
@@ -4573,7 +4573,7 @@ in {
       proc_macro2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".proc-macro2."1.0.47" {inherit profileName;};
       quote = rustPackages."registry+https://github.com/rust-lang/crates.io-index".quote."1.0.18" {inherit profileName;};
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
-      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {inherit profileName;};
+      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" {inherit profileName;};
       sha2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".sha2."0.10.6" {inherit profileName;};
       sqlx_core = rustPackages."registry+https://github.com/rust-lang/crates.io-index".sqlx-core."0.6.2" {inherit profileName;};
       sqlx_rt = rustPackages."registry+https://github.com/rust-lang/crates.io-index".sqlx-rt."0.6.2" {inherit profileName;};
@@ -5781,7 +5781,7 @@ in {
       rand = rustPackages."registry+https://github.com/rust-lang/crates.io-index".rand."0.8.5" {inherit profileName;};
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
       serde_cbor = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_cbor_2."0.12.0-dev" {inherit profileName;};
-      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {inherit profileName;};
+      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" {inherit profileName;};
       thiserror = rustPackages."registry+https://github.com/rust-lang/crates.io-index".thiserror."1.0.38" {inherit profileName;};
       tracing = rustPackages."registry+https://github.com/rust-lang/crates.io-index".tracing."0.1.37" {inherit profileName;};
       url = rustPackages."registry+https://github.com/rust-lang/crates.io-index".url."2.3.1" {inherit profileName;};
@@ -5802,7 +5802,7 @@ in {
     dependencies = {
       base64urlsafedata = rustPackages."registry+https://github.com/rust-lang/crates.io-index".base64urlsafedata."0.1.2" {inherit profileName;};
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
-      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.91" {inherit profileName;};
+      serde_json = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde_json."1.0.93" {inherit profileName;};
       url = rustPackages."registry+https://github.com/rust-lang/crates.io-index".url."2.3.1" {inherit profileName;};
     };
   });
