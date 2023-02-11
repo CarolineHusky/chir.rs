@@ -37,7 +37,7 @@
       };
       rustPkgs = pkgs.rustBuilder.makePackageSet {
         packageFun = import ./Cargo.nix;
-        rustChannel = "1.67.1";
+        rustChannel = "1.67.0";
         packageOverrides = pkgs: pkgs.rustBuilder.overrides.all;
       };
     in rec {
@@ -47,6 +47,7 @@
             [
               (rust-bin.nightly.latest.default.override {
                 extensions = ["rust-src"];
+                targets = ["wasm32-unknown-unknown"];
               })
               cargo2nix.packages.${system}.cargo2nix
               statix
