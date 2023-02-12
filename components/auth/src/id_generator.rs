@@ -2,7 +2,11 @@
 
 use std::sync::atomic::{AtomicU16, Ordering};
 
-use base64::{engine::general_purpose, Engine as _};
+use base64::{
+    alphabet::Alphabet,
+    engine::{general_purpose::NO_PAD, GeneralPurpose},
+    Engine as _,
+};
 use chrono::Utc;
 use once_cell::sync::Lazy;
 use rand::Rng;
@@ -36,10 +40,19 @@ pub fn generate_numeric_id() -> u128 {
     timestamp << 32 | u128::from(*RANDOM_STATE) << 16 | u128::from(counter)
 }
 
+/// The encoder for this ID type, sortable through comparing byte values
+#[allow(clippy::expect_used)]
+static URLSAFE_ENCODER: Lazy<GeneralPurpose> = Lazy::new(|| {
+    let alphabet =
+        Alphabet::new("-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz")
+            .expect("valid alphabet");
+    GeneralPurpose::new(&alphabet, NO_PAD)
+});
+
 /// Generates an urlsafe alphanumeric ID
 #[must_use]
 pub fn generate_id_urlsafe() -> String {
     let id = generate_numeric_id();
     let id_bytes = id.to_be_bytes();
-    general_purpose::URL_SAFE_NO_PAD.encode(id_bytes)
+    URLSAFE_ENCODER.encode(id_bytes)
 }
