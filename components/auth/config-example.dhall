@@ -9,6 +9,5 @@ let BaseConfig =
 
 in  BaseConfig::{
     , database_url = "postgres:///darkkirb?host=/run/postgresql&user=darkkirb"
-    , listen_addr = "[::1]:5621"
     , redis_url = "redis://localhost/0"
     }

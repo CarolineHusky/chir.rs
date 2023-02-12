@@ -19,8 +19,7 @@ static COUNTER: AtomicU16 = AtomicU16::new(0);
 ///
 /// The ID is generated as follows:
 ///
-/// bits 127-64: non-leap seconds since 1970-01-01T00:00:00Z
-/// bits 63-32: subsecond nanoseconds. may be 1,000,000,000 or larger in the case of leap seconds
+/// bits 127-32: non-leap nanoseconds since 1970-01-01T00:00:00Z
 /// bits 31-16: node ID
 /// bits 15-0: counter
 ///
@@ -28,15 +27,13 @@ static COUNTER: AtomicU16 = AtomicU16::new(0);
 /// This function will panic if the system clock is before 1970-01-01T00:00:00Z.
 pub fn generate_numeric_id() -> u128 {
     let now = Utc::now();
-    let timestamp = now.timestamp();
-    assert!(timestamp >= 0, "Valid time");
-    let timestamp: u64 = timestamp.try_into().unwrap_or_default();
-    let subsecond_nanos = now.timestamp_subsec_nanos();
+    let timestamp_secs = now.timestamp();
+    assert!(timestamp_secs >= 0, "Valid time");
+    let timestamp_secs: u64 = timestamp_secs.try_into().unwrap_or_default();
+    let timestamp: u128 =
+        u128::from(timestamp_secs) * 1_000_000_000 + u128::from(now.timestamp_subsec_nanos());
     let counter = COUNTER.fetch_add(1, Ordering::Relaxed);
-    u128::from(timestamp) << 64
-        | u128::from(subsecond_nanos) << 32
-        | u128::from(*RANDOM_STATE) << 16
-        | u128::from(counter)
+    timestamp << 32 | u128::from(*RANDOM_STATE) << 16 | u128::from(counter)
 }
 
 /// Generates an urlsafe alphanumeric ID
