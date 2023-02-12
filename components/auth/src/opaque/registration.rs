@@ -10,9 +10,9 @@ use chir_rs_auth_model::{
 };
 use opaque_ke::{RegistrationRequest, RegistrationUpload, ServerRegistration};
 use redis::cmd;
-use uuid::Uuid;
 
 use crate::{
+    id_generator::generate_id_urlsafe,
     models::User,
     token::{on_error, on_error_response},
     ServiceState,
@@ -39,10 +39,10 @@ impl ServiceState {
             registration_request,
             user_id.as_bytes(),
         )?;
-        let req_uuid = Uuid::new_v4().as_hyphenated().to_string();
+        let req_id = generate_id_urlsafe();
         let mut conn = self.redis.get().await?;
         cmd("SET")
-            .arg(format!("registration/step1:{req_uuid}"))
+            .arg(format!("registration/step1:{req_id}"))
             .arg(user_id)
             .arg("EX")
             .arg(300)
@@ -50,7 +50,7 @@ impl ServiceState {
             .await?;
         let message = server_registration_start_result.message.serialize();
 
-        Ok((req_uuid, message.to_vec()))
+        Ok((req_id, message.to_vec()))
     }
 
     /// Continues the registration process
@@ -75,15 +75,15 @@ impl ServiceState {
             password_file: new_password_file.serialize().to_vec(),
             activated: false,
         };
-        let req_uuid = Uuid::new_v4().as_hyphenated().to_string();
+        let req_id = generate_id_urlsafe();
         cmd("SET")
-            .arg(format!("registration/step2:{req_uuid}"))
+            .arg(format!("registration/step2:{req_id}"))
             .arg(serde_json::to_string(&user)?)
             .arg("EX")
             .arg(300)
             .query_async(&mut conn)
             .await?;
-        Ok(req_uuid)
+        Ok(req_id)
     }
 }
 

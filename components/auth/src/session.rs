@@ -7,7 +7,6 @@ use axum::{
     response::Response,
     Json,
 };
-use uuid::Uuid;
 
 use crate::{
     token::{on_error_response, on_server_error, AuthenticatedUser},
@@ -25,7 +24,7 @@ use crate::{
 pub async fn list_sessions(
     state: State<Arc<ServiceState>>,
     user: AuthenticatedUser,
-) -> Result<Json<Vec<Uuid>>, Response> {
+) -> Result<Json<Vec<String>>, Response> {
     if !user.has_scope("https://auth.chir.rs/sessions/read") {
         return Err(on_error_response());
     }
@@ -49,7 +48,7 @@ pub async fn list_sessions(
 pub async fn load_session(
     state: State<Arc<ServiceState>>,
     user: AuthenticatedUser,
-    Path(session): Path<Uuid>,
+    Path(session): Path<String>,
 ) -> Result<Json<AuthenticatedUser>, Response> {
     if !user.has_scope("https://auth.chir.rs/sessions/read") {
         return Err(on_error_response());
@@ -72,7 +71,7 @@ pub async fn load_session(
 pub async fn revoke_session(
     state: State<Arc<ServiceState>>,
     user: AuthenticatedUser,
-    Path(session): Path<Uuid>,
+    Path(session): Path<String>,
 ) -> Result<(), Response> {
     if !user.has_scope("https://auth.chir.rs/sessions/write") {
         return Err(on_error_response());
@@ -95,7 +94,7 @@ pub async fn revoke_session(
 pub async fn revoke_session_scope(
     state: State<Arc<ServiceState>>,
     user: AuthenticatedUser,
-    Path((session, scope)): Path<(Uuid, String)>,
+    Path((session, scope)): Path<(String, String)>,
 ) -> Result<(), Response> {
     if !user.has_scope("https://auth.chir.rs/sessions/write") {
         return Err(on_error_response());

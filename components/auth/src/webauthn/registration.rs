@@ -9,13 +9,12 @@ use chir_rs_auth_model::{
 };
 use redis::cmd;
 use sqlx::query;
-use uuid::Uuid;
 use webauthn_rs::prelude::{
     AuthenticatorAttachment, CreationChallengeResponse, RegisterPublicKeyCredential,
     SecurityKeyRegistration,
 };
 
-use crate::{models::User, token::on_error, ServiceState};
+use crate::{id_generator::generate_id_urlsafe, models::User, token::on_error, ServiceState};
 
 impl ServiceState {
     /// Starts webauthn token registration
@@ -42,15 +41,15 @@ impl ServiceState {
             Some(AuthenticatorAttachment::CrossPlatform),
         )?;
         let new_state = (state, webauthn_state);
-        let req_uuid = Uuid::new_v4().as_hyphenated().to_string();
+        let req_id = generate_id_urlsafe();
         cmd("SET")
-            .arg(format!("registration/step3:{req_uuid}"))
+            .arg(format!("registration/step3:{req_id}"))
             .arg(serde_json::to_string(&new_state)?)
             .arg("EX")
             .arg(300)
             .query_async(&mut conn)
             .await?;
-        Ok((registration, req_uuid))
+        Ok((registration, req_id))
     }
 
     /// Completes the registration

@@ -16,9 +16,8 @@ use opaque_ke::{
 use redis::cmd;
 use sha2::{Digest, Sha256};
 use sqlx::query;
-use uuid::Uuid;
 
-use crate::{token::on_error, ServiceState};
+use crate::{id_generator::generate_id_urlsafe, token::on_error, ServiceState};
 
 use super::CipherSuite;
 
@@ -88,15 +87,15 @@ impl ServiceState {
             server_login_start_params,
         )?;
         let new_state = (login.state.serialize().to_vec(), user_id);
-        let req_uuid = Uuid::new_v4().as_hyphenated().to_string();
+        let req_id = generate_id_urlsafe();
         cmd("SET")
-            .arg(format!("login/step3:{req_uuid}"))
+            .arg(format!("login/step3:{req_id}"))
             .arg(serde_json::to_string(&new_state)?)
             .arg("EX")
             .arg(300)
             .query_async(&mut conn)
             .await?;
-        Ok((login.message.serialize().to_vec(), req_uuid))
+        Ok((login.message.serialize().to_vec(), req_id))
     }
 
     /// Completes an OPAQUE login
@@ -123,15 +122,15 @@ impl ServiceState {
         server_login.finish(credential_finalization)?;
         let token = self.issue_token(&user_id, scopes).await?;
         let new_state = (code_challenge, token);
-        let req_uuid = Uuid::new_v4().as_hyphenated().to_string();
+        let req_id = generate_id_urlsafe();
         cmd("SET")
-            .arg(format!("login/step4:{req_uuid}"))
+            .arg(format!("login/step4:{req_id}"))
             .arg(serde_json::to_string(&new_state)?)
             .arg("EX")
             .arg(300)
             .query_async(&mut conn)
             .await?;
-        Ok(req_uuid)
+        Ok(req_id)
     }
 
     /// Retrieves a token from the access code

@@ -5501,9 +5501,7 @@ in {
     };
     features = builtins.concatLists [
       ["default"]
-      ["fast-rng"]
       ["getrandom"]
-      ["rand"]
       ["rng"]
       ["serde"]
       ["sha1"]
@@ -5514,7 +5512,6 @@ in {
     ];
     dependencies = {
       getrandom = rustPackages."registry+https://github.com/rust-lang/crates.io-index".getrandom."0.2.8" {inherit profileName;};
-      rand = rustPackages."registry+https://github.com/rust-lang/crates.io-index".rand."0.8.5" {inherit profileName;};
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
       sha1_smol = rustPackages."registry+https://github.com/rust-lang/crates.io-index".sha1_smol."1.0.0" {inherit profileName;};
     };

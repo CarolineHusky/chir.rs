@@ -3,6 +3,7 @@
 use std::sync::Arc;
 
 use crate::{
+    id_generator::generate_id_urlsafe,
     token::{on_error, on_server_error},
     ServiceState,
 };
@@ -13,7 +14,6 @@ use chir_rs_auth_model::{
 };
 use redis::cmd;
 use sqlx::query;
-use uuid::Uuid;
 use webauthn_rs::prelude::{
     AuthenticationResult, PublicKeyCredential, RequestChallengeResponse, SecurityKey,
 };
@@ -111,15 +111,15 @@ impl ServiceState {
         let (challenge, state) = WEBAUTHN.start_securitykey_authentication(&security_keys)?;
         let mut conn = self.redis.get().await?;
         let new_state = (state, user_id);
-        let req_uuid = Uuid::new_v4().as_hyphenated().to_string();
+        let req_id = generate_id_urlsafe();
         cmd("SET")
-            .arg(format!("login/step1:{req_uuid}"))
+            .arg(format!("login/step1:{req_id}"))
             .arg(serde_json::to_string(&new_state)?)
             .arg("EX")
             .arg(300)
             .query_async(&mut conn)
             .await?;
-        Ok((challenge, req_uuid))
+        Ok((challenge, req_id))
     }
 
     /// Completes webauthn authentication
@@ -139,15 +139,15 @@ impl ServiceState {
         let (state, user_id) = serde_json::from_str(&state_json)?;
         let result = WEBAUTHN.finish_securitykey_authentication(&credentials, &state)?;
         self.update_authenticator(user_id, result).await?; // TODO: verify the counter
-        let req_uuid = Uuid::new_v4().as_hyphenated().to_string();
+        let req_id = generate_id_urlsafe();
         cmd("SET")
-            .arg(format!("login/step2:{req_uuid}"))
+            .arg(format!("login/step2:{req_id}"))
             .arg(user_id)
             .arg("EX")
             .arg(300)
             .query_async(&mut conn)
             .await?;
-        Ok(req_uuid)
+        Ok(req_id)
     }
 }
 

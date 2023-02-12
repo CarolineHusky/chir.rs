@@ -27,9 +27,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::{query, query_as, PgPool};
 use tracing::{error, info};
-use uuid::Uuid;
 
-use crate::{kv::ensure_kv, models::UserSession, ServiceState};
+use crate::{id_generator::generate_id_urlsafe, kv::ensure_kv, models::UserSession, ServiceState};
 
 /// Loads or Creates the PASETO key
 ///
@@ -53,7 +52,7 @@ pub struct AuthenticatedUser {
     /// Scopes that the user can access
     scopes: HashSet<String>,
     /// Session ID of the session
-    session_id: Uuid,
+    session_id: String,
 }
 
 impl AuthenticatedUser {
@@ -124,8 +123,7 @@ impl ServiceState {
     ///
     /// # Errors
     /// This function will return an error if connection to redis fails or
-    pub async fn get_cached_token(self: &Arc<Self>, jti: &Uuid) -> Result<AuthenticatedUser> {
-        let jti = jti.as_hyphenated().to_string();
+    pub async fn get_cached_token(self: &Arc<Self>, jti: &str) -> Result<AuthenticatedUser> {
         let mut conn = self.redis.get().await?;
         let value: String = cmd("GET")
             .arg(format!("auth/session:{jti}"))
@@ -141,7 +139,7 @@ impl ServiceState {
     /// This function will return an error if the list couldn’t be fetched
     #[allow(clippy::missing_panics_doc)]
     #[allow(clippy::panic)]
-    pub async fn list_user_sessions(self: &Arc<Self>, user_id: &str) -> Result<Vec<Uuid>> {
+    pub async fn list_user_sessions(self: &Arc<Self>, user_id: &str) -> Result<Vec<String>> {
         let res = query!(
             "SELECT jti FROM auth_user_sessions WHERE user_id = $1",
             user_id
@@ -157,10 +155,9 @@ impl ServiceState {
     /// This function will return an error if connection to redis fails
     pub async fn try_cache_token(
         self: &Arc<Self>,
-        jti: &Uuid,
+        jti: &str,
         user: &AuthenticatedUser,
     ) -> Result<()> {
-        let jti = jti.as_hyphenated().to_string();
         let mut conn = self.redis.get().await?;
         let encoded = serde_json::to_string(user)?;
         cmd("SET")
@@ -180,7 +177,7 @@ impl ServiceState {
     /// This function will return an error if the token is invalid or the database connection fails
     pub async fn get_session_for_user(
         self: &Arc<Self>,
-        jti: &Uuid,
+        jti: &str,
         user: &str,
     ) -> Result<AuthenticatedUser> {
         let sess = self.get_user_session(jti).await?;
@@ -198,7 +195,7 @@ impl ServiceState {
     ///
     /// # Errors
     /// This function will return an error if the token is invalid or the database connection fails
-    pub async fn get_user_session(self: &Arc<Self>, jti: &Uuid) -> Result<AuthenticatedUser> {
+    pub async fn get_user_session(self: &Arc<Self>, jti: &str) -> Result<AuthenticatedUser> {
         if let Ok(sess) = self.get_cached_token(jti).await {
             return Ok(sess);
         }
@@ -207,7 +204,7 @@ impl ServiceState {
         let sess = AuthenticatedUser {
             id: token.user_id,
             scopes,
-            session_id: *jti,
+            session_id: jti.to_string(),
         };
         self.try_cache_token(jti, &sess).await.ok();
         Ok(sess)
@@ -217,8 +214,7 @@ impl ServiceState {
     ///
     /// # Errors
     /// This function will return an error if redis access failed
-    pub async fn invalidate_user_session(self: &Arc<Self>, jti: &Uuid) -> Result<()> {
-        let jti = jti.as_hyphenated().to_string();
+    pub async fn invalidate_user_session(self: &Arc<Self>, jti: &str) -> Result<()> {
         let mut conn = self.redis.get().await?;
         cmd("DEL")
             .arg(format!("auth/session:{jti}"))
@@ -234,7 +230,7 @@ impl ServiceState {
     #[allow(clippy::missing_panics_doc)]
     #[allow(clippy::panic)]
     pub async fn issue_token(self: &Arc<Self>, user: &str, scopes: &[String]) -> Result<String> {
-        let jti = Uuid::new_v4();
+        let jti = generate_id_urlsafe();
         let now = Utc::now();
         let expire = now.checked_add_months(Months::new(1)).unwrap_or(now);
         let expire_paseto = expire.to_rfc3339_opts(SecondsFormat::Secs, true);
@@ -243,7 +239,7 @@ impl ServiceState {
         claims.issuer("https://auth.chir.rs/")?;
         claims.subject(user)?;
         claims.expiration(&expire_paseto)?;
-        claims.token_identifier(&jti.as_hyphenated().to_string())?;
+        claims.token_identifier(&jti)?;
 
         let token = local::encrypt(&self.paseto_key, &claims, None, None)?;
 
@@ -303,14 +299,14 @@ pub fn on_error(e: impl std::fmt::Debug) -> Response {
 
 /// The response returned on error
 pub fn on_server_error_response() -> Response {
-    let incident_uuid = Uuid::new_v4();
-    error!("Incident UUID: {incident_uuid:?}");
+    let incident_id = generate_id_urlsafe();
+    error!("Incident ID: {incident_id}");
     (
         StatusCode::INTERNAL_SERVER_ERROR,
         Json(json!({
             "title": "Internal Server Error",
             "status": 500,
-            "incident_uuid": incident_uuid.to_string()
+            "incident_id": incident_id.to_string()
         })),
     )
         .into_response()
@@ -328,7 +324,7 @@ pub fn on_server_error(e: impl std::fmt::Debug) -> Response {
 /// This function returns an error if the token doesn’t exist
 #[allow(clippy::missing_panics_doc)]
 #[allow(clippy::panic)]
-async fn get_token_info(state: &Arc<ServiceState>, token_jti: &Uuid) -> Result<UserSession> {
+async fn get_token_info(state: &Arc<ServiceState>, token_jti: &str) -> Result<UserSession> {
     let res = query_as!(
         UserSession,
         r#"
@@ -349,7 +345,7 @@ async fn get_token_info(state: &Arc<ServiceState>, token_jti: &Uuid) -> Result<U
 /// This function returns an error if the connection to the database fails
 #[allow(clippy::missing_panics_doc)]
 #[allow(clippy::panic)]
-async fn get_token_scopes(state: &Arc<ServiceState>, token_jti: &Uuid) -> Result<HashSet<String>> {
+async fn get_token_scopes(state: &Arc<ServiceState>, token_jti: &str) -> Result<HashSet<String>> {
     let res = query!(
         r#"
             SELECT scope FROM auth_session_scopes
@@ -417,9 +413,8 @@ impl FromRequestParts<Arc<ServiceState>> for AuthenticatedUser {
             .ok_or_else(on_error_response)?;
 
         let jti = claims.get_string_claim("jti").map_err(on_error)?;
-        let jti = Uuid::parse_str(jti).map_err(on_error)?;
 
-        let sess = state.get_user_session(&jti).await.map_err(on_error)?;
+        let sess = state.get_user_session(jti).await.map_err(on_error)?;
         if sess.id != claims.get_string_claim("sub").map_err(on_error)? {
             return Err(on_error_response());
         }

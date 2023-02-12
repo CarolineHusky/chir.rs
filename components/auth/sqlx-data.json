@@ -6,7 +6,7 @@
       "nullable": [],
       "parameters": {
         "Left": [
-          "Uuid",
+          "Text",
           "Text"
         ]
       }
@@ -53,7 +53,7 @@
         {
           "name": "jti",
           "ordinal": 0,
-          "type_info": "Uuid"
+          "type_info": "Text"
         },
         {
           "name": "user_id",
@@ -79,7 +79,7 @@
       ],
       "parameters": {
         "Left": [
-          "Uuid"
+          "Text"
         ]
       }
     },
@@ -91,7 +91,7 @@
         {
           "name": "jti",
           "ordinal": 0,
-          "type_info": "Uuid"
+          "type_info": "Text"
         }
       ],
       "nullable": [
@@ -152,7 +152,7 @@
       "nullable": [],
       "parameters": {
         "Left": [
-          "Uuid",
+          "Text",
           "Text",
           "Timestamptz",
           "Timestamptz"
@@ -168,7 +168,7 @@
       "parameters": {
         "Left": [
           "Text",
-          "Uuid"
+          "Text"
         ]
       }
     },
@@ -188,7 +188,7 @@
       ],
       "parameters": {
         "Left": [
-          "Uuid"
+          "Text"
         ]
       }
     },
@@ -200,7 +200,7 @@
       "nullable": [],
       "parameters": {
         "Left": [
-          "Uuid",
+          "Text",
           "Text",
           "Text"
         ]

@@ -18,7 +18,9 @@ use serde::{Deserialize, Serialize};
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use std::{net::SocketAddr, path::Path, sync::Arc};
 use tracing::info;
-use uuid::Uuid;
+
+use crate::id_generator::generate_id_urlsafe;
+pub mod id_generator;
 pub mod kv;
 pub mod models;
 pub mod opaque;
@@ -117,7 +119,7 @@ async fn main() -> Result<()> {
         server_setup: opaque::get_opaque_server_setup(&database).await?,
         database,
         redis,
-        registration_key: Uuid::new_v4().as_hyphenated().to_string(),
+        registration_key: generate_id_urlsafe(),
     });
 
     info!("Register with registration key: {}", state.registration_key);

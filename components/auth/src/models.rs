@@ -3,7 +3,6 @@
 use chrono::{DateTime, Utc};
 use educe::Educe;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 /// Database model for local users.
 #[derive(Educe, Serialize, Deserialize)]
@@ -24,7 +23,7 @@ pub struct User {
 #[non_exhaustive]
 pub struct UserSession {
     /// the PASETO token ID of the user session
-    pub jti: Uuid,
+    pub jti: String,
     /// The user the session belongs to
     pub user_id: String,
     /// The last possible time the token can be used at
