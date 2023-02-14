@@ -99,11 +99,11 @@ pub async fn step_1(
         return Err(on_error_response());
     }
     let (next_token, registration_message) = state
-        .start_opaque_registration(&request.user_id, &request.registration_message)
+        .start_opaque_registration(&request.user_id, &request.registration_message.0)
         .await
         .map_err(on_error)?;
     Ok(Json(RegistrationStep1Response {
-        registration_message,
+        registration_message: registration_message.into(),
         next_token,
     }))
 }
@@ -117,7 +117,7 @@ pub async fn step_2(
     Json(request): Json<RegistrationStep2Request>,
 ) -> Result<Json<RegistrationStep2Response>, Response> {
     let next_token = state
-        .continue_opaque_registration(&request.continuation_token, &request.credential_upload)
+        .continue_opaque_registration(&request.continuation_token, &request.credential_upload.0)
         .await
         .map_err(on_error)?;
     Ok(Json(RegistrationStep2Response { next_token }))

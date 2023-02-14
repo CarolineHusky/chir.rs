@@ -306,7 +306,7 @@ pub fn on_server_error_response() -> Response {
         Json(json!({
             "title": "Internal Server Error",
             "status": 500,
-            "incident_id": incident_id.to_string()
+            "incident_id": incident_id
         })),
     )
         .into_response()

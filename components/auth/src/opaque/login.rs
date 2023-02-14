@@ -168,12 +168,12 @@ pub async fn step_3(
     Json(request): Json<LoginStep3Request>,
 ) -> Result<Json<LoginStep3Response>, Response> {
     let (credential_response, next_token) = state
-        .start_opaque_login(&request.continuation_token, &request.credential_request)
+        .start_opaque_login(&request.continuation_token, &request.credential_request.0)
         .await
         .map_err(on_error)?;
 
     Ok(Json(LoginStep3Response {
-        credential_response,
+        credential_response: credential_response.into(),
         next_token,
     }))
 }
@@ -189,7 +189,7 @@ pub async fn step_4(
     let next_token = state
         .finish_opaque_login(
             &request.continuation_token,
-            &request.credential_finalization,
+            &request.credential_finalization.0,
             &request.code_challenge,
             &request.scopes,
         )

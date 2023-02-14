@@ -9,16 +9,7 @@ use crate::kv::ensure_kv;
 pub mod login;
 pub mod registration;
 
-/// The ciphersuite used by OPAQUE
-#[derive(Debug, Copy, Clone)]
-pub struct CipherSuite;
-
-impl opaque_ke::CipherSuite for CipherSuite {
-    type OprfCs = opaque_ke::Ristretto255;
-    type KeGroup = opaque_ke::Ristretto255;
-    type KeyExchange = opaque_ke::key_exchange::tripledh::TripleDh;
-    type Ksf = argon2::Argon2<'static>;
-}
+pub use chir_rs_auth_model::CipherSuite;
 
 /// Loads the OPAQUE configuration from the database, or creates a new one if it does not exist.
 ///

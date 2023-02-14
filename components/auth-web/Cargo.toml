@@ -1,0 +1,44 @@
+[package]
+name = "chir-rs-auth-web"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+authors = ["Charlotte 🦝 Delenk"]
+description = "The authentication webapp for chir.rs"
+repository = "https://github.com/darkkirb/chir.rs"
+keywords = ["authentication", "opaque", "webauthn"]
+categories = ["web-programming"]
+readme = "README.md"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.69"
+argon2 = { version = "0.4.1", features = ["zeroize"] }
+base16ct = "0.1.1"
+chir-rs-auth-model = { path = "../auth-model" }
+gloo-console = "0.2.3"
+gloo-net = "0.2.6"
+gloo-utils = "0.1.6"
+once_cell = "1.17.0"
+opaque-ke = { version = "2.0.0", features = ["argon2"] }
+rand = "0.8.5"
+sha1 = "0.10.5"
+unicode-normalization = "0.1.22"
+wasm-bindgen = { version = "0.2.84" }
+wasm-bindgen-futures = "0.4.34"
+web-sys = { version = "0.3.61", features = [
+    "Window",
+    "Document",
+    "Element",
+    "HtmlInputElement",
+    "HtmlButtonElement",
+    "CredentialsContainer",
+    "Navigator",
+    "CredentialCreationOptions",
+    "PublicKeyCredential",
+] }
+webauthn-rs-proto = { version = "0.4.9", features = ["wasm"] }
+yew = { version = "0.20.0", features = ["csr"] }
+yew-router = "0.17.0"
+zxcvbn = "2.2.1"

@@ -1,7 +1,8 @@
 //! The types for the `chir-rs-auth` crate
 
+use base64urlsafedata::Base64UrlSafeData;
 use serde::{Deserialize, Serialize};
-use webauthn_rs::prelude::{
+use webauthn_rs_proto::{
     CreationChallengeResponse, PublicKeyCredential, RegisterPublicKeyCredential,
     RequestChallengeResponse,
 };
@@ -14,14 +15,14 @@ pub struct RegistrationStep1Request {
     /// User ID of choice
     pub user_id: String,
     /// OPAQUE registration start request
-    pub registration_message: Vec<u8>,
+    pub registration_message: Base64UrlSafeData,
 }
 
 /// Response structure for the first registration step
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RegistrationStep1Response {
     /// OPAQUE registration start response
-    pub registration_message: Vec<u8>,
+    pub registration_message: Base64UrlSafeData,
     /// Token used for the next request
     pub next_token: String,
 }
@@ -32,7 +33,7 @@ pub struct RegistrationStep2Request {
     /// Token used for continuing the registration
     pub continuation_token: String,
     /// OPAQUE credential upload
-    pub credential_upload: Vec<u8>,
+    pub credential_upload: Base64UrlSafeData,
 }
 
 /// Response structure for the second registration step
@@ -105,14 +106,14 @@ pub struct LoginStep3Request {
     /// Token returned from the previous step
     pub continuation_token: String,
     /// The OPAQUE credential request
-    pub credential_request: Vec<u8>,
+    pub credential_request: Base64UrlSafeData,
 }
 
 /// Response structure for the third login step
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LoginStep3Response {
     /// The OPAQUE credential response
-    pub credential_response: Vec<u8>,
+    pub credential_response: Base64UrlSafeData,
     /// Token used for the next request
     pub next_token: String,
 }
@@ -123,7 +124,7 @@ pub struct LoginStep4Request {
     /// Token returned from the previous step
     pub continuation_token: String,
     /// The OPAQUE credential finalization
-    pub credential_finalization: Vec<u8>,
+    pub credential_finalization: Base64UrlSafeData,
     /// Code challenge for OAuth
     pub code_challenge: String,
     /// Requested scopes
@@ -151,4 +152,15 @@ pub struct LoginStep5Request {
 pub struct LoginStep5Response {
     /// Access token
     pub access_token: String,
+}
+
+/// The ciphersuite used by OPAQUE
+#[derive(Debug, Copy, Clone)]
+pub struct CipherSuite;
+
+impl opaque_ke::CipherSuite for CipherSuite {
+    type OprfCs = opaque_ke::Ristretto255;
+    type KeGroup = opaque_ke::Ristretto255;
+    type KeyExchange = opaque_ke::key_exchange::tripledh::TripleDh;
+    type Ksf = argon2::Argon2<'static>;
 }

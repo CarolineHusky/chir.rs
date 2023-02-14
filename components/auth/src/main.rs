@@ -17,6 +17,7 @@ use pasetors::{keys::SymmetricKey, version4::V4};
 use serde::{Deserialize, Serialize};
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use std::{net::SocketAddr, path::Path, sync::Arc};
+use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing::info;
 
 use crate::id_generator::generate_id_urlsafe;
@@ -146,7 +147,9 @@ async fn main() -> Result<()> {
         .route("/login/step3", post(opaque::login::step_3))
         .route("/login/step4", post(opaque::login::step_4))
         .route("/login/step5", post(opaque::login::step_5))
-        .with_state(state);
+        .with_state(state)
+        .layer(CorsLayer::permissive())
+        .layer(TraceLayer::new_for_http());
 
     axum::Server::bind(&config.listen_addr)
         .serve(app.into_make_service())

@@ -65,6 +65,8 @@
               sqlite
               pkg-config
               openssl
+              trunk
+              binaryen
             ]
             ++ (
               if system == "x86_64-linux"

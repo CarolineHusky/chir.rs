@@ -49,5 +49,8 @@
         "-Aclippy::type-repetition-in-bounds",
         "-Aclippy::trait-duplication-in-bounds"
     ],
-    "conventionalCommits.scopes": ["auth", "base"]
+    "conventionalCommits.scopes": ["auth", "base"],
+    "files.watcherExclude": {
+        "**/target": true
+    }
 }
