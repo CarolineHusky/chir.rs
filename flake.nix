@@ -35,10 +35,23 @@
       pkgs = import nixpkgs {
         inherit system overlays;
       };
+      crossPkgs = import nixpkgs {
+        inherit system overlays;
+        crossSystem = {
+          config = "wasm32-unknown-wasi";
+          useLLVM = true;
+        };
+      };
       rustPkgs = pkgs.rustBuilder.makePackageSet {
         packageFun = import ./Cargo.nix;
         rustChannel = "1.67.0";
         packageOverrides = pkgs: pkgs.rustBuilder.overrides.all;
+      };
+      rustCrossPkgs = crossPkgs.rustBuilder.makePackageSet {
+        packageFun = import ./Cargo.nix;
+        rustChannel = "1.67.0";
+        packageOverrides = pkgs: pkgs.rustBuilder.overrides.all;
+        target = "wasm32-unknown-unknown";
       };
     in rec {
       devShells.default = with pkgs;
@@ -76,7 +89,11 @@
               else []
             );
         };
-      packages = pkgs.lib.mapAttrs (_: v: v {}) rustPkgs.workspace;
+      packages =
+        pkgs.lib.mapAttrs (_: v: v {}) rustPkgs.workspace
+        // {
+          chir-rs-auth-web = rustCrossPkgs.workspace.chir-rs-auth-web {};
+        };
 
       nixosModules.default = import ./nixos {
         inherit inputs system;
