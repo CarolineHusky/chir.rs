@@ -12,7 +12,7 @@
     };
 
     cargo2nix = {
-      url = "github:cargo2nix/cargo2nix";
+      url = "github:cargo2nix/cargo2nix/release-0.11.0";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
       inputs.rust-overlay.follows = "rust-overlay";
@@ -36,11 +36,30 @@
         inherit system overlays;
       };
       crossPkgs = import nixpkgs {
-        inherit system overlays;
+        inherit system;
+        overlays =
+          overlays
+          ++ [
+            (self: super: {
+              rust =
+                super.rust
+                // {
+                  toRustTarget = system: let
+                    res = super.rust.toRustTarget system;
+                  in
+                    if res == "wasm32-unknown-none"
+                    then "wasm32-unknown-unknown"
+                    else res;
+                };
+            })
+          ];
         crossSystem = {
-          config = "wasm32-unknown-wasi";
+          system = "wasm32-unknown";
+          config = "wasm32-unknown-none-unknown";
           useLLVM = true;
+          rustc.target = "wasm32-unknown-unknown";
         };
+        config.allowUnsupportedSystem = true;
       };
       rustPkgs = pkgs.rustBuilder.makePackageSet {
         packageFun = import ./Cargo.nix;
