@@ -427,11 +427,11 @@ const fn mk_identifiers(user_name: &str) -> Identifiers<'_> {
 }
 
 /// Base URL for the server
-//#[cfg(not(debug_assertions))]
-//const BASE_URL: &str = "https://auth.chir.rs/";
+#[cfg(not(debug_assertions))]
+const BASE_URL: &str = "https://auth.chir.rs/";
 
 /// Base URL for the server
-//#[cfg(debug_assertions)]
+#[cfg(debug_assertions)]
 const BASE_URL: &str = "http://localhost:5621/";
 
 /// Argon2id instance
