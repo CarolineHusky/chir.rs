@@ -68,7 +68,6 @@
         packageFun = args: let
           cnix = import ./Cargo.nix;
           hostPlatform = args.hostPlatform;
-          trace = a: builtins.trace a a;
           hostPlatformPatch =
             if hostPlatform.isWasm
             then {
@@ -80,7 +79,7 @@
         in
           cnix (args
             // {
-              hostPlatform = trace (crossPkgs.lib.recursiveUpdate hostPlatform hostPlatformPatch);
+              hostPlatform = crossPkgs.lib.recursiveUpdate hostPlatform hostPlatformPatch;
             });
         rustChannel = "1.67.0";
         packageOverrides = pkgs: pkgs.rustBuilder.overrides.all;
@@ -113,6 +112,7 @@
               openssl
               trunk
               binaryen
+              wasm-bindgen-cli
             ]
             ++ (
               if system == "x86_64-linux"
@@ -125,7 +125,18 @@
       packages =
         pkgs.lib.mapAttrs (_: v: v {}) rustPkgs.workspace
         // {
-          chir-rs-auth-web = rustCrossPkgs.workspace.chir-rs-auth-web {};
+          chir-rs-auth-web = pkgs.stdenvNoCC.mkDerivation {
+            name = "chir-rs-auth-web";
+            src = (rustCrossPkgs.workspace.chir-rs-auth-web {}).bin;
+            nativeBuildInputs = [pkgs.wasm-bindgen-cli];
+            index_html = ./components/auth-web/index.html;
+            buildPhase = ''
+              wasm-bindgen --target web ./bin/chir-rs-auth-web.wasm --out-dir $out
+            '';
+            installPhase = ''
+              cp $index_html $out
+            '';
+          };
         };
 
       nixosModules.default = import ./nixos {
