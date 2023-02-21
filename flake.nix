@@ -12,7 +12,7 @@
     };
 
     cargo2nix = {
-      url = "github:cargo2nix/cargo2nix/release-0.11.0";
+      url = "github:DarkKirb/cargo2nix/release-0.11.0";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
       inputs.rust-overlay.follows = "rust-overlay";
@@ -47,17 +47,15 @@
                   toRustTarget = system: let
                     res = super.rust.toRustTarget system;
                   in
-                    if res == "wasm32-unknown-none"
+                    if res == "wasm32-unknown-wasi"
                     then "wasm32-unknown-unknown"
                     else res;
                 };
             })
           ];
         crossSystem = {
-          system = "wasm32-unknown";
-          config = "wasm32-unknown-none-unknown";
+          system = "wasm32-wasi";
           useLLVM = true;
-          rustc.target = "wasm32-unknown-unknown";
         };
         config.allowUnsupportedSystem = true;
       };
@@ -67,7 +65,23 @@
         packageOverrides = pkgs: pkgs.rustBuilder.overrides.all;
       };
       rustCrossPkgs = crossPkgs.rustBuilder.makePackageSet {
-        packageFun = import ./Cargo.nix;
+        packageFun = args: let
+          cnix = import ./Cargo.nix;
+          hostPlatform = args.hostPlatform;
+          trace = a: builtins.trace a a;
+          hostPlatformPatch =
+            if hostPlatform.isWasm
+            then {
+              parsed.kernel.name = "unknown";
+              config = "wasm32-unknown-none-unknown";
+              isWasi = false;
+            }
+            else {};
+        in
+          cnix (args
+            // {
+              hostPlatform = trace (crossPkgs.lib.recursiveUpdate hostPlatform hostPlatformPatch);
+            });
         rustChannel = "1.67.0";
         packageOverrides = pkgs: pkgs.rustBuilder.overrides.all;
         target = "wasm32-unknown-unknown";
