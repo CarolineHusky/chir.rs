@@ -134,7 +134,7 @@
               wasm-bindgen --target web ./bin/chir-rs-auth-web.wasm --out-dir $out
             '';
             installPhase = ''
-              cp $index_html $out
+              cp $index_html $out/index.html
             '';
           };
         };
