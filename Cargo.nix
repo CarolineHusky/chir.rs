@@ -238,23 +238,6 @@ in {
     };
     features = builtins.concatLists [
       ["alloc"]
-    ];
-    dependencies = {
-      base64ct = rustPackages."registry+https://github.com/rust-lang/crates.io-index".base64ct."1.5.3" {inherit profileName;};
-      blake2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".blake2."0.10.6" {inherit profileName;};
-    };
-  });
-
-  "registry+https://github.com/rust-lang/crates.io-index".argon2."0.5.0" = overridableMkRustCrate (profileName: rec {
-    name = "argon2";
-    version = "0.5.0";
-    registry = "registry+https://github.com/rust-lang/crates.io-index";
-    src = fetchCratesIo {
-      inherit name version;
-      sha256 = "95c2fcf79ad1932ac6269a738109997a83c227c09b75842ae564dc8ede6a861c";
-    };
-    features = builtins.concatLists [
-      ["alloc"]
       ["default"]
       ["password-hash"]
       ["rand"]
@@ -263,7 +246,7 @@ in {
     dependencies = {
       base64ct = rustPackages."registry+https://github.com/rust-lang/crates.io-index".base64ct."1.5.3" {inherit profileName;};
       blake2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".blake2."0.10.6" {inherit profileName;};
-      password_hash = rustPackages."registry+https://github.com/rust-lang/crates.io-index".password-hash."0.5.0" {inherit profileName;};
+      password_hash = rustPackages."registry+https://github.com/rust-lang/crates.io-index".password-hash."0.4.2" {inherit profileName;};
       zeroize = rustPackages."registry+https://github.com/rust-lang/crates.io-index".zeroize."1.5.7" {inherit profileName;};
     };
   });
@@ -792,7 +775,7 @@ in {
     registry = "unknown";
     src = fetchCrateLocal (workspaceSrc + "/components/auth-model");
     dependencies = {
-      argon2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".argon2."0.5.0" {inherit profileName;};
+      argon2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".argon2."0.4.1" {inherit profileName;};
       base64urlsafedata = rustPackages."registry+https://github.com/rust-lang/crates.io-index".base64urlsafedata."0.1.3" {inherit profileName;};
       opaque_ke = rustPackages."registry+https://github.com/rust-lang/crates.io-index".opaque-ke."2.0.0" {inherit profileName;};
       serde = rustPackages."registry+https://github.com/rust-lang/crates.io-index".serde."1.0.152" {inherit profileName;};
@@ -807,7 +790,7 @@ in {
     src = fetchCrateLocal (workspaceSrc + "/components/auth-web");
     dependencies = {
       anyhow = rustPackages."registry+https://github.com/rust-lang/crates.io-index".anyhow."1.0.69" {inherit profileName;};
-      argon2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".argon2."0.5.0" {inherit profileName;};
+      argon2 = rustPackages."registry+https://github.com/rust-lang/crates.io-index".argon2."0.4.1" {inherit profileName;};
       base16ct = rustPackages."registry+https://github.com/rust-lang/crates.io-index".base16ct."0.2.0" {inherit profileName;};
       chir_rs_auth_model = rustPackages."unknown".chir-rs-auth-model."0.1.0" {inherit profileName;};
       gloo_console = rustPackages."registry+https://github.com/rust-lang/crates.io-index".gloo-console."0.2.3" {inherit profileName;};
@@ -3625,13 +3608,13 @@ in {
     };
   });
 
-  "registry+https://github.com/rust-lang/crates.io-index".password-hash."0.5.0" = overridableMkRustCrate (profileName: rec {
+  "registry+https://github.com/rust-lang/crates.io-index".password-hash."0.4.2" = overridableMkRustCrate (profileName: rec {
     name = "password-hash";
-    version = "0.5.0";
+    version = "0.4.2";
     registry = "registry+https://github.com/rust-lang/crates.io-index";
     src = fetchCratesIo {
       inherit name version;
-      sha256 = "346f04948ba92c43e8469c1ee6736c7563d71012b17d40745260fe106aac2166";
+      sha256 = "7676374caaee8a325c9e7a2ae557f216c5563a171d6997b0ef8a65af35147700";
     };
     features = builtins.concatLists [
       ["default"]
