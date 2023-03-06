@@ -31,6 +31,11 @@
       overlays = [
         cargo2nix.overlays.default
         (import rust-overlay)
+        (
+          if system == "riscv64-linux"
+          then import ./overlays/riscv.nix nixpkgs
+          else _: _: {}
+        )
       ];
       pkgs = import nixpkgs {
         inherit system overlays;
