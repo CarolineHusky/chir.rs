@@ -14,11 +14,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1677008659,
-        "narHash": "sha256-Bo4bA+gesOZEJ8zY56p4QTwlDGMJcHkyWjZJRpMdTH0=",
+        "lastModified": 1678094756,
+        "narHash": "sha256-FoVmeU9ITOhKO/wQt76JMZsIDxfNmzgkqHud6hrHB18=",
         "owner": "DarkKirb",
         "repo": "cargo2nix",
-        "rev": "9896ea89579090c13910d8adbb1f1abdb7bf803d",
+        "rev": "a2c22af726db8fca367865d6631b3f321eadc647",
         "type": "github"
       },
       "original": {
@@ -46,15 +46,15 @@
     },
     "flake-utils": {
       "locked": {
-        "lastModified": 1676283394,
-        "narHash": "sha256-XX2f9c3iySLCw54rJ/CZs+ZK6IQy7GXNY4nSOyu2QG4=",
-        "owner": "numtide",
+        "lastModified": 1677835344,
+        "narHash": "sha256-+SF1dfj02xAizhtY2/pEPyA0DP0pMvZZjC2aMyprYhA=",
+        "owner": "DarkKirb",
         "repo": "flake-utils",
-        "rev": "3db36a8b464d0c4532ba1c7dda728f4576d6d073",
+        "rev": "17cffe5284b6da6b50cc82f4d2b4c3ff8185f83c",
         "type": "github"
       },
       "original": {
-        "owner": "numtide",
+        "owner": "DarkKirb",
         "repo": "flake-utils",
         "type": "github"
       }
