@@ -61,7 +61,8 @@
       };
       rustPkgs = pkgs.rustBuilder.makePackageSet {
         packageFun = import ./Cargo.nix;
-        rustChannel = "1.67.0";
+        rustChannel = "nightly";
+        rustVersion = "latest";
         packageOverrides = pkgs: pkgs.rustBuilder.overrides.all;
       };
       rustCrossPkgs = crossPkgs.rustBuilder.makePackageSet {
@@ -81,7 +82,8 @@
             // {
               hostPlatform = crossPkgs.lib.recursiveUpdate hostPlatform hostPlatformPatch;
             });
-        rustChannel = "1.67.0";
+        rustChannel = "nightly";
+        rustVersion = "latest";
         packageOverrides = pkgs: pkgs.rustBuilder.overrides.all;
         target = "wasm32-unknown-unknown";
       };
