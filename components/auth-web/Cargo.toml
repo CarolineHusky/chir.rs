@@ -15,7 +15,7 @@ readme = "README.md"
 [dependencies]
 anyhow = "1.0.69"
 argon2 = { version = "0.4.1", features = ["zeroize"] }
-base16ct = "0.1.1"
+base16ct = "0.2.0"
 chir-rs-auth-model = { path = "../auth-model" }
 gloo-console = "0.2.3"
 gloo-net = "0.2.6"
