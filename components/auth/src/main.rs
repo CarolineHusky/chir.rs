@@ -17,7 +17,11 @@ use pasetors::{keys::SymmetricKey, version4::V4};
 use serde::{Deserialize, Serialize};
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use std::{net::SocketAddr, path::Path, sync::Arc};
-use tower_http::{cors::CorsLayer, services::ServeDir, trace::TraceLayer};
+use tower_http::{
+    cors::CorsLayer,
+    services::{ServeDir, ServeFile},
+    trace::TraceLayer,
+};
 use tracing::info;
 
 use crate::id_generator::generate_id_urlsafe;
@@ -150,7 +154,11 @@ async fn main() -> Result<()> {
         .route("/login/step4", post(opaque::login::step_4))
         .route("/login/step5", post(opaque::login::step_5))
         // web endpoints
-        .nest_service("/web", ServeDir::new(&config.asset_path))
+        .nest_service(
+            "/web",
+            ServeDir::new(&config.asset_path)
+                .not_found_service(ServeFile::new(format!("{}/index.html", config.asset_path))),
+        )
         .with_state(state)
         .layer(CorsLayer::permissive())
         .layer(TraceLayer::new_for_http());

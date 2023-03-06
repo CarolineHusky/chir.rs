@@ -3,11 +3,14 @@ let BaseConfig =
           { database_url : Text
           , listen_addr : Text
           , redis_url : Text
+          , asset_path : Text
           }
-        , default.listen_addr = "[::1]:5621"
+      , default.listen_addr = "[::1]:5621"
       }
 
 in  BaseConfig::{
     , database_url = "postgres:///darkkirb?host=/run/postgresql&user=darkkirb"
     , redis_url = "redis://localhost/0"
+    , asset_path =
+        "/nix/store/7s70jiy06giiqvbxv8r53vxl7vjid1zi-chir-rs-auth-web"
     }

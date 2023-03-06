@@ -204,7 +204,7 @@ impl ServiceState {
         let sess = AuthenticatedUser {
             id: token.user_id,
             scopes,
-            session_id: jti.to_string(),
+            session_id: jti.to_owned(),
         };
         self.try_cache_token(jti, &sess).await.ok();
         Ok(sess)

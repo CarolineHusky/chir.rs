@@ -5,7 +5,7 @@ use register::Register;
 use sha1::{Digest, Sha1};
 use unicode_normalization::UnicodeNormalization;
 use yew::{function_component, html, Html};
-use yew_router::{prelude::Link, HashRouter, Routable, Switch};
+use yew_router::{prelude::Link, BrowserRouter, Routable, Switch};
 use zxcvbn::zxcvbn;
 
 pub mod register;
@@ -47,19 +47,10 @@ fn switch(routes: Route) -> Html {
 /// App entrypoint
 #[function_component]
 fn App() -> Html {
-    /*let counter = use_state(|| 0);
-    let onclick = {
-        let counter = counter.clone();
-        move |_| {
-            let value = *counter + 1;
-            counter.set(value);
-        }
-    };*/
-
     html! {
-        <HashRouter>
+        <BrowserRouter>
             <Switch<Route> render={switch} />
-        </HashRouter>
+        </BrowserRouter>
     }
 }
 
