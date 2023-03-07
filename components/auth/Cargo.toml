@@ -23,7 +23,7 @@ educe = "0.4.20"
 headers = "0.3.8"
 once_cell = "1.17.1"
 opaque-ke = { version = "2.0.0", features = ["argon2", "std"] }
-pasetors = "0.6.5"
+pasetors = "0.6.6"
 rand = "0.8.5"
 redis = { version = "0.22.3" }
 serde = { version = "1.0.152", features = ["derive"] }
