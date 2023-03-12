@@ -11,6 +11,7 @@ use axum::{
 };
 use dotenvy::dotenv;
 use educe::Educe;
+use headers::{HeaderName, HeaderValue};
 use opaque::CipherSuite;
 use opaque_ke::ServerSetup;
 use pasetors::{keys::SymmetricKey, version4::V4};
@@ -18,8 +19,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use std::{net::SocketAddr, path::Path, sync::Arc};
 use tower_http::{
-    cors::CorsLayer,
     services::{ServeDir, ServeFile},
+    set_header::SetResponseHeaderLayer,
     trace::TraceLayer,
 };
 use tracing::info;
@@ -160,8 +161,19 @@ async fn main() -> Result<()> {
                 .not_found_service(ServeFile::new(format!("{}/index.html", config.asset_path))),
         )
         .with_state(state)
-        .layer(CorsLayer::permissive())
-        .layer(TraceLayer::new_for_http());
+        .layer(TraceLayer::new_for_http())
+        .layer(SetResponseHeaderLayer::if_not_present(
+            HeaderName::from_static("Cross-Origin-Embedder-Policy"),
+            HeaderValue::from_static("require-corp"),
+        ))
+        .layer(SetResponseHeaderLayer::if_not_present(
+            HeaderName::from_static("Cross-Origin-Opener-Policy"),
+            HeaderValue::from_static("same-origin"),
+        ))
+        .layer(SetResponseHeaderLayer::if_not_present(
+            HeaderName::from_static("Cross-Origin-Resource-Policy"),
+            HeaderValue::from_static("same-origin"),
+        ));
 
     axum::Server::bind(&config.listen_addr)
         .serve(app.into_make_service())

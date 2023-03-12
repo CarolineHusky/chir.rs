@@ -5816,7 +5816,6 @@ in {
       sha256 = "5d1d42a9b3f3ec46ba828e8d376aec14592ea199f70a06a548587ecd1c4ab658";
     };
     features = builtins.concatLists [
-      ["cors"]
       ["default"]
       ["fs"]
       ["httpdate"]
@@ -5824,6 +5823,7 @@ in {
       ["mime"]
       ["mime_guess"]
       ["percent-encoding"]
+      ["set-header"]
       ["set-status"]
       ["tokio"]
       ["tokio-util"]
