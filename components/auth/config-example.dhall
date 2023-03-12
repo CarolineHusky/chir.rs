@@ -11,6 +11,5 @@ let BaseConfig =
 in  BaseConfig::{
     , database_url = "postgres:///darkkirb?host=/run/postgresql&user=darkkirb"
     , redis_url = "redis://localhost/0"
-    , asset_path =
-        "/nix/store/7s70jiy06giiqvbxv8r53vxl7vjid1zi-chir-rs-auth-web"
+    , asset_path = "../../result"
     }

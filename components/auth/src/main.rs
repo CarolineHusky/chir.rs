@@ -163,18 +163,20 @@ async fn main() -> Result<()> {
         .with_state(state)
         .layer(TraceLayer::new_for_http())
         .layer(SetResponseHeaderLayer::if_not_present(
-            HeaderName::from_static("Cross-Origin-Embedder-Policy"),
+            HeaderName::from_static("cross-origin-embedder-policy"),
             HeaderValue::from_static("require-corp"),
         ))
         .layer(SetResponseHeaderLayer::if_not_present(
-            HeaderName::from_static("Cross-Origin-Opener-Policy"),
+            HeaderName::from_static("cross-origin-opener-policy"),
             HeaderValue::from_static("same-origin"),
         ))
         .layer(SetResponseHeaderLayer::if_not_present(
-            HeaderName::from_static("Cross-Origin-Resource-Policy"),
+            HeaderName::from_static("cross-origin-resource-policy"),
             HeaderValue::from_static("same-origin"),
-        ));
-
+        ))
+        .layer(SetResponseHeaderLayer::if_not_present(
+            HeaderName::from_static("content-security-policy"),
+            HeaderValue::from_static("default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; object-src 'none'; worker-src 'none';")));
     axum::Server::bind(&config.listen_addr)
         .serve(app.into_make_service())
         .await?;

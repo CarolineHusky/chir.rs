@@ -137,11 +137,13 @@
             src = (rustCrossPkgs.workspace.chir-rs-auth-web {}).bin;
             nativeBuildInputs = [pkgs.wasm-bindgen-cli];
             index_html = ./components/auth-web/index.html;
+            index_js = ./components/auth-web/index.js;
             buildPhase = ''
               wasm-bindgen --target web ./bin/chir-rs-auth-web.wasm --out-dir $out
             '';
             installPhase = ''
               cp $index_html $out/index.html
+              cp $index_js $out/index.js
             '';
           };
         };
