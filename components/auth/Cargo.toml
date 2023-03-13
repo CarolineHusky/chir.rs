@@ -16,7 +16,7 @@ async-trait = "0.1.66"
 axum = { version = "0.6.10", features = ["headers", "macros"] }
 base64 = "0.21.0"
 chir-rs-auth-model = { path = "../auth-model" }
-chrono = { version = "0.4.23", features = ["serde"] }
+chrono = { version = "0.4.24", features = ["serde"] }
 deadpool-redis = { version = "0.11.1", features = ["serde"] }
 dotenvy = "0.15.6"
 educe = "0.4.20"
