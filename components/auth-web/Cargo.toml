@@ -13,7 +13,7 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.69"
+anyhow = "1.0.71"
 argon2 = { version = "0.4.1", features = ["zeroize"] }
 base16ct = "0.2.0"
 chir-rs-auth-model = { path = "../auth-model" }
