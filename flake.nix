@@ -66,7 +66,7 @@
       };
       rustPkgs = pkgs.rustBuilder.makePackageSet {
         packageFun = import ./Cargo.nix;
-        rustChannel = "nightly";
+        rustChannel = "stable";
         rustVersion = "latest";
         packageOverrides = pkgs: pkgs.rustBuilder.overrides.all;
       };
