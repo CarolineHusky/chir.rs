@@ -41,4 +41,4 @@ web-sys = { version = "0.3.61", features = [
 webauthn-rs-proto = { version = "0.4.9", features = ["wasm"] }
 yew = { version = "0.20.0", features = ["csr"] }
 yew-router = "0.17.0"
-zxcvbn = "2.2.1"
+zxcvbn = "2.2.2"
