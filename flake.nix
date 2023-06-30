@@ -87,7 +87,7 @@
             // {
               hostPlatform = crossPkgs.lib.recursiveUpdate hostPlatform hostPlatformPatch;
             });
-        rustChannel = "nightly";
+        rustChannel = "stable";
         rustVersion = "latest";
         packageOverrides = pkgs: pkgs.rustBuilder.overrides.all;
         target = "wasm32-unknown-unknown";
@@ -97,7 +97,7 @@
         mkShell {
           buildInputs =
             [
-              (rust-bin.nightly.latest.default.override {
+              (rust-bin.stable.latest.default.override {
                 extensions = ["rust-src"];
                 targets = ["wasm32-unknown-unknown"];
               })
