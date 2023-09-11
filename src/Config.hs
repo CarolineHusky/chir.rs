@@ -1,21 +1,13 @@
-module Config where
+module Config (ConfigFile (database, databasePoolSize), logLevel', staticDir', toLogLevel, DatabaseConfig (..), toPostgresConf, toSqliteConfInfo, listenPort', loadConfigAuto) where
 
 import Control.Exception (try)
 import Control.Lens ((%~))
-import Control.Monad.Logger (MonadLoggerIO, logErrorSH)
+import Control.Lens.TH (makeLensesFor)
+import Control.Monad.Logger (LogLevel (..), MonadLoggerIO, logErrorSH)
 import Database.Persist.Postgresql qualified as Postgres
 import Database.Persist.Sqlite qualified as Sqlite
 import Dhall (FromDhall, auto, input)
 import Utils (fallbackAll, tailOrEmpty)
-
-data ConfigFile = ConfigFile
-  { listenPort :: Word16
-  , database :: DatabaseConfig
-  , databasePoolSize :: Natural
-  }
-  deriving stock (Generic, Show)
-
-instance FromDhall ConfigFile
 
 data SqliteConfig = SqliteConfig
   { filename :: Text
@@ -56,6 +48,36 @@ data DatabaseConfig = DatabaseSQLite SqliteConfig | DatabasePostgres PostgresCon
   deriving stock (Generic, Show)
 
 instance FromDhall DatabaseConfig
+
+data LogLevelConfig = LogLevelDebug | LogLevelInfo | LogLevelWarn | LogLevelError | LogLevelOther Text
+  deriving stock (Generic, Show)
+
+instance FromDhall LogLevelConfig
+
+toLogLevel :: LogLevelConfig -> LogLevel
+toLogLevel LogLevelDebug = LevelDebug
+toLogLevel LogLevelInfo = LevelInfo
+toLogLevel LogLevelWarn = LevelWarn
+toLogLevel LogLevelError = LevelError
+toLogLevel (LogLevelOther a) = LevelOther a
+
+data ConfigFile = ConfigFile
+  { listenPort :: Word16
+  , database :: DatabaseConfig
+  , databasePoolSize :: Natural
+  , staticDir :: Text
+  , logLevel :: LogLevelConfig
+  }
+  deriving stock (Generic, Show)
+
+makeLensesFor
+  [ ("staticDir", "staticDir'")
+  , ("logLevel", "logLevel'")
+  , ("listenPort", "listenPort'")
+  ]
+  ''ConfigFile
+
+instance FromDhall ConfigFile
 
 loadConfig :: (MonadLoggerIO m) => Text -> m (Either SomeException ConfigFile)
 loadConfig cfg = do

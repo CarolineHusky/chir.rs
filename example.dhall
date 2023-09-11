@@ -28,13 +28,29 @@ let DatabaseConfig =
           >
       }
 
+let LogLevel =
+      { Type =
+          < LogLevelDebug
+          | LogLevelInfo
+          | LogLevelWarn
+          | LogLevelError
+          | LogLevelOther : Text
+          >
+      }
+
 let Config =
       { Type =
           { listenPort : Natural
           , database : DatabaseConfig.Type
           , databasePoolSize : Natural
+          , staticDir : Text
+          , logLevel : LogLevel.Type
           }
-      , default.databasePoolSize = 10
+      , default =
+        { databasePoolSize = 10
+        , staticDir = "./static"
+        , logLevel = LogLevel.Type.LogLevelInfo
+        }
       }
 
 in  Config::{

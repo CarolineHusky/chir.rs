@@ -1,16 +1,3 @@
-module Database.Persist.Model where
-
-import Database.Persist.TH (
-  mkMigrate,
-  mkPersist,
-  persistLowerCase,
-  share,
-  sqlSettings,
- )
-
-share
-  [mkPersist sqlSettings, mkMigrate "migrateAll"]
-  [persistLowerCase|
 LocalAccount
     username Text
     password_hash Text
@@ -26,4 +13,3 @@ LocalAccountSessions
     user LocalAccountId
     jid Text
     deriving Show
-|]

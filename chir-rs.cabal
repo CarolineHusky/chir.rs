@@ -17,6 +17,7 @@ synopsis:           Personal homepage
 -- bug-reports:
 
 extra-source-files:
+  config/**/*
   LICENSE
   README.md
 
@@ -24,7 +25,7 @@ common shared
   ghc-options:
     -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
     -Wmissing-deriving-strategies -Wunused-foralls -Wunused-foralls
-    -fprint-explicit-foralls -fprint-explicit-kinds
+    -fprint-explicit-foralls -fprint-explicit-kinds -O3 -threaded
 
   mixins:
     base hiding (Prelude),
@@ -32,13 +33,13 @@ common shared
     relude
 
   default-extensions:
+    NoStarIsType
     DataKinds
     DerivingStrategies
     DerivingVia
     GADTs
     LambdaCase
     MultiWayIf
-    NoStarIsType
     OverloadedStrings
     QuasiQuotes
     TemplateHaskell
@@ -53,7 +54,9 @@ common shared
     , data-default
     , dhall
     , directory
+    , fast-logger
     , filepath
+    , hjsmin
     , lens
     , monad-logger
     , mtl
@@ -66,10 +69,16 @@ common shared
     , resourcet
     , shakespeare
     , shower
+    , template-haskell
     , time
+    , wai
+    , wai-extra
+    , warp
     , with-utf8
     , yesod
+    , yesod-core
     , yesod-persistent
+    , yesod-static
 
   hs-source-dirs:     src
   default-language:   GHC2021
@@ -78,7 +87,10 @@ executable chir-rs
   import:        shared
   main-is:       Main.hs
   other-modules:
+    Application
     Config
     Database.Persist.Mixed
-    Database.Persist.Model
+    Foundation
+    Handler.Home
+    Model
     Utils
