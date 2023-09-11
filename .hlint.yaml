@@ -9,6 +9,7 @@
       - "-XGeneralizedNewtypeDeriving"
       - "-XLambdaCase"
       - "-XOverloadedStrings"
+      - "-XQuasiQuotes"
       - "-XRecordWildCards"
       - "-XScopedTypeVariables"
       - "-XStandaloneDeriving"

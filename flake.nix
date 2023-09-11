@@ -1,7 +1,7 @@
 {
-  description = "srid/haskell-template: Nix template for Haskell projects";
+  description = "srid/chir-rs: Nix template for Haskell projects";
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs";
     systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
     haskell-flake.url = "github:srid/haskell-flake";
@@ -10,13 +10,20 @@
   };
 
   outputs = inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+    inputs.flake-parts.lib.mkFlake {inherit inputs;} {
       systems = import inputs.systems;
       imports = [
         inputs.haskell-flake.flakeModule
         inputs.treefmt-nix.flakeModule
       ];
-      perSystem = { self', system, lib, config, pkgs, ... }: {
+      perSystem = {
+        self',
+        system,
+        lib,
+        config,
+        pkgs,
+        ...
+      }: {
         # Our only Haskell project. You can have multiple projects, but this template
         # has only one.
         # See https://github.com/srid/haskell-flake/blob/master/example/flake.nix
@@ -37,7 +44,7 @@
           # Add your package overrides here
           settings = {
             /*
-            haskell-template = {
+            chir-rs = {
               haddock = false;
             };
             aeson = {
@@ -52,7 +59,7 @@
           };
 
           # What should haskell-flake add to flake outputs?
-          autoWire = [ "packages" "apps" "checks" ]; # Wire all but the devShell
+          autoWire = ["packages" "apps" "checks"]; # Wire all but the devShell
         };
 
         # Auto formatters. This also adds a flake check to ensure that the
@@ -61,9 +68,10 @@
           projectRootFile = "flake.nix";
 
           programs.ormolu.enable = true;
-          programs.nixpkgs-fmt.enable = true;
+          programs.alejandra.enable = true;
           programs.cabal-fmt.enable = true;
           programs.hlint.enable = true;
+          programs.dhall.enable = true;
 
           # We use fourmolu
           programs.ormolu.package = pkgs.haskellPackages.fourmolu;
@@ -76,12 +84,12 @@
         };
 
         # Default package & app.
-        packages.default = self'.packages.haskell-template;
-        apps.default = self'.apps.haskell-template;
+        packages.default = self'.packages.chir-rs;
+        apps.default = self'.apps.chir-rs;
 
         # Default shell.
         devShells.default = pkgs.mkShell {
-          name = "haskell-template";
+          name = "chir-rs";
           meta.description = "Haskell development environment";
           # See https://zero-to-flakes.com/haskell-flake/devshell#composing-devshells
           inputsFrom = [
@@ -90,8 +98,10 @@
           ];
           nativeBuildInputs = with pkgs; [
             just
+            rnix-lsp
           ];
         };
+        formatter = pkgs.alejandra;
       };
     };
 }

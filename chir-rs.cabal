@@ -1,0 +1,84 @@
+cabal-version:      2.4
+name:               chir-rs
+version:            0.1.0.0
+copyright:          2023 Charlotte 🦝 Delenk
+maintainer:         lotte@chir.rs
+author:             Charlotte 🦝 Delenk
+category:           Web
+
+-- TODO: Before hackage release.
+-- A short (one-line) description of the package.
+synopsis:           Personal homepage
+
+-- A longer description of the package.
+-- description:
+
+-- A URL where users can report bugs.
+-- bug-reports:
+
+extra-source-files:
+  LICENSE
+  README.md
+
+common shared
+  ghc-options:
+    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
+    -Wmissing-deriving-strategies -Wunused-foralls -Wunused-foralls
+    -fprint-explicit-foralls -fprint-explicit-kinds
+
+  mixins:
+    base hiding (Prelude),
+    relude (Relude as Prelude, Relude.Container.One),
+    relude
+
+  default-extensions:
+    DataKinds
+    DerivingStrategies
+    DerivingVia
+    GADTs
+    LambdaCase
+    MultiWayIf
+    NoStarIsType
+    OverloadedStrings
+    QuasiQuotes
+    TemplateHaskell
+    TypeFamilies
+    UndecidableInstances
+    ViewPatterns
+
+  build-depends:
+    , aeson
+    , async
+    , base                   >=4.13.0.0 && <4.18.0.0.0
+    , data-default
+    , dhall
+    , directory
+    , filepath
+    , lens
+    , monad-logger
+    , mtl
+    , persistent
+    , persistent-postgresql
+    , persistent-sqlite
+    , profunctors
+    , relude                 >=1.0
+    , resource-pool
+    , resourcet
+    , shakespeare
+    , shower
+    , time
+    , with-utf8
+    , yesod
+    , yesod-persistent
+
+  hs-source-dirs:     src
+  default-language:   GHC2021
+
+executable chir-rs
+  import:        shared
+  main-is:       Main.hs
+  other-modules:
+    Config
+    Database.Persist.Mixed
+    Database.Persist.Model
+    Utils

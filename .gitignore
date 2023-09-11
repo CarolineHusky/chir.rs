@@ -10,3 +10,6 @@ result-*
 
 # direnv
 .direnv
+
+client_session_key.aes
+database.db*
