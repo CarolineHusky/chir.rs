@@ -1,4 +1,4 @@
-module Application (appMain) where
+module Application (appMain, develMain) where
 
 import Config (ConfigFile, listenPort', loadConfigAuto, staticDir')
 import Control.Lens ((^.))
@@ -29,7 +29,7 @@ import Yesod (
   toWaiAppPlain,
  )
 import Yesod.Core.Types (Logger (loggerSet))
-import Yesod.Default.Config2 (makeYesodLogger)
+import Yesod.Default.Config2 (develMainHelper, getDevSettings, makeYesodLogger)
 import Yesod.Static (static)
 
 -- This line actually creates our YesodDispatch instance. It is the second half
@@ -115,3 +115,16 @@ appMain = do
   -- Generate a WAI Application from the foundation
   app <- makeApplication foundation
   runSettings (warpSettings foundation) app
+
+-- | For yesod devel, return the Warp settings and WAI Application.
+getApplicationDev :: IO (Settings, Application)
+getApplicationDev = do
+  config <- runStderrLoggingT loadConfigAuto
+  foundation <- makeFoundation config
+  wsettings <- getDevSettings $ warpSettings foundation
+  app <- makeApplication foundation
+  return (wsettings, app)
+
+-- | main function for use by yesod devel
+develMain :: IO ()
+develMain = develMainHelper getApplicationDev

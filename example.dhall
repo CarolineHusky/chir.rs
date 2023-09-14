@@ -58,4 +58,5 @@ in  Config::{
     , database =
         DatabaseConfig.Type.DatabaseSQLite
           SqliteConfig::{ filename = "database.db" }
+    , logLevel = LogLevel.Type.LogLevelDebug
     }

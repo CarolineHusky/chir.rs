@@ -13,3 +13,7 @@ result-*
 
 client_session_key.aes
 database.db*
+.stack-work
+node_modules
+yesod-devel
+static

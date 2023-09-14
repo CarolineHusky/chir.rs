@@ -4,16 +4,16 @@ Get a Haskell development environment up and running quickly. Thanks to Nix, thi
 
 - [Nix](https://srid.ca/haskell-nix) + [Flakes](https://serokell.io/blog/practical-nix-flakes) (via [`github:srid/haskell-flake`](https://github.com/srid/haskell-flake)) + GHC 9.4
 - VSCode + [HLS](https://github.com/haskell/haskell-language-server)
-- [fourmolu](https://github.com/fourmolu/fourmolu) autoformatting 
+- [fourmolu](https://github.com/fourmolu/fourmolu) autoformatting
 - [Relude](https://github.com/kowainik/relude#relude) as Prelude.
   - `.hlint.yaml` is [from relude](https://github.com/kowainik/relude/blob/main/.hlint.yaml)
 - Devshell commands are provided via [just](https://just.systems/); run `just` in devshell.
 
-If you have an *existing* Haskell project, you should probably use https://github.com/srid/haskell-flake instead.
+If you have an _existing_ Haskell project, you should probably use https://github.com/srid/haskell-flake instead.
 
 ## Getting Started
 
-*tldr: Install Nix, enable Flakes, open in VSCode and run `just run`.*
+_tldr: Install Nix, enable Flakes, open in VSCode and run `just run`._
 
 Full instructions: https://srid.ca/haskell-template/start
 

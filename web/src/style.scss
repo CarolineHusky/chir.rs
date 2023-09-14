@@ -1,0 +1,124 @@
+@charset "utf-8";
+
+@font-face {
+  font-family: "nasin-nanpa";
+  src: local("nasin-nanpa"), url("../webfonts/nasin-nanpa-2.7.1.otf");
+  unicode-range: U+F1900-F19FF;
+}
+
+@font-face {
+  font-family: "crisa";
+  src: local("Crisa Regular"), url("../webfonts/crisa-regular.otf");
+  font-weight: 400;
+  unicode-range: U+ED80-EDBF;
+}
+
+@font-face {
+  font-family: "crisa";
+  src: local("Crisa Light"), url("../webfonts/crisa-light.otf");
+  font-weight: 200;
+  unicode-range: U+ED80-EDBF;
+}
+
+$primary-hue: 285;
+
+@import "~@picocss/pico/scss/pico.scss";
+
+:root {
+  --font-family: system-ui, -apple-system, "Segoe UI", "Roboto", "Ubuntu",
+    "Cantarell", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji", "nasin-nanpa", "crisa";
+}
+
+@mixin dark-override {
+  --background-color: rgba(82, 0, 117, 0.705) !important;
+  --color: white !important;
+  --h1-color: white !important;
+  --h2-color: white !important;
+  --h3-color: white !important;
+  --h4-color: white !important;
+  --h5-color: white !important;
+  --h6-color: white !important;
+  --muted-color: #{$grey-200} !important;
+  --link-color: white;
+}
+
+[data-theme="light"],
+:root:not([data-theme="dark"]) {
+  --background-color: #ffd1dc !important;
+  --color: black !important;
+  --h1-color: black !important;
+  --h2-color: black !important;
+  --h3-color: black !important;
+  --h4-color: black !important;
+  --h5-color: black !important;
+  --h6-color: black !important;
+  --muted-color: #{$grey-800} !important;
+  --link-color: var(--primary-color);
+}
+
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    @include dark-override;
+  }
+  [role="link"],
+  a {
+    --color: var(--link-color) !important;
+  }
+}
+
+[role="link"],
+a {
+  text-decoration: underline;
+}
+
+[data-theme="dark"] {
+  @include dark-override;
+}
+
+$fa-font-path: "../node_modules/@fortawesome/fontawesome-free/webfonts";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "~@fortawesome/fontawesome-free/scss/solid.scss";
+@import "~@fortawesome/fontawesome-free/scss/brands.scss";
+
+@mixin visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.visually-hidden {
+  @include visually-hidden;
+}
+
+.visually-hidden-focusable:not(:focus):not(:active) {
+  @include visually-hidden;
+}
+
+.hamburger {
+  cursor: pointer;
+  display: block;
+  float: right;
+  padding: 40px 20px;
+}
+
+#settings-menu-checkbox:not(:checked)
+  ~ #settings-menu:not(:focus):not(:active) {
+  @include visually-hidden;
+}
+
+.no-flex {
+  display: block;
+}
+
+body > header {
+  --block-spacing-vertical: 1rem !important;
+}
+
+.flex {
+  display: flex;
+}

@@ -45,10 +45,10 @@
           settings = {
             /*
             chir-rs = {
-              haddock = false;
+            haddock = false;
             };
             aeson = {
-              check = false;
+            check = false;
             };
             */
           };
@@ -72,6 +72,7 @@
           programs.cabal-fmt.enable = true;
           programs.hlint.enable = true;
           programs.dhall.enable = true;
+          programs.prettier.enable = true;
 
           # We use fourmolu
           programs.ormolu.package = pkgs.haskellPackages.fourmolu;
@@ -84,7 +85,27 @@
         };
 
         # Default package & app.
-        packages.default = self'.packages.chir-rs;
+        packages = rec {
+            chir-rs-fe = with pkgs; mkYarnPackage {
+                name = "chir-rs-fe";
+                src = ./web;
+                packageJSON = ./web/package.json;
+                yarnLock = ./web/yarn.lock;
+                yarnNix = ./web/yarn.nix;
+                nativeBuildInputs = [fixup_yarn_lock];
+                configurePhase = ''
+                    cp -r $node_modules node_modules
+                '';
+                buildPhase = "yarn build";
+                installPhase = "cp -rv dist $out";
+                distPhase = "true";
+            };
+            default = self'.packages.chir-rs.overrideAttrs (super: {
+                postUnpack = ''
+                    cp -rv ${chir-rs-fe} chir-rs-0.1.0.0/static
+                '';
+            });
+        };
         apps.default = self'.apps.chir-rs;
 
         # Default shell.
@@ -99,6 +120,10 @@
           nativeBuildInputs = with pkgs; [
             just
             rnix-lsp
+            stack
+            nodejs
+            yarn
+            yarn2nix
           ];
         };
         formatter = pkgs.alejandra;

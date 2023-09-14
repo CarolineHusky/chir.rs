@@ -7,31 +7,41 @@ module Foundation (
   resourcesApp,
 ) where
 
-import Config (ConfigFile, logLevel', staticDir', toLogLevel)
+import Config (ConfigFile, logLevel', staticDir', toLogLevel, widgetFile)
+import Config.StaticFiles (main_css, main_js)
 import Control.Lens ((^.))
 import Control.Lens.TH (makeLenses)
 import Control.Monad.Logger (LogLevel, LogSource)
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Database.Persist.SqlBackend (SqlBackend)
 import Database.Persist.Sqlite (SqlPersistT)
+import Text.Hamlet (hamletFile)
 import Text.Jasmine (minifym)
 import Yesod (
   DBRunner,
   FormMessage,
+  Html,
   Lang,
+  PageContent (pageBody, pageHead, pageTitle),
   RenderMessage,
   RenderRoute (Route, renderRoute),
   SessionBackend,
   ToTypedContent,
-  Yesod (addStaticContent, makeLogger, makeSessionBackend, shouldLogIO, yesodMiddleware),
+  Yesod (addStaticContent, defaultLayout, makeLogger, makeSessionBackend, shouldLogIO, yesodMiddleware),
   YesodPersist (runDB),
   YesodPersistRunner,
+  addScript,
+  addStylesheet,
   defaultFormMessage,
   defaultGetDBRunner,
   defaultYesodMiddleware,
   getYesod,
+  lookupCookie,
+  mkMessage,
   mkYesodData,
   parseRoutesFile,
+  widgetToPageContent,
+  withUrlRenderer,
  )
 import Yesod.Core (RenderMessage (renderMessage))
 import Yesod.Core.Types (Logger)
@@ -69,6 +79,8 @@ appStatic = flip (^.) appStatic'
 -- type Handler = HandlerFor App
 -- type Widget = WidgetFor App ()
 mkYesodData "App" $(parseRoutesFile "config/routes.yesodroutes")
+
+mkMessage "App" "messages" "en"
 
 instance Yesod App where
   makeSessionBackend :: App -> IO (Maybe SessionBackend)
@@ -109,6 +121,16 @@ instance Yesod App where
 
   makeLogger :: App -> IO Logger
   makeLogger app = return $ app ^. appLogger
+
+  defaultLayout :: Widget -> Handler Html
+  defaultLayout widget = do
+    themeCookie <- lookupCookie "_THEME"
+    let theme = fromMaybe "" themeCookie
+    pc <- widgetToPageContent $ do
+      addScript $ StaticR main_js
+      addStylesheet $ StaticR main_css
+      $(widgetFile "default-layout")
+    withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
 instance YesodPersist App where
   type YesodPersistBackend App = SqlBackend

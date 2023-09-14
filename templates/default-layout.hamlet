@@ -1,0 +1,36 @@
+$newline never
+<a .visually-hidden-focusable href="#main">_{MsgJumpToContent}
+<header .container>
+    <hgroup>
+        <h1>_{MsgPageTitle}
+        <p>_{MsgPageSubtitle}
+<nav .container .no-flex>
+    <input .visually-hidden type="checkbox" #settings-menu-checkbox aria-hidden=true>
+    <label .hamburger .fa-solid .fa-gear for="settings-menu-checkbox" title="_{MsgSettingsMenu}" aria-hidden=true>
+    <div #settings-menu>
+        <p>_{MsgSettingsCookieNotice}
+        <label for="change-language">_{MsgSettingLanguage}
+        <select #change-language>
+            <option value="auto">_{MsgAutomatic}
+            <option value="de">Deutsch (Deutschland)
+            <option value="en">English (Usonia)
+            <option value="jbo">la .lojban.
+            <option value="jbo@ZLR">  (la .lojban., zbalermorna)
+            <option value="tok">toki pona
+            <option value="tok@SP">󱥬󱦖󱥔 (toki pona, sitelen pona)
+        <label for="change-theme">_{MsgSettingTheme}
+        <select #change-theme>
+            <option value="auto">_{MsgAutomatic}
+            <option value="dark">_{MsgSettingDarkTheme}
+            <option value="light">_{MsgSettingLightTheme}
+    <ul .flex>
+        <li>
+            <a href="@{HomeR}">_{MsgPageHome}
+        <li>
+            <a>_{MsgPageBlog}
+        <li>
+            <a>_{MsgPageChat}
+<main #main .container role="main" id="main">
+    ^{widget}
+<footer .container>
+    _{MsgFooterText}
