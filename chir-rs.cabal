@@ -84,6 +84,7 @@ common shared
     TemplateHaskell
     TypeFamilies
     UndecidableInstances
+    UnicodeSyntax
     ViewPatterns
 
   build-depends:
@@ -99,9 +100,8 @@ common shared
     , lens
     , monad-logger
     , mtl
+    , parsec
     , persistent
-    , persistent-postgresql
-    , persistent-sqlite
     , profunctors
     , relude                 >=1.0
     , resource-pool
@@ -134,6 +134,8 @@ common shared
     Foundation
     Handler.Home
     Model
+    Text.Lojban
+    Text.TokiPona
     Utils
 
 library

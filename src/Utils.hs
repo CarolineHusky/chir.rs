@@ -1,4 +1,6 @@
-module Utils (fallbackAll, tailOrEmpty) where
+module Utils (fallbackAll, tailOrEmpty, capitalize) where
+
+import Data.Char (toUpper)
 
 fallback :: (Monad m) => m (Either a b) -> m (Either a b) -> m (Either a b)
 fallback e1 e2 = do
@@ -19,3 +21,7 @@ tailOr xs ys = fromMaybe ys $ maybeTail xs
 
 tailOrEmpty :: [a] -> [a]
 tailOrEmpty xs = tailOr xs []
+
+capitalize :: String -> String
+capitalize (c : cs) = toUpper c : cs
+capitalize s = s

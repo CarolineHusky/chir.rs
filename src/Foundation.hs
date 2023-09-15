@@ -17,6 +17,8 @@ import Database.Persist.SqlBackend (SqlBackend)
 import Database.Persist.Sqlite (SqlPersistT)
 import Text.Hamlet (hamletFile)
 import Text.Jasmine (minifym)
+import Text.Lojban (zlrToLatin)
+import Text.TokiPona (spToLatin)
 import Yesod (
   DBRunner,
   FormMessage,
@@ -80,7 +82,22 @@ appStatic = flip (^.) appStatic'
 -- type Widget = WidgetFor App ()
 mkYesodData "App" $(parseRoutesFile "config/routes.yesodroutes")
 
-mkMessage "App" "messages" "en"
+data Dummy = Dummy
+
+mkMessage "Dummy" "messages" "en"
+
+type AppMessage = DummyMessage
+
+instance RenderMessage App AppMessage where
+  renderMessage app (lang : langs) msg
+    | lang == "de" = renderMessage Dummy (lang : langs) msg
+    | lang == "en" = renderMessage Dummy (lang : langs) msg
+    | lang == "jbo@ZLR" = renderMessage Dummy (lang : langs) msg
+    | lang == "tok@SP" = renderMessage Dummy (lang : langs) msg
+    | lang == "jbo" = zlrToLatin $ renderMessage Dummy ("jbo@ZLR" : langs) msg
+    | lang == "tok" = spToLatin $ renderMessage Dummy ("tok@SP" : langs) msg
+    | otherwise = renderMessage app langs msg
+  renderMessage _ [] msg = renderMessage Dummy [] msg
 
 instance Yesod App where
   makeSessionBackend :: App -> IO (Maybe SessionBackend)

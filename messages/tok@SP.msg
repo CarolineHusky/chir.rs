@@ -1,4 +1,5 @@
 Automatic: 󱤇󱥧󱤎 (anu tan ilo)
+FooterText:󱤴󱥉󱤉󱥁󱤙󱥪󱦓󱤢󱤂,󱤙󱥬󱤎󱦐󱤈󱦒󱥦󱦒󱥰󱦒󱤘󱦒󱤋󱦒󱤣󱦒󱥰󱦒󱦑.
 JumpToContent: 󱥄󱥩󱤉󱤪
 PageBlog: 󱤪󱤼
 PageChat: 󱥭󱥬
