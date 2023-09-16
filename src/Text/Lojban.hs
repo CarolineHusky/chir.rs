@@ -61,19 +61,8 @@ zlrToLatin :: Text -> Text
 zlrToLatin = toText . zlrToLatinStr . toString
 
 formatDigit :: Char -> String
-formatDigit '0' = "\xED97\xEDA3"
-formatDigit '1' = "\xED80\xEDA0"
-formatDigit '2' = "\xED94\xEDA1"
-formatDigit '3' = "\xED86\xEDA2"
-formatDigit '4' = "\xED93\xEDA3"
-formatDigit '5' = "\xED87\xEDA4"
-formatDigit '6' = "\xED88\xEDA0"
-formatDigit '7' = "\xED95\xEDA1"
-formatDigit '8' = "\xED90\xEDA2"
-formatDigit '9' = "\xED85\xEDA3"
 formatDigit '+' = "\xED87\xEDA0\xED8A\xEDA4"
 formatDigit '-' = "\xED97\xEDA2\xED8A\xEDA4"
-formatDigit '.' = "\xED80\xEDA2"
 formatDigit ',' = "\xED82\xEDA2\xED8A\xEDA3"
 formatDigit 'e' = "\xED80\xEDA2\xED8A\xEDA2\xED80\xEDA0\xED97\xEDA3\xED81\xEDA1\xED8A\xEDA0"
 formatDigit c = one c
