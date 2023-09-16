@@ -1,6 +1,6 @@
-module Text.TokiPona (spToLatin) where
+module Text.TokiPona (spToLatin, ShowNum (..)) where
 
-import Text.Parsec (anyChar, char, choice, lookAhead, many1, manyTill, parse, skipMany, try)
+import Text.Parsec (anyChar, char, choice, lookAhead, many1, parse, skipMany, try)
 import Text.Parsec.Text (Parser)
 import Utils (capitalize)
 import Prelude hiding (unwords)
@@ -201,3 +201,33 @@ spToLatin :: Text -> Text
 spToLatin t = case parse parseText "" t of
   Left e -> show e
   Right v -> v
+
+-- tan waso pi sona nanpa
+formatDigit :: Integer -> Char
+formatDigit 0 = '\x0F1902'
+formatDigit 1 = '\x0F1973'
+formatDigit 2 = '\x0F196E'
+formatDigit 3 = '\x0F1930'
+formatDigit 4 = '\x0F1955'
+formatDigit 5 = '\x0F191C'
+formatDigit _ = 'e'
+
+class (Num a) => ShowNum a where
+  formatNum :: a -> Text
+
+instance {-# OVERLAPPING #-} ShowNum Integer where
+  formatNum :: Integer -> Text
+  formatNum = toText . reverse . formatInteger'
+    where
+      formatInteger' n
+        | n < 0 = '\x0F1976' : formatInteger' (-n)
+        | n < 6 = [formatDigit n]
+        | otherwise = formatDigit (n `mod` 6) : formatInteger' (n `div` 6)
+
+instance (Integral a, ShowNum a) => ShowNum (Ratio a) where
+  formatNum :: Ratio a -> Text
+  formatNum v = formatNum (numerator v) <> "\x0F197B" <> formatNum (denominator v)
+
+instance (Integral a, Num a) => ShowNum a where
+  formatNum :: a -> Text
+  formatNum = formatNum . (fromIntegral :: a -> Integer)
