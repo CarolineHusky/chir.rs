@@ -19,6 +19,7 @@ import Text.Hamlet (hamletFile)
 import Text.Jasmine (minifym)
 import Text.Lojban (zlrToLatin)
 import Text.TokiPona (spToLatin)
+import Utils (headOr)
 import Yesod (
   DBRunner,
   FormMessage,
@@ -38,6 +39,7 @@ import Yesod (
   defaultGetDBRunner,
   defaultYesodMiddleware,
   getYesod,
+  languages,
   lookupCookie,
   mkMessage,
   mkYesodData,
@@ -143,6 +145,8 @@ instance Yesod App where
   defaultLayout widget = do
     themeCookie <- lookupCookie "_THEME"
     let theme = fromMaybe "" themeCookie
+    langs <- languages
+    let lang = headOr langs "en"
     pc <- widgetToPageContent $ do
       addScript $ StaticR main_js
       addStylesheet $ StaticR main_css

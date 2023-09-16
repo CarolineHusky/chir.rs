@@ -1,6 +1,6 @@
 $newline never
 \<!doctype html>
-<html lang="en" data-theme=#{theme}>
+<html lang=#{lang} data-theme=#{theme}>
     <head>
         <meta charset="utf-8">
         <title>#{pageTitle pc}

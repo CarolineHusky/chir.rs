@@ -20,9 +20,9 @@ extra-source-files:
   config/**/*.persistentmodels
   config/**/*.yesodroutes
   LICENSE
+  messages/**/*.msg
   README.md
   templates/**/*.hamlet
-  messages/**/*.msg
 
 flag library-only
   description: Build for use with "yesod devel"
@@ -90,7 +90,7 @@ common shared
   build-depends:
     , aeson
     , async
-    , base                   >=4.13.0.0 && <4.18.0.0.0
+    , base              >=4.13.0.0 && <4.18.0.0.0
     , data-default
     , dhall
     , directory
@@ -103,7 +103,7 @@ common shared
     , parsec
     , persistent
     , profunctors
-    , relude                 >=1.0
+    , relude            >=1.0
     , resource-pool
     , resourcet
     , shakespeare
