@@ -122,3 +122,15 @@ body > header {
 .flex {
   display: flex;
 }
+
+main {
+  border: 1px solid var(--color);
+  border-radius: 1rem;
+  padding: 2rem 0 !important;
+  margin-top: 2rem !important;
+  margin-bottom: 2rem !important;
+}
+
+main > * {
+  padding: 0 1em !important;
+}
