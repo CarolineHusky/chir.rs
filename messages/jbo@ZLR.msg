@@ -1,14 +1,14 @@
 Automatic:  (zmiku)
-FooterText:        
+FooterText:        
 JumpToContent:     
 PageBlog:  
 PageChat:  
 PageHome:   
-PageSubtitle:                         
+PageSubtitle:                         
 PageTitle:     
 SettingDarkTheme:    (le manku staile)
-SettingLanguage:   
+SettingLanguage:    
 SettingLightTheme:    (le blabi staile)
-SettingsCookieNotice:                 
+SettingsCookieNotice:                  
 SettingsMenu:   (le gaftercu'a)
-SettingTheme:   
+SettingTheme:    
