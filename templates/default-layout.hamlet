@@ -7,6 +7,13 @@ $newline never
 <nav .container .no-flex>
     <input .visually-hidden type="checkbox" #settings-menu-checkbox aria-hidden=true>
     <label .hamburger .fa-solid .fa-gear for="settings-menu-checkbox" title="_{MsgSettingsMenu}" aria-hidden=true>
+    <ul .flex>
+        <li>
+            <a href="@{HomeR}">_{MsgPageHome}
+        <li>
+            <a>_{MsgPageBlog}
+        <li>
+            <a>_{MsgPageChat}
     <div #settings-menu>
         <p>_{MsgSettingsCookieNotice}
         <label for="change-language">_{MsgSettingLanguage}
@@ -23,13 +30,6 @@ $newline never
             <option value="auto">_{MsgAutomatic}
             <option value="dark">_{MsgSettingDarkTheme}
             <option value="light">_{MsgSettingLightTheme}
-    <ul .flex>
-        <li>
-            <a href="@{HomeR}">_{MsgPageHome}
-        <li>
-            <a>_{MsgPageBlog}
-        <li>
-            <a>_{MsgPageChat}
 <main #main .container role="main" id="main">
     ^{widget}
 <footer .container>
