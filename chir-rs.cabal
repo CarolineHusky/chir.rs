@@ -91,6 +91,7 @@ common shared
     , aeson
     , async
     , base              >=4.13.0.0 && <4.18.0.0.0
+    , blaze-html
     , data-default
     , dhall
     , directory
@@ -128,7 +129,9 @@ common shared
   hs-source-dirs:     src
   default-language:   GHC2021
   other-modules:
+    Components.Image
     Config
+    Config.Images
     Config.StaticFiles
     Database.Persist.Mixed
     Foundation

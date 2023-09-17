@@ -1,0 +1,8 @@
+<picture>
+    <source srcset=@{jxlImg} type="image/jxl">
+    <source srcset=@{avifImg} type="image/avif">
+    <source srcset=@{heifImg} type="image/heif">
+    <source srcset=@{webpImg} type="image/webp">
+    <source srcset=@{jpgImg} type="image/jpeg">
+    <source srcset=@{pngImg} type="image/png">
+    <img src=@{pngImg} type="image/png" alt=_{alt}>

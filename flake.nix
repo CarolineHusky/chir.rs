@@ -7,6 +7,8 @@
     haskell-flake.url = "github:srid/haskell-flake";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+    nix-packages.url = "github:DarkKirb/nix-packages";
+    nix-packages.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs:
@@ -86,25 +88,34 @@
 
         # Default package & app.
         packages = rec {
-            chir-rs-fe = with pkgs; mkYarnPackage {
-                name = "chir-rs-fe";
-                src = ./web;
-                packageJSON = ./web/package.json;
-                yarnLock = ./web/yarn.lock;
-                yarnNix = ./web/yarn.nix;
-                nativeBuildInputs = [fixup_yarn_lock];
-                configurePhase = ''
-                    cp -r $node_modules node_modules
-                '';
-                buildPhase = "yarn build";
-                installPhase = "cp -rv dist $out";
-                distPhase = "true";
+          chir-rs-fe = with pkgs;
+            mkYarnPackage {
+              name = "chir-rs-fe";
+              src = ./web;
+              packageJSON = ./web/package.json;
+              yarnLock = ./web/yarn.lock;
+              yarnNix = ./web/yarn.nix;
+              nativeBuildInputs = [fixup_yarn_lock];
+              configurePhase = ''
+                cp -r $node_modules node_modules
+              '';
+              buildPhase = "yarn build";
+              installPhase = "cp -rv dist $out";
+              distPhase = "true";
             };
-            default = self'.packages.chir-rs.overrideAttrs (super: {
-                postUnpack = ''
-                    cp -rv ${chir-rs-fe} chir-rs-0.1.0.0/static
-                '';
-            });
+          default = self'.packages.chir-rs.overrideAttrs (super: {
+            postUnpack = ''
+              cp -rv ${chir-rs-fe} chir-rs-0.1.0.0/static
+              mkdir chir-rs-0.1.0.0/static/img
+              for f in ${art-assets}/*; do
+                ln -sv $f chir-rs-0.1.0.0/static/img
+              done
+            '';
+          });
+          inherit (inputs.nix-packages.packages.${system}) lotte-art;
+          art-assets = pkgs.callPackage ./packages/art-encodes.nix {
+            inherit (inputs.nix-packages.packages.${system}) lotte-art;
+          };
         };
         apps.default = self'.apps.chir-rs;
 
