@@ -93,8 +93,8 @@ type AppMessage = DummyMessage
 instance RenderMessage App AppMessage where
   renderMessage app (lang : langs) msg
     | lang == "de" = renderMessage Dummy (lang : langs) msg
-    | lang == "fr" = renderMessage Dummy (lang : langs) msg
     | lang == "en" = renderMessage Dummy (lang : langs) msg
+    | lang == "fr" = renderMessage Dummy (lang : langs) msg
     | lang == "jbo@ZLR" = renderMessage Dummy (lang : langs) msg
     | lang == "nl" = renderMessage Dummy (lang : langs) msg
     | lang == "tok@SP" = renderMessage Dummy (lang : langs) msg

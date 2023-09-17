@@ -21,8 +21,10 @@ $newline never
             <option value="auto">_{MsgAutomatic}
             <option value="de">Deutsch (Deutschland)
             <option value="en">English (Usonia)
+            <option value="fr">Français (France)
             <option value="jbo">la .lojban.
             <option value="jbo@ZLR">  (la .lojban., zbalermorna)
+            <option value="nl">Nederlands (Netherland)
             <option value="tok">toki pona
             <option value="tok@SP">󱥬󱦖󱥔 (toki pona, sitelen pona)
         <label for="change-theme">_{MsgSettingTheme}
