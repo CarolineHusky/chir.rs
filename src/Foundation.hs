@@ -5,6 +5,10 @@ module Foundation (
   appLogger,
   appStatic,
   resourcesApp,
+  DummyMessage (..),
+  AppMessage,
+  Widget,
+  translationUnescaped,
 ) where
 
 import Config (ConfigFile, logLevel', staticDir', toLogLevel, widgetFile)
@@ -15,6 +19,7 @@ import Control.Monad.Logger (LogLevel, LogSource)
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Database.Persist.SqlBackend (SqlBackend)
 import Database.Persist.Sqlite (SqlPersistT)
+import Text.Blaze.Html (preEscapedToHtml)
 import Text.Hamlet (hamletFile)
 import Text.Jasmine (minifym)
 import Text.Lojban (zlrToLatin)
@@ -25,6 +30,7 @@ import Yesod (
   FormMessage,
   Html,
   Lang,
+  MonadHandler (HandlerSite),
   PageContent (pageBody, pageHead, pageTitle),
   RenderMessage,
   RenderRoute (Route, renderRoute),
@@ -38,6 +44,7 @@ import Yesod (
   defaultFormMessage,
   defaultGetDBRunner,
   defaultYesodMiddleware,
+  getMessageRender,
   getYesod,
   languages,
   lookupCookie,
@@ -171,3 +178,8 @@ instance YesodPersistRunner App where
 instance RenderMessage App FormMessage where
   renderMessage :: App -> [Lang] -> FormMessage -> Text
   renderMessage _ _ = defaultFormMessage
+
+translationUnescaped :: (MonadHandler m, RenderMessage (HandlerSite m) message) => message -> m Html
+translationUnescaped message = do
+  messageHandler <- getMessageRender
+  return $ preEscapedToHtml $ messageHandler message

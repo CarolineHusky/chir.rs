@@ -1,11 +1,17 @@
 Automatic: Automatisch
 FooterText: Gemacht mit Kaffee und Haskell.
+ImgVintagecoyotePrideicon: Portrait von Charlotte, ein orangener Waschbär mit rosa Gesicht und lilafarbener Maske. Es lächelt und trägt einen Schal, der mit den Farben der Asexuellen-Pride-Flagge ausgestattet, nämlich schwarz, grau, weiß, und lila. Im hintergrund ist die Therian-Pride-Flagge, welches die Farben grün, weiß, und lila hat, und ein komplexes Symbol mit einem Dreieck, einem Kreis, und einem Heptagramm besteht.
+ImgVintagecoyotePrideiconFigcaption: Illustration von <a href="https://nitter.net/vintagecoyote" lang="en">yote</a>
 JumpToContent: Springe zum Inhalt…
 PageBlog: Blog
 PageChat: Chat
 PageHome: Homepage
 PageSubtitle: Waschbären? Im Internet? Das ist wahrscheinlicher als es klingt!
 PageTitle: Lottes Dachboden
+SelfIntroPart1: Hi! Ich bin <span class="p-name">Charlotte</span>, oder auch nur <span class="p-nick">Lotte</span>, eine <abbr class="dt-bday" title="2001-01-10">22 Jahre alte</abbr> Waschbärin-Therian und <span class="p-role">Studentin</span> aus <span class="p-country-name">Deutschland</span>.
+SelfIntroPart2: Ich bin Systemadministratorin, Softwareentwicklerin, und manchmal Hardwaredesignerin.
+SelfIntroPart3: Ich liebe Kaffe, Lasagne, Pizza, Waschbären, und Plüschtiere.
+SelfIntroPart4: Meine Pronomen sind <span class="u-pronoun">es</span> und <span class="u-pronoun">sie</span>.
 SettingDarkTheme: Dunkler Stil
 SettingLanguage: Sprache:
 SettingLightTheme: Heller Stil

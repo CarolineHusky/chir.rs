@@ -1,2 +1,10 @@
 $newline never
-<p>Hello World!
+<div .h-card>
+    <figure .u-photo .pfpfig>
+        ^{image img_2023_06_02_vintagecoyote_prideicon}
+        <figcaption>^{figcaption}
+    <p .p-note>
+        ^{selfIntro1}&nbsp;
+        ^{selfIntro2}&nbsp;
+        ^{selfIntro3}&nbsp;
+        ^{selfIntro4}

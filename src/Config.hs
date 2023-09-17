@@ -1,4 +1,7 @@
 {-# LANGUAGE CPP #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use fewer imports" #-}
 
 module Config where
 
@@ -16,10 +19,12 @@ import Database.Persist.Sqlite qualified as Sqlite
 import Dhall (FromDhall, auto, input)
 import Language.Haskell.TH (Exp, Q)
 import Utils (fallbackAll, tailOrEmpty)
-import Yesod.Default.Util (
-  WidgetFileSettings,
-  widgetFileReload,
- )
+import Yesod.Default.Util (WidgetFileSettings)
+#ifdef DEBUG
+import Yesod.Default.Util (widgetFileReload)
+#else
+import Yesod.Default.Util (widgetFileNoReload)
+#endif
 
 data SqliteConfig = SqliteConfig
   { filename :: Text
@@ -128,5 +133,10 @@ https://github.com/yesodweb/yesod/wiki/Overriding-widgetFile
 widgetFileSettings :: WidgetFileSettings
 widgetFileSettings = def
 
+#ifdef DEBUG
 widgetFile :: String -> Q Exp
 widgetFile = widgetFileReload widgetFileSettings
+#else
+widgetFile :: String -> Q Exp
+widgetFile = widgetFileNoReload widgetFileSettings
+#endif

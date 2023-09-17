@@ -129,8 +129,30 @@ main {
   padding: 2rem 0 !important;
   margin-top: 2rem !important;
   margin-bottom: 2rem !important;
+  min-height: calc(256px + 4rem);
 }
 
 main > * {
   padding: 0 1em !important;
+}
+
+@media (min-width: 576px) {
+  .pfpfig {
+    max-width: 256px;
+  }
+}
+
+@media (max-width: 576px) {
+  .pfpfig {
+    max-width: 25%;
+  }
+  .pfpfig > figcaption {
+    display: none;
+  }
+}
+
+.pfpfig {
+  margin-bottom: 1rem;
+  float: left;
+  margin-right: 1rem;
 }
