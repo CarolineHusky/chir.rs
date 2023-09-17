@@ -1,5 +1,7 @@
 module Text.Lojban where
 
+import Data.Time (Day, toGregorian)
+
 -- | Converts a zbalermorna character into a latin character.
 zlrToLatinChar :: Char -> String
 zlrToLatinChar '\xED80' = "p"
@@ -72,3 +74,8 @@ formatNumberString = toText . concatMap formatDigit . toString
 
 formatNumber :: (Show a, Num a) => a -> Text
 formatNumber = formatNumberString . show
+
+formatDate :: Day -> Text
+formatDate date = "\xED84\xEDA2 " <> formatNumber day <> " \xED80\xEDA2\xED8A\xEDA1 " <> formatNumber month <> " \xED80\xEDA2\xED8A\xEDA1 " <> formatNumber year
+  where
+    (year, month, day) = toGregorian date

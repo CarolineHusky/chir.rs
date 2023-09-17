@@ -1,5 +1,6 @@
-module Text.TokiPona (spToLatin, ShowNum (..)) where
+module Text.TokiPona (spToLatin, ShowNum (..), formatDate) where
 
+import Data.Time (Day, toGregorian)
 import Text.Parsec (anyChar, char, choice, lookAhead, many1, parse, skipMany, try)
 import Text.Parsec.Text (Parser)
 import Utils (capitalize)
@@ -204,12 +205,12 @@ spToLatin t = case parse parseText "" t of
 
 -- tan waso pi sona nanpa
 formatDigit :: Integer -> Char
-formatDigit 0 = '\x0F1902'
-formatDigit 1 = '\x0F1973'
-formatDigit 2 = '\x0F196E'
-formatDigit 3 = '\x0F1930'
-formatDigit 4 = '\x0F1955'
-formatDigit 5 = '\x0F191C'
+formatDigit 0 = '\x0F1902' -- ala
+formatDigit 1 = '\x0F1973' -- wan
+formatDigit 2 = '\x0F196E' -- tu
+formatDigit 3 = '\x0F1930' -- ma
+formatDigit 4 = '\x0F1955' -- pu
+formatDigit 5 = '\x0F191C' -- ko
 formatDigit _ = 'e'
 
 class (Num a) => ShowNum a where
@@ -231,3 +232,17 @@ instance (Integral a, ShowNum a) => ShowNum (Ratio a) where
 instance (Integral a, Num a) => ShowNum a where
   formatNum :: a -> Text
   formatNum = formatNum . (fromIntegral :: a -> Integer)
+
+-- the most ad-hoc date system possible
+-- It uses the release year of pu as the epoch (2014)
+formatDate :: Day -> Text
+formatDate date =
+  let
+    (gregYear, month, day) = toGregorian date
+    yearEpoch = gregYear - 2014
+    yearStrFirst = "\x0F195C\x0F1964\x0F1993" <> formatNum (abs yearEpoch) <> "\x0F1994" -- sike suno pi …
+    yearStr = (if yearEpoch < 0 then yearStrFirst <> "\xF1938" else if yearEpoch > 0 then yearStrFirst <> "\xF195F" else "\x0F195C\x0F1964") <> "\xF1955"
+    dayStr = "\x0F1964\x0F1993" <> formatNum day <> "\x0F1994" -- suno pi …
+    monthStr = "\xF193A\x0F1993" <> formatNum month <> "\x0F1994" -- mun pi …
+   in
+    dayStr <> monthStr <> yearStr
