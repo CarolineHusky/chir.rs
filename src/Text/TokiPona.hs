@@ -1,4 +1,4 @@
-module Text.TokiPona (spToLatin, ShowNum (..), formatDate) where
+module Text.TokiPona (spToLatin, spToEmoji, ShowNum (..), formatDate) where
 
 import Data.Time (Day, toGregorian)
 import Text.Parsec (anyChar, char, choice, lookAhead, many1, parse, skipMany, try)
@@ -158,12 +158,157 @@ logogramToText '\x0F19A3' = "powe"
 logogramToText '\x0F1993' = "pi"
 logogramToText c = [c]
 
-parseLogogram :: Parser String
-parseLogogram = logogramToText <$> matchLogogram
+logogramToEmoji :: Char -> String
+logogramToEmoji '\x0F1900' = "❗"
+logogramToEmoji '\x0F1901' = "🦎"
+logogramToEmoji '\x0F1902' = "❌"
+logogramToEmoji '\x0F1903' = "🏹"
+logogramToEmoji '\x0F1904' = "♾️"
+logogramToEmoji '\x0F1905' = "⬇️"
+logogramToEmoji '\x0F1906' = "🔀"
+logogramToEmoji '\x0F1907' = "☯️"
+logogramToEmoji '\x0F1908' = "⚓"
+logogramToEmoji '\x0F1909' = "⏩"
+logogramToEmoji '\x0F190A' = "➕"
+logogramToEmoji '\x0F190B' = "🛒"
+logogramToEmoji '\x0F190C' = "🐚"
+logogramToEmoji '\x0F190D' = "👎"
+logogramToEmoji '\x0F190E' = "⚙️"
+logogramToEmoji '\x0F190F' = "⏺️"
+logogramToEmoji '\x0F1910' = "💩"
+logogramToEmoji '\x0F1911' = "👤"
+logogramToEmoji '\x0F1912' = "💛"
+logogramToEmoji '\x0F1913' = "👜"
+logogramToEmoji '\x0F1914' = "🐟"
+logogramToEmoji '\x0F1915' = "🔈"
+logogramToEmoji '\x0F1916' = "🚶"
+logogramToEmoji '\x0F1917' = "🌴"
+logogramToEmoji '\x0F1918' = "💪"
+logogramToEmoji '\x0F1919' = "🔧"
+logogramToEmoji '\x0F191A' = "🍎"
+logogramToEmoji '\x0F191B' = "💎"
+logogramToEmoji '\x0F191C' = "🍦"
+logogramToEmoji '\x0F191D' = "💨"
+logogramToEmoji '\x0F191E' = "🌈"
+logogramToEmoji '\x0F191F' = "👥"
+logogramToEmoji '\x0F1920' = "👂"
+logogramToEmoji '\x0F1921' = "🔼"
+logogramToEmoji '\x0F1922' = "😴"
+logogramToEmoji '\x0F1923' = "🔵"
+logogramToEmoji '\x0F1924' = "😶"
+logogramToEmoji '\x0F1925' = "👕"
+logogramToEmoji '\x0F1926' = "❄️"
+logogramToEmoji '\x0F1927' = "▶️"
+logogramToEmoji '\x0F1928' = "🐭"
+logogramToEmoji '\x0F1929' = "〰️"
+logogramToEmoji '\x0F192A' = "📄"
+logogramToEmoji '\x0F192B' = "🔴"
+logogramToEmoji '\x0F192C' = "📍"
+logogramToEmoji '\x0F192D' = "✋"
+logogramToEmoji '\x0F192E' = "👀"
+logogramToEmoji '\x0F192F' = "🕳️"
+logogramToEmoji '\x0F1930' = "🏝️"
+logogramToEmoji '\x0F1931' = "👪"
+logogramToEmoji '\x0F1932' = "💰"
+logogramToEmoji '\x0F1933' = "👧"
+logogramToEmoji '\x0F1934' = "👈"
+logogramToEmoji '\x0F1935' = "👨"
+logogramToEmoji '\x0F1936' = "🍽️"
+logogramToEmoji '\x0F1937' = "💀"
+logogramToEmoji '\x0F1938' = "⬅️"
+logogramToEmoji '\x0F1939' = "😹"
+logogramToEmoji '\x0F193A' = "🌙"
+logogramToEmoji '\x0F193B' = "😃"
+logogramToEmoji '\x0F193C' = "👐"
+logogramToEmoji '\x0F193D' = "#️⃣"
+logogramToEmoji '\x0F193E' = "🌀"
+logogramToEmoji '\x0F193F' = "🛣️"
+logogramToEmoji '\x0F1940' = "🗻"
+logogramToEmoji '\x0F1941' = "👇"
+logogramToEmoji '\x0F1942' = "💬"
+logogramToEmoji '\x0F1943' = "🦵"
+logogramToEmoji '\x0F1944' = "👋"
+logogramToEmoji '\x0F1945' = "💕"
+logogramToEmoji '\x0F1946' = "👆"
+logogramToEmoji '\x0F1947' = "🔓"
+logogramToEmoji '\x0F1948' = "💥"
+logogramToEmoji '\x0F1949' = "✊"
+logogramToEmoji '\x0F194A' = "📏"
+logogramToEmoji '\x0F194B' = "🍞"
+logogramToEmoji '\x0F194C' = "📤"
+logogramToEmoji '\x0F194D' = "⏹️"
+logogramToEmoji '\x0F194E' = "❤️"
+logogramToEmoji '\x0F194F' = "⚫"
+logogramToEmoji '\x0F1950' = "🏁"
+logogramToEmoji '\x0F1951' = "🐞"
+logogramToEmoji '\x0F1952' = "↔️"
+logogramToEmoji '\x0F1953' = "📦"
+logogramToEmoji '\x0F1954' = "👍"
+logogramToEmoji '\x0F1955' = "📖"
+logogramToEmoji '\x0F1956' = "⚖️"
+logogramToEmoji '\x0F1957' = "🔥"
+logogramToEmoji '\x0F1958' = "🔲"
+logogramToEmoji '\x0F1959' = "❓"
+logogramToEmoji '\x0F195A' = "⬆️"
+logogramToEmoji '\x0F195B' = "🏋️"
+logogramToEmoji '\x0F195C' = "⭕"
+logogramToEmoji '\x0F195D' = "🎁"
+logogramToEmoji '\x0F195E' = "👉"
+logogramToEmoji '\x0F195F' = "➡️"
+logogramToEmoji '\x0F1960' = "🖼️"
+logogramToEmoji '\x0F1961' = "🧠"
+logogramToEmoji '\x0F1962' = "🐒"
+logogramToEmoji '\x0F1963' = "🐘"
+logogramToEmoji '\x0F1964' = "☀️"
+logogramToEmoji '\x0F1965' = "🛏️"
+logogramToEmoji '\x0F1966' = "🍭"
+logogramToEmoji '\x0F1967' = "↩️"
+logogramToEmoji '\x0F1968' = "🤔"
+logogramToEmoji '\x0F1969' = "↪️"
+logogramToEmoji '\x0F196A' = "💧"
+logogramToEmoji '\x0F196B' = "⏰"
+logogramToEmoji '\x0F196C' = "🗣️"
+logogramToEmoji '\x0F196D' = "🏠"
+logogramToEmoji '\x0F196E' = "✌️"
+logogramToEmoji '\x0F196F' = "🍆"
+logogramToEmoji '\x0F1970' = "👄"
+logogramToEmoji '\x0F1971' = "⚔️"
+logogramToEmoji '\x0F1972' = "⚪"
+logogramToEmoji '\x0F1973' = "☝️"
+logogramToEmoji '\x0F1974' = "🦅"
+logogramToEmoji '\x0F1975' = "⚡"
+logogramToEmoji '\x0F1976' = "🛫"
+logogramToEmoji '\x0F1977' = "💭"
+logogramToEmoji '\x0F1978' = "🧂"
+logogramToEmoji '\x0F1979' = "❕"
+logogramToEmoji '\x0F197A' = "👁️"
+logogramToEmoji '\x0F197B' = "✂️"
+logogramToEmoji '\x0F197C' = "🧱"
+logogramToEmoji '\x0F197D' = "👹"
+logogramToEmoji '\x0F197E' = "♐"
+logogramToEmoji '\x0F197F' = "🪞"
+logogramToEmoji '\x0F1980' = "🦝"
+logogramToEmoji '\x0F1981' = "🍄"
+logogramToEmoji '\x0F1982' = "meso"
+logogramToEmoji '\x0F1983' = "😎"
+logogramToEmoji '\x0F1984' = "🐊"
+logogramToEmoji '\x0F1985' = "📥"
+logogramToEmoji '\x0F1986' = "😑"
+logogramToEmoji '\x0F1987' = "💊"
+logogramToEmoji '\x0F1988' = "😎"
+logogramToEmoji '\x0F19A0' = "🛑"
+logogramToEmoji '\x0F19A1' = "😳"
+logogramToEmoji '\x0F19A2' = "👵"
+logogramToEmoji '\x0F19A3' = "🤥"
+logogramToEmoji '\x0F1993' = "⏹️"
+logogramToEmoji c = [c]
+
+parseLogogram :: (Char -> String) -> Parser String
+parseLogogram p = p <$> matchLogogram
 
 parseLogogramFirst :: Parser Char
 parseLogogramFirst = do
-  transliterated <- parseLogogram
+  transliterated <- parseLogogram logogramToText
   case uncons transliterated of
     Just (c, _) -> return c
     Nothing -> fail "Program bug: parseLogogram returned empty string"
@@ -190,18 +335,28 @@ ignoredChars = choice (map char "\xF1994\xF1995\xF1996\xF1997\xF1998\xF1999\xF19
 ignoreChars :: Parser ()
 ignoreChars = skipMany ignoredChars
 
-parseWord :: Parser String
-parseWord = do
+withOptSpace :: Functor f => Bool -> f String -> f String
+withOptSpace False = id
+withOptSpace True = (<$>)  (' ' :)
+
+parseWord :: Bool ->  (Char -> String) -> Parser String
+parseWord space p = do
   ignoreChars
-  try parseCartouche <|> try ((' ' :) <$> parseLogogram) <|> (one <$> anyChar)
+  try parseCartouche <|> try (withOptSpace space $ parseLogogram p) <|> (one <$> anyChar)
 
-parseText :: Parser Text
-parseText = toText . concat <$> many parseWord
+parseText :: Bool -> (Char -> String) -> Parser Text
+parseText space p = toText . concat <$> many (parseWord space p)
 
-spToLatin :: Text -> Text
-spToLatin t = case parse parseText "" t of
+spToText :: Bool -> (Char -> String) -> Text -> Text
+spToText space p t = case parse (parseText space p) "" t of
   Left e -> show e
   Right v -> v
+
+spToLatin :: Text -> Text
+spToLatin = spToText True logogramToText
+
+spToEmoji :: Text -> Text
+spToEmoji = spToText False logogramToEmoji
 
 -- tan waso pi sona nanpa
 formatDigit :: Integer -> Char

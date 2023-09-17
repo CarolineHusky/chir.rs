@@ -23,7 +23,7 @@ import Text.Blaze.Html (preEscapedToHtml)
 import Text.Hamlet (hamletFile)
 import Text.Jasmine (minifym)
 import Text.Lojban (zlrToLatin)
-import Text.TokiPona (spToLatin)
+import Text.TokiPona (spToEmoji, spToLatin)
 import Utils (headOr)
 import Yesod (
   DBRunner,
@@ -107,6 +107,7 @@ instance RenderMessage App AppMessage where
     | lang == "tok@SP" = renderMessage Dummy (lang : langs) msg
     | lang == "jbo" = zlrToLatin $ renderMessage Dummy ("jbo@ZLR" : langs) msg
     | lang == "tok" = spToLatin $ renderMessage Dummy ("tok@SP" : langs) msg
+    | lang == "tok@SE" = spToEmoji $ renderMessage Dummy ("tok@SP" : langs) msg
     | otherwise = renderMessage app langs msg
   renderMessage _ [] msg = renderMessage Dummy [] msg
 

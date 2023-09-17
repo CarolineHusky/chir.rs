@@ -26,6 +26,7 @@ $newline never
             <option value="jbo@ZLR">  (la .lojban., zbalermorna)
             <option value="nl">Nederlands (Netherland)
             <option value="tok">toki pona
+            <option value="tok@SE">🗣️👍
             <option value="tok@SP">󱥬󱦖󱥔 (toki pona, sitelen pona)
         <label for="change-theme">_{MsgSettingTheme}
         <select #change-theme>
