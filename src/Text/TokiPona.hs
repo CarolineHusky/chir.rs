@@ -1560,7 +1560,7 @@ logogramToEmoji '\xffae7' = "🍀"
 logogramToEmoji '\xffae8' = "🎳"
 logogramToEmoji '\xffae9' = "📈"
 logogramToEmoji '\xffaea' = "📈"
-logogramToEmoji '\xffaeb' = "san"
+logogramToEmoji '\xffaeb' = "☘️"
 logogramToEmoji '\xffaec' = "🤛"
 logogramToEmoji '\xffaed' = "taki"
 logogramToEmoji '\xffaee' = "taki"
@@ -1836,7 +1836,7 @@ logogramToEmoji '\xffbfb' = "💬 🎁"
 logogramToEmoji '\xffbfc' = "amonka"
 logogramToEmoji '\xffbfd' = "manka"
 logogramToEmoji '\xffbfe' = "nutan"
-logogramToEmoji '\xffbff' = "🐚 👇 li ❓"
+logogramToEmoji '\xffbff' = "🐚 👇 ▶️ ❓"
 logogramToEmoji c = [c]
 
 parseLogogram :: (Char -> String) -> Parser String
