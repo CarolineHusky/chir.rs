@@ -99,6 +99,10 @@ $fa-font-path: "../node_modules/@fortawesome/fontawesome-free/webfonts";
   @include visually-hidden;
 }
 
+.hidden {
+  display: none;
+}
+
 .hamburger {
   cursor: pointer;
   display: block;
@@ -113,6 +117,10 @@ $fa-font-path: "../node_modules/@fortawesome/fontawesome-free/webfonts";
 
 .no-flex {
   display: block;
+}
+
+.flex {
+  display: flex;
 }
 
 body > header {
@@ -155,4 +163,8 @@ main > * {
   margin-bottom: 1rem;
   float: left;
   margin-right: 1rem;
+}
+
+.flex-item {
+  margin: 0 1rem;
 }

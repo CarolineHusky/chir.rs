@@ -8,3 +8,51 @@ $newline never
         ^{selfIntro2}&nbsp;
         ^{selfIntro3}&nbsp;
         ^{selfIntro4}
+    <div .container .flex>
+        <div .flex-item>
+            <hgroup>
+                <h2>_{MsgReportedSightings}
+                <p>_{MsgReportedSightingsSubtitle}
+            <ul>
+                <li>
+                    <a href="https://akko.chir.rs/users/charlotte" rel="me">_{MsgMyFediverse}
+                <li>
+                    <a href="matrix:u/lotte:chir.rs" rel="me">_{MsgMyMatrixChat}
+                    <a href="https://matrix.to/#/@lotte:chir.rs"> _{MsgAlternateLink}
+                <li>
+                    <a href="mailto:lotte@chir.rs" rel="me">_{MsgMyEmail}
+                    <a href="https://keys.openpgp.org/vks/v1/by-fingerprint/EF5F367A95E0BFA63902D86AB4E3D4801C49EC5E" rel="pgpkey"> _{MsgGPGKeyNote}
+                <li>
+                    <a href="https://git.chir.rs/darkkirb" rel="me">_{MsgMyForgejo}
+                <li>
+                    <a href="https://peertube.chir.rs/c/lotte_channel/videos" rel="me">_{MsgPeertube}
+                <li>
+                    <a href="https://keybase.io/darkkirb" rel="me">_{MsgMyKeybase}
+                <li>
+                    <a href="https://github.com/DarkKirb" rel="me">_{MsgGithub}
+                <li>
+                    _{MsgMyDiscord}
+                    <sup>1
+                <li>
+                    <a href="https://t.me/darkkirb">_{MsgMyTelegram}
+                    <sup>1
+                <li>
+                    _{MsgMySignalWhatsapp}
+                    <sup>1
+            <p>
+                <sup>1
+                : _{MsgFootnoteBridgedMatrix}
+        <div .flex-item>
+            <h2>_{MsgSiteIndex}
+            <ul>
+                <li .hidden>
+                    <a .u-url .u-uid href="@{HomeR}">@{HomeR}
+                <li>
+                    <a .u-url>_{MsgPageBlog}
+                <li>
+                    <a .u-url href="https://akko.chir.rs/">_{MsgAkkoma}
+                <li>
+                    <a .u-url href="https://cloud.chir.rs">_{MsgNextcloud}
+                <li>_{MsgAndALotMore}
+            <button>
+                _{MsgPageChat}

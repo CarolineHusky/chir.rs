@@ -3,7 +3,7 @@ module Handler.Home (getHomeR) where
 import Components.Image (image)
 import Config (widgetFile)
 import Config.Images (img_2023_06_02_vintagecoyote_prideicon)
-import Foundation (App, DummyMessage (..), translationUnescaped)
+import Foundation (App, DummyMessage (..), Route (HomeR), translationUnescaped)
 import Yesod (HandlerFor, Html, Yesod (defaultLayout))
 
 getHomeR :: HandlerFor App Html
