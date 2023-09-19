@@ -1,6 +1,6 @@
 module Foundation (
   App (..),
-  Route (HomeR, StaticR),
+  Route (..),
   appConfig,
   appLogger,
   appStatic,

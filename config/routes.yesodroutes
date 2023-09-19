@@ -1,2 +1,3 @@
 /static StaticR Static appStatic
 / HomeR GET
+/.well-known/webfinger WebfingerR GET

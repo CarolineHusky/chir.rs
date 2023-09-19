@@ -136,7 +136,10 @@ common shared
     Database.Persist.Mixed
     Foundation
     Handler.Home
+    Handler.Webfinger
     Model
+    Network.Webfinger
+    Network.Webfinger.Link
     Text.Lojban
     Text.TokiPona
     Utils

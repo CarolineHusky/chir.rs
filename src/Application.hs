@@ -9,13 +9,14 @@ import Database.Persist.Sql (runSqlPool)
 import Database.Persist.Sql.Migration (runMigration)
 import Foundation (
   App (..),
-  Route (HomeR, StaticR),
+  Route (..),
   appConfig,
   appLogger,
   appStatic,
   resourcesApp,
  )
 import Handler.Home (getHomeR)
+import Handler.Webfinger (getWebfingerR)
 import Language.Haskell.TH.Syntax (qLocation)
 import Model (migrateAll)
 import Network.Wai (Application, Middleware)
