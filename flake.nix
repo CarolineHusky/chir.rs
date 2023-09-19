@@ -106,6 +106,7 @@
           default = self'.packages.chir-rs.overrideAttrs (super: {
             postUnpack = ''
               cp -rv ${chir-rs-fe} chir-rs-0.1.0.0/static
+              chmod -R +w chir-rs-0.1.0.0/static
               mkdir chir-rs-0.1.0.0/static/img
               for f in ${art-assets}/*; do
                 ln -sv $f chir-rs-0.1.0.0/static/img

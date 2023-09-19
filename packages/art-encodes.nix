@@ -5,44 +5,88 @@
   oxipng,
   jpegoptim,
   lotte-art,
-}:
-stdenv.mkDerivation {
-  pname = "art-encode";
-  inherit (lotte-art) version;
+  emptyDirectory,
+  lib,
+  lndir,
+}: let
+  mkPng = name:
+    stdenv.mkDerivation {
+      name = name + ".png";
+      inherit (lotte-art) version;
+      src = emptyDirectory;
 
-  src = lotte-art;
+      nativeBuildInputs = [imagemagick oxipng];
 
-  nativeBuildInputs = [parallel imagemagick oxipng jpegoptim];
+      unpackPhase = ''
+        ln -sv ${lotte-art}/${name}.jxl in.jxl
+      '';
 
-  buildPhase = ''
-    # First, we convert all source images to png, due to a silly jxl thing where we can’t reencode jxl
+      buildPhase = ''
+        convert in.jxl out.png
+        oxipng out.png
+      '';
 
-    parallel -j$NIX_BUILD_CORES mogrify -verbose -format png ::: *.jxl
-    rm -v *.jxl
+      installPhase = ''
+        mkdir $out
+        mv out.png $out/$name
+      '';
+    };
 
-    # Optimize all pngs
-    oxipng *.png # TODO: -o max -Z?
+  qualities = {
+    jpg = "80";
+    webp = "80";
+    heif = "60";
+    avif = "85";
+    jxl = "70";
+  };
 
-    # TODO: tweak these numbers, currently heifs and avifs are larger than webps
+  mkImg' = name: ext:
+    stdenv.mkDerivation {
+      name = name + ".${ext}";
+      inherit (lotte-art) version;
+      src = emptyDirectory;
 
-    # Create 80% jpegs
-    parallel -j$NIX_BUILD_CORES mogrify -verbose -format jpg -quality 80 ::: *.png
-    jpegoptim *.jpg *.jpeg
+      nativeBuildInputs = [imagemagick];
+      input = mkPng name;
 
-    # Create 80% webps
-    parallel -j$NIX_BUILD_CORES mogrify -verbose -format webp -quality 80 ::: *.png
+      unpackPhase = ''
+        ln -sv $input/${name}.png in.png
+      '';
 
-    # Create 60% heifs
-    parallel -j$NIX_BUILD_CORES mogrify -verbose -format heif -quality 60 ::: *.png
+      buildPhase = ''
+        convert in.png -quality ${qualities.${ext}} out.${ext}
+      '';
 
-    # Create 85% avifs
-    parallel -j$NIX_BUILD_CORES mogrify -verbose -format avif -quality 85 ::: *.png
+      installPhase = ''
+        mkdir $out
+        mv out.${ext} $out/$name
+      '';
+    };
 
-    # Create 70% jxls
-    parallel -j$NIX_BUILD_CORES mogrify -verbose -format jxl -quality 70 ::: *.png
-  '';
-  installPhase = ''
-    mkdir $out
-    mv *.png *.jpg *.webp *.heif *.avif *.jxl $out
-  '';
-}
+  mkImg = name: ext:
+    if ext == "png"
+    then mkPng name
+    else mkImg' name ext;
+
+  mkImgs = name: map (i: mkImg name i) ["png" "jpg" "webp" "heif" "avif" "jxl"];
+
+  flatmap = f: xs: lib.flatten (map f xs);
+
+  imgSet = flatmap mkImgs ["2023-06-02-vintagecoyote-prideicon"];
+in
+  stdenv.mkDerivation {
+    pname = "art-encode";
+    inherit (lotte-art) version;
+
+    src = emptyDirectory;
+
+    nativeBuildInputs = [lndir];
+
+    buildPhase = "";
+    installPhase = ''
+      mkdir $out
+      for f in ${toString imgSet}; do
+        lndir $f $out
+      done
+    '';
+  }
