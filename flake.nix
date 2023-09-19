@@ -61,7 +61,7 @@
           };
 
           # What should haskell-flake add to flake outputs?
-          autoWire = ["packages" "apps" "checks"]; # Wire all but the devShell
+          autoWire = []; # Wire all but the devShell
         };
 
         # Auto formatters. This also adds a flake check to ensure that the
@@ -103,7 +103,7 @@
               installPhase = "cp -rv dist $out";
               distPhase = "true";
             };
-          default = self'.packages.chir-rs.overrideAttrs (super: {
+          chir-rs = config.haskellProjects.default.outputs.packages.chir-rs.package.overrideAttrs (super: {
             postUnpack = ''
               cp -rv ${chir-rs-fe} chir-rs-0.1.0.0/static
               chmod -R +w chir-rs-0.1.0.0/static
@@ -117,8 +117,8 @@
           art-assets = pkgs.callPackage ./packages/art-encodes.nix {
             inherit (inputs.nix-packages.packages.${system}) lotte-art;
           };
+          default = self'.packages.chir-rs;
         };
-        apps.default = self'.apps.chir-rs;
 
         # Default shell.
         devShells.default = pkgs.mkShell {
