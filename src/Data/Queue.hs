@@ -11,7 +11,8 @@ import Database.Persist.Sql (ConnectionPool, SqlPersistT, rawSql, runSqlPool)
 import GHC.Conc (getNumProcessors)
 import Model (EntityField (..), Jobs (jobsAttempts, jobsPayload))
 import System.Random (randomRIO)
-import Utils (repeatM, whileM)
+import Utils (repeatM, timeoutM, whileM)
+import Yesod (MonadUnliftIO (withRunInIO))
 
 data Queue m a e where
   Queue ::
@@ -59,10 +60,10 @@ runOne queue = do
   case claimed of
     Nothing -> return False
     Just (queueId, job) -> do
-      result <- queueHandler queue job
+      result <- timeoutM 300_000_000 $ queueHandler queue job
       case result of
-        Right _ -> runSqlPool (delete queueId) dbpool
-        Left e -> runSqlPool (unclaim (queueId, e)) dbpool
+        Just (Right _) -> runSqlPool (delete queueId) dbpool
+        v -> runSqlPool (unclaim (queueId, v)) dbpool
       return True
 
 runThread :: (MonadUnliftIO m, Serialise a, Serialise e) => Queue m e a -> m ()
@@ -74,15 +75,16 @@ runThread queue = do
   liftIO $ threadDelay (secs * 1_000_000)
   pass
 
-run :: (MonadUnliftIO m, Serialise a, Serialise e) => Queue m e a -> (m Void -> IO Void) -> m ()
-run queue wrapper = do
+run :: (MonadUnliftIO m, Serialise a, Serialise e) => Queue m e a -> m ()
+run queue = do
   concurrency <- liftIO getNumProcessors
   repeatM
     concurrency
-    ( do
-        _ <- liftIO $ forkIO $ do
-          _ <- wrapper $ infinitely $ runThread queue
-          pass
-        pass
+    ( withRunInIO
+        ( \run' -> forkIO $ do
+            _ <- infinitely $ run' $ runThread queue
+            pass
+        )
+        >> pass
     )
   pass

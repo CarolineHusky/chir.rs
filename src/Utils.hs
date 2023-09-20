@@ -1,6 +1,9 @@
-module Utils (fallbackAll, tailOrEmpty, capitalize, headOr, (>$>), repeatM, whileM) where
+module Utils (fallbackAll, tailOrEmpty, capitalize, headOr, (>$>), repeatM, whileM, timeoutM) where
 
+import Control.Monad.Trans.Resource (MonadUnliftIO)
 import Data.Char (toUpper)
+import System.Timeout (timeout)
+import Yesod (MonadUnliftIO (withRunInIO))
 
 fallback :: (Monad m) => m (Either a b) -> m (Either a b) -> m (Either a b)
 fallback e1 e2 = do
@@ -45,3 +48,6 @@ whileM m = do
 repeatM :: (Monad m) => Int -> m () -> m ()
 repeatM 0 _ = pass
 repeatM n m = m >> repeatM (n - 1) m
+
+timeoutM :: (MonadUnliftIO m) => Int -> m a -> m (Maybe a)
+timeoutM duration monad = withRunInIO (\run' -> timeout duration $ run' monad)

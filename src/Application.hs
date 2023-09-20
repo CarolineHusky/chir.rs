@@ -88,7 +88,7 @@ makeFoundation config = do
               ) ::
                 () -> IO (Either () ())
           }
-  Queue.run queue id
+  Queue.run queue
   -- Return the foundation
   return $ mkFoundation pool
 
