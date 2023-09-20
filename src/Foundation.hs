@@ -9,6 +9,7 @@ module Foundation (
   AppMessage,
   Widget,
   translationUnescaped,
+  translationEscaped,
 ) where
 
 import Config (ConfigFile, logLevel', staticDir', toLogLevel, widgetFile)
@@ -19,12 +20,12 @@ import Control.Monad.Logger (LogLevel, LogSource)
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Database.Persist.SqlBackend (SqlBackend)
 import Database.Persist.Sqlite (SqlPersistT)
-import Text.Blaze.Html (preEscapedToHtml)
+import Text.Blaze.Html (preEscapedToHtml, toHtml)
 import Text.Hamlet (hamletFile)
 import Text.Jasmine (minifym)
 import Text.Lojban (zlrToLatin)
 import Text.TokiPona (spToEmoji, spToLatin)
-import Utils (headOr)
+import Utils (headOr, (>$>))
 import Yesod (
   DBRunner,
   FormMessage,
@@ -180,7 +181,11 @@ instance RenderMessage App FormMessage where
   renderMessage :: App -> [Lang] -> FormMessage -> Text
   renderMessage _ _ = defaultFormMessage
 
+translation :: (MonadHandler m, RenderMessage (HandlerSite m) message) => message -> m Text
+translation message = getMessageRender >$> message
+
 translationUnescaped :: (MonadHandler m, RenderMessage (HandlerSite m) message) => message -> m Html
-translationUnescaped message = do
-  messageHandler <- getMessageRender
-  return $ preEscapedToHtml $ messageHandler message
+translationUnescaped message = translation message <&> preEscapedToHtml
+
+translationEscaped :: (MonadHandler m, RenderMessage (HandlerSite m) message) => message -> m Html
+translationEscaped message = translation message <&> toHtml

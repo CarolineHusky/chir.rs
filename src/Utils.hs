@@ -1,4 +1,4 @@
-module Utils (fallbackAll, tailOrEmpty, capitalize, headOr) where
+module Utils (fallbackAll, tailOrEmpty, capitalize, headOr, (>$>)) where
 
 import Data.Char (toUpper)
 
@@ -32,3 +32,7 @@ tailOrEmpty xs = tailOr xs []
 capitalize :: String -> String
 capitalize (c : cs) = toUpper c : cs
 capitalize s = s
+
+-- | cursed map operator, like fmap but the function is a functor, and the value is not
+(>$>) :: (Functor f) => f (a -> b) -> a -> f b
+f >$> v = (\f' -> f' v) <$> f
