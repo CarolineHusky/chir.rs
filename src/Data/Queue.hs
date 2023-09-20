@@ -5,7 +5,7 @@ import Codec.Serialise (Serialise, deserialise, serialise)
 import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad.Trans.Resource (MonadUnliftIO)
 import Data.Time (NominalDiffTime, addUTCTime, getCurrentTime)
-import Database.Persist (Entity (entityKey, entityVal), PersistEntity (Key), PersistStoreWrite (delete, update), PersistValue (PersistUTCTime), (+=.), (=.))
+import Database.Persist (Entity (entityKey, entityVal), PersistEntity (Key), PersistQueryWrite (updateWhere), PersistStoreWrite (delete, update), PersistValue (PersistUTCTime), (+=.), (<=.), (=.))
 import Database.Persist qualified as P
 import Database.Persist.Sql (ConnectionPool, SqlPersistT, rawSql, runSqlPool)
 import GHC.Conc (getNumProcessors)
@@ -68,12 +68,20 @@ runOne queue = do
 
 runThread :: (MonadUnliftIO m, Serialise a, Serialise e) => Queue m e a -> m ()
 runThread queue = do
-  liftIO $ print ("Run queue…" :: Text)
+  liftIO $ putStrLn "Run queue…"
   -- Run until queue is empty
   whileM $ runOne queue
   secs <- liftIO $ randomRIO (10 :: Int, 30)
   liftIO $ threadDelay (secs * 1_000_000)
   pass
+
+cleanupThread :: (MonadUnliftIO m, Serialise a, Serialise e) => Queue m e a -> m ()
+cleanupThread queue = do
+  liftIO $ putStrLn "Cleanup queue…"
+  now <- liftIO getCurrentTime
+  let oldTime = addUTCTime (-360 :: NominalDiffTime) now
+  runSqlPool (updateWhere [JobsLocked_at <=. Just oldTime] [JobsUpdatedAt =. now, JobsLocked =. False, JobsLocked_at =. Nothing, JobsLocked_by =. Nothing]) (queueDbPool queue)
+  liftIO $ threadDelay 360_000_000
 
 run :: (MonadUnliftIO m, Serialise a, Serialise e) => Queue m e a -> m ()
 run queue = do
@@ -87,4 +95,10 @@ run queue = do
         )
         >> pass
     )
+  _ <-
+    withRunInIO
+      ( \run' -> forkIO $ do
+          _ <- infinitely $ run' $ cleanupThread queue
+          pass
+      )
   pass

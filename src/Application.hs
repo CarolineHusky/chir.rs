@@ -83,7 +83,7 @@ makeFoundation config = do
           { Queue.queueDbPool = pool
           , Queue.queueHandler =
               ( \_ -> do
-                  print ("Hewwo" :: Text)
+                  putStrLn "Hewwo"
                   return $ Right ()
               ) ::
                 () -> IO (Either () ())
