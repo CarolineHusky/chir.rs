@@ -48,7 +48,8 @@ let Config =
 
 in  Config::{
     , listenPort = 62936
-    , database =
-          PostgresConfig::{ connectionString = "postgresql:///darkkirb?host=/run/postgresql" }
+    , database = PostgresConfig::{
+      , connectionString = "postgresql:///darkkirb?host=/run/postgresql"
+      }
     , logLevel = LogLevel.Type.LogLevelDebug
     }
