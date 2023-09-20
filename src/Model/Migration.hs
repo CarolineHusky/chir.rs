@@ -1,12 +1,14 @@
-module Model.Migration where
+module Model.Migration (migration) where
 
 import Database.Persist.Migration (
   Column (Column),
-  ColumnProp (AutoIncrement, NotNull, References),
+  ColumnProp (AutoIncrement, Default, NotNull, References),
+  MigrateSql (MigrateSql),
   Migration,
   MigrationPath ((:=)),
-  Operation (CreateTable, constraints, name, schema),
-  SqlType (SqlBlob, SqlBool, SqlInt64, SqlString),
+  Operation (CreateTable, RawOperation, constraints, message, name, rawOp, schema),
+  PersistValue (PersistInt64),
+  SqlType (SqlBlob, SqlBool, SqlDayTime, SqlInt64, SqlString),
   TableConstraint (PrimaryKey),
   (~>),
  )
@@ -69,6 +71,27 @@ createWebFingerAccount =
         ]
     }
 
+createJobs :: Operation
+createJobs =
+  CreateTable
+    { name = "jobs"
+    , schema =
+        [ Column "id" SqlInt64 [NotNull, AutoIncrement]
+        , Column "created_at" SqlDayTime [NotNull]
+        , Column "updated_at" SqlDayTime [NotNull]
+        , Column "run_at" SqlDayTime [NotNull]
+        , Column "payload" SqlBlob [NotNull]
+        , Column "last_error" SqlBlob [NotNull]
+        , Column "attempts" SqlInt64 [NotNull, Default $ PersistInt64 0]
+        , Column "locked" SqlBool [NotNull]
+        , Column "locked_at" SqlDayTime []
+        , Column "locked_by" SqlString []
+        ]
+    , constraints =
+        [ PrimaryKey ["id"]
+        ]
+    }
+
 migration :: Migration
 migration =
   [ 0
@@ -77,5 +100,19 @@ migration =
          , createLocalAccountCredentials
          , createLocalAccountSessions
          , createWebFingerAccount
+         ]
+  , 1
+      ~> 2
+      := [ createJobs
+         , RawOperation
+            { message = "Add indexes to Jobs"
+            , rawOp =
+                return
+                  [ MigrateSql "CREATE INDEX jobs_created_at ON jobs (created_at)" []
+                  , MigrateSql "CREATE INDEX jobs_updated_at ON jobs (updated_at)" []
+                  , MigrateSql "CREATE INDEX jobs_run_at ON jobs (run_at)" []
+                  , MigrateSql "CREATE INDEX jobs_locked ON jobs (locked)" []
+                  ]
+            }
          ]
   ]

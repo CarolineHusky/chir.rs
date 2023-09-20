@@ -22,3 +22,14 @@ WebFingerAccount
     oidcIssuer (Maybe Text)
     Primary webfingerUsername
     deriving Show
+Jobs
+    createdAt UTCTime
+    updatedAt UTCTime
+    runAt UTCTime
+    payload ByteString
+    lastError ByteString
+    attempts Int default=0
+    locked Bool
+    locked_at (Maybe UTCTime)
+    locked_by (Maybe Text)
+    deriving Show

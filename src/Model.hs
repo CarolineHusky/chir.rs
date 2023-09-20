@@ -1,6 +1,7 @@
 module Model where
 
-import Database.Persist.Quasi
+import Data.Time (UTCTime)
+import Database.Persist.Quasi (lowerCaseSettings)
 import Database.Persist.TH (
   mkMigrate,
   mkPersist,

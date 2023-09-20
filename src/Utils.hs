@@ -1,4 +1,4 @@
-module Utils (fallbackAll, tailOrEmpty, capitalize, headOr, (>$>)) where
+module Utils (fallbackAll, tailOrEmpty, capitalize, headOr, (>$>), repeatM, whileM) where
 
 import Data.Char (toUpper)
 
@@ -36,3 +36,12 @@ capitalize s = s
 -- | cursed map operator, like fmap but the function is a functor, and the value is not
 (>$>) :: (Functor f) => f (a -> b) -> a -> f b
 f >$> v = (\f' -> f' v) <$> f
+
+whileM :: (Monad m) => m Bool -> m ()
+whileM m = do
+  cont <- m
+  if cont then whileM m else pass
+
+repeatM :: (Monad m) => Int -> m () -> m ()
+repeatM 0 _ = pass
+repeatM n m = m >> repeatM (n - 1) m

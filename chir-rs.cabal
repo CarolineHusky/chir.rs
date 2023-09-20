@@ -90,9 +90,11 @@ common shared
     , persistent-migration
     , persistent-postgresql
     , profunctors
+    , random
     , relude            >=1.0
     , resource-pool
     , resourcet
+    , serialise
     , shakespeare
     , shower
     , template-haskell
@@ -113,6 +115,7 @@ common shared
     Config
     Config.Images
     Config.StaticFiles
+    Data.Queue
     Foundation
     Handler.Home
     Handler.Webfinger
