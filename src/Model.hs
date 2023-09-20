@@ -1,4 +1,4 @@
-module Model (migrateAll) where
+module Model where
 
 import Database.Persist.Quasi
 import Database.Persist.TH (
