@@ -1,12 +1,13 @@
 module Application (appMain, develMain) where
 
-import Config (ConfigFile, listenPort', loadConfigAuto, staticDir')
+import Config (ConfigFile (database, databasePoolSize), listenPort', loadConfigAuto, staticDir', toPostgresConf)
 import Control.Lens ((^.))
 import Control.Monad.Logger (LogLevel (LevelError), LoggingT (runLoggingT), liftLoc, runStderrLoggingT)
 import Data.Default (def)
-import Database.Persist.Mixed (createConn)
+import Database.Persist.Migration qualified as DPM
+import Database.Persist.Migration.Postgres (runMigration)
+import Database.Persist.Postgresql (createPostgresqlPoolWithConf, defaultPostgresConfHooks)
 import Database.Persist.Sql (runSqlPool)
-import Database.Persist.Sql.Migration (runMigration)
 import Foundation (
   App (..),
   Route (..),
@@ -19,6 +20,7 @@ import Handler.Home (getHomeR)
 import Handler.Webfinger (getWebfingerR)
 import Language.Haskell.TH.Syntax (qLocation)
 import Model (migrateAll)
+import Model.Migration (migration)
 import Network.Wai (Application, Middleware)
 import Network.Wai.Handler.Warp (Settings, defaultSettings, defaultShouldDisplayException, runSettings, setOnException, setPort)
 import Network.Wai.Middleware.RequestLogger (Destination (Logger), OutputFormat (Detailed), RequestLoggerSettings (..), mkRequestLogger)
@@ -64,10 +66,16 @@ makeFoundation config = do
       -- https://ocharles.org.uk/blog/posts/2014-12-04-record-wildcards.html
       tempFoundation = mkFoundation $ error "connPool forced in tempFoundation"
       logFunc = messageLoggerSource tempFoundation appLogger'
-  pool <- flip runLoggingT logFunc $ createConn config
+  pool <- flip runLoggingT logFunc $ createPostgresqlPoolWithConf (toPostgresConf (database config) (fromIntegral $ databasePoolSize config)) defaultPostgresConfHooks
 
   -- Perform database migration using our application's logging settings.
-  runLoggingT (runSqlPool (runMigration migrateAll) pool) logFunc
+
+  runSqlPool
+    ( do
+        runMigration DPM.defaultSettings migration
+        DPM.checkMigration migrateAll
+    )
+    pool
 
   -- Return the foundation
   return $ mkFoundation pool

@@ -3,7 +3,14 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: persistent-migration-0.3.0@sha256:1b28e22c2eeff694eed6835299b3a80104772d5d2262e6dbfa5c47d9e7594f59,3433
+    pantry-tree:
+      sha256: dca2b30b726ac3ee8e5a556fe78f50c1714d3d8bf9c02b66f645de60b221f3b9
+      size: 1619
+  original:
+    hackage: persistent-migration-0.3.0
 snapshots:
 - completed:
     sha256: 64d66303f927e87ffe6b8ccf736229bf608731e80d7afdf62bdd63c59f857740

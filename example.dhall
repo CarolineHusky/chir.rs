@@ -21,13 +21,6 @@ let PostgresConfig =
       , default = { poolStripes = 0, poolIdleTimeout = 300 }
       }
 
-let DatabaseConfig =
-      { Type =
-          < DatabaseSQLite : SqliteConfig.Type
-          | DatabasePostgres : PostgresConfig.Type
-          >
-      }
-
 let LogLevel =
       { Type =
           < LogLevelDebug
@@ -41,7 +34,7 @@ let LogLevel =
 let Config =
       { Type =
           { listenPort : Natural
-          , database : DatabaseConfig.Type
+          , database : PostgresConfig.Type
           , databasePoolSize : Natural
           , staticDir : Text
           , logLevel : LogLevel.Type
@@ -56,7 +49,6 @@ let Config =
 in  Config::{
     , listenPort = 62936
     , database =
-        DatabaseConfig.Type.DatabaseSQLite
-          SqliteConfig::{ filename = "database.db" }
+          PostgresConfig::{ connectionString = "postgresql:///darkkirb?host=/run/postgresql" }
     , logLevel = LogLevel.Type.LogLevelDebug
     }

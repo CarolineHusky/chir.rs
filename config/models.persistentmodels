@@ -1,13 +1,8 @@
-WebFingerAccount
-    webfingerUsername Text
-    indieUsername Text
-    oidcIssuer (Maybe Text)
-    Primary webfingerUsername
-    deriving Show
 LocalAccount
     username Text
     password_hash Text
     enabled Bool
+    Primary username
     deriving Show
 LocalAccountCredentials
     credentialId ByteString
@@ -19,4 +14,11 @@ LocalAccountCredentials
 LocalAccountSessions
     user LocalAccountId
     jid Text
+    Primary user
+    deriving Show
+WebFingerAccount
+    webfingerUsername Text
+    indieUsername Text
+    oidcIssuer (Maybe Text)
+    Primary webfingerUsername
     deriving Show

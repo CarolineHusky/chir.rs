@@ -6,16 +6,10 @@
 module Config where
 
 import Control.Exception (try)
-import Control.Lens ((%~))
 import Control.Lens.TH (makeLensesFor)
 import Control.Monad.Logger (LogLevel (..), MonadLoggerIO, logErrorSH)
 import Data.Default (Default (def))
-#ifdef POSTGRESQL
 import Database.Persist.Postgresql qualified as Postgres
-#endif
-#ifdef SQLITE
-import Database.Persist.Sqlite qualified as Sqlite
-#endif
 import Dhall (FromDhall, auto, input)
 import Language.Haskell.TH (Exp, Q)
 import Utils (fallbackAll, tailOrEmpty)
@@ -24,25 +18,6 @@ import Yesod.Default.Util (WidgetFileSettings)
 import Yesod.Default.Util (widgetFileReload)
 #else
 import Yesod.Default.Util (widgetFileNoReload)
-#endif
-
-data SqliteConfig = SqliteConfig
-  { filename :: Text
-  , walEnabled :: Maybe Bool
-  , fkEnabled :: Maybe Bool
-  , extraPragmas :: Maybe [Text]
-  }
-  deriving stock (Generic, Show)
-
-instance FromDhall SqliteConfig
-
-#ifdef SQLITE
-toSqliteConfInfo :: SqliteConfig -> Sqlite.SqliteConnectionInfo
-toSqliteConfInfo conf =
-  Sqlite.mkSqliteConnectionInfo (filename conf)
-    & Sqlite.walEnabled %~ (`fromMaybe` walEnabled conf)
-    & Sqlite.fkEnabled %~ (`fromMaybe` fkEnabled conf)
-    & Sqlite.extraPragmas %~ (`fromMaybe` extraPragmas conf)
 #endif
 
 data PostgresConfig = PostgresConfig
@@ -54,7 +29,6 @@ data PostgresConfig = PostgresConfig
 
 instance FromDhall PostgresConfig
 
-#ifdef POSTGRESQL
 toPostgresConf :: PostgresConfig -> Int -> Postgres.PostgresConf
 toPostgresConf conf poolSize =
   Postgres.PostgresConf
@@ -63,12 +37,6 @@ toPostgresConf conf poolSize =
     , Postgres.pgPoolIdleTimeout = fromIntegral $ poolIdleTimeout conf
     , Postgres.pgPoolSize = poolSize
     }
-#endif
-
-data DatabaseConfig = DatabaseSQLite SqliteConfig | DatabasePostgres PostgresConfig
-  deriving stock (Generic, Show)
-
-instance FromDhall DatabaseConfig
 
 data LogLevelConfig = LogLevelDebug | LogLevelInfo | LogLevelWarn | LogLevelError | LogLevelOther Text
   deriving stock (Generic, Show)
@@ -84,7 +52,7 @@ toLogLevel (LogLevelOther a) = LevelOther a
 
 data ConfigFile = ConfigFile
   { listenPort :: Word16
-  , database :: DatabaseConfig
+  , database :: PostgresConfig
   , databasePoolSize :: Natural
   , staticDir :: Text
   , logLevel :: LogLevelConfig
