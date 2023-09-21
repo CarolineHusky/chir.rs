@@ -56,6 +56,7 @@ data ConfigFile = ConfigFile
   , databasePoolSize :: Natural
   , staticDir :: Text
   , logLevel :: LogLevelConfig
+  , nodeName :: Text
   }
   deriving stock (Generic, Show)
 
@@ -63,6 +64,7 @@ makeLensesFor
   [ ("staticDir", "staticDir'")
   , ("logLevel", "logLevel'")
   , ("listenPort", "listenPort'")
+  , ("nodeName", "nodeName'")
   ]
   ''ConfigFile
 

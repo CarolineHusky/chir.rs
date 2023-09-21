@@ -38,6 +38,7 @@ let Config =
           , databasePoolSize : Natural
           , staticDir : Text
           , logLevel : LogLevel.Type
+          , nodeName : Text
           }
       , default =
         { databasePoolSize = 10
@@ -52,4 +53,5 @@ in  Config::{
       , connectionString = "postgresql:///darkkirb?host=/run/postgresql"
       }
     , logLevel = LogLevel.Type.LogLevelDebug
+    , nodeName = "example"
     }

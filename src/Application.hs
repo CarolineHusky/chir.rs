@@ -1,6 +1,6 @@
 module Application (appMain, develMain) where
 
-import Config (ConfigFile (database, databasePoolSize), listenPort', loadConfigAuto, staticDir', toPostgresConf)
+import Config (ConfigFile (database, databasePoolSize), listenPort', loadConfigAuto, nodeName', staticDir', toPostgresConf)
 import Control.Lens ((^.))
 import Control.Monad.Logger (LogLevel (LevelError), LoggingT (runLoggingT), liftLoc, runStderrLoggingT)
 import Data.Default (def)
@@ -87,6 +87,7 @@ makeFoundation config = do
                   return $ Right ()
               ) ::
                 () -> IO (Either () ())
+          , Queue.queueNodeName = config ^. nodeName'
           }
   Queue.run queue
   -- Return the foundation

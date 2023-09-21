@@ -6,7 +6,7 @@ import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad.Trans.Resource (MonadUnliftIO)
 import Data.ByteString qualified as BS
 import Data.Time (NominalDiffTime, UTCTime, addUTCTime, getCurrentTime)
-import Database.Persist (Entity (entityKey, entityVal), PersistEntity (Key), PersistQueryWrite (updateWhere), PersistStoreWrite (delete, update), PersistValue (PersistUTCTime), (+=.), (<=.), (=.))
+import Database.Persist (Entity (entityKey, entityVal), PersistEntity (Key), PersistQueryWrite (updateWhere), PersistStoreWrite (delete, update), PersistValue (PersistText, PersistUTCTime), (+=.), (<=.), (=.))
 import Database.Persist qualified as P
 import Database.Persist.Sql (ConnectionPool, SqlPersistM, SqlPersistT, rawSql, runSqlPool)
 import GHC.Conc (getNumProcessors)
@@ -20,13 +20,14 @@ data Queue m a e where
     (MonadUnliftIO m, Serialise a, Serialise e) =>
     { queueDbPool :: ConnectionPool
     , queueHandler :: a -> m (Either e ())
+    , queueNodeName :: Text
     } ->
     Queue m a e
 
-claim :: (MonadUnliftIO m, Serialise a) => SqlPersistT m (Maybe (Key Jobs, a))
-claim = do
+claim :: (MonadUnliftIO m, Serialise a, Serialise e) => Queue m a e -> SqlPersistT m (Maybe (Key Jobs, a))
+claim queue = do
   time <- liftIO getCurrentTime
-  jobs :: [Entity Jobs] <- rawSql "UPDATE jobs SET updated_at = ?, locked = 'T', locked_at = ? WHERE id IN (SELECT id FROM jobs WHERE locked = 'F' AND run_at <= ? ORDER BY run_at ASC, created_at ASC LIMIT 1) RETURNING ??" [PersistUTCTime time, PersistUTCTime time, PersistUTCTime time]
+  jobs :: [Entity Jobs] <- rawSql "UPDATE jobs SET updated_at = ?, locked = 'T', locked_at = ?, locked_by = ? WHERE id IN (SELECT id FROM jobs WHERE locked = 'F' AND run_at <= ? ORDER BY run_at ASC, created_at ASC LIMIT 1) RETURNING ??" [PersistUTCTime time, PersistUTCTime time, PersistText $ queueNodeName queue, PersistUTCTime time]
   case jobs of
     [job] -> return $ Just (entityKey job, deserialise $ fromStrict $ jobsPayload $ entityVal job)
     [] -> return Nothing
@@ -57,7 +58,7 @@ unclaim (queueId, value) = do
 runOne :: (MonadUnliftIO m, Serialise a, Serialise e) => Queue m a e -> m Bool
 runOne queue = do
   let dbpool = queueDbPool queue
-  claimed <- runSqlPool claim dbpool
+  claimed <- runSqlPool (claim queue) dbpool
   case claimed of
     Nothing -> return False
     Just (queueId, job) -> do
