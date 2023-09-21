@@ -33,3 +33,7 @@ Jobs
     locked_at (Maybe UTCTime)
     locked_by (Maybe Text)
     deriving Show
+Keys
+    name Text
+    jwk ByteString
+    Primary name

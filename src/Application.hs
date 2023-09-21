@@ -3,6 +3,7 @@ module Application (appMain, develMain) where
 import Config (ConfigFile (database, databasePoolSize), listenPort', loadConfigAuto, nodeName', staticDir', toPostgresConf)
 import Control.Lens ((^.))
 import Control.Monad.Logger (LogLevel (LevelError), LoggingT (runLoggingT), liftLoc, runStderrLoggingT)
+import Crypto.KeyStore (performRekey)
 import Data.Default (def)
 import Data.Queue qualified as Queue
 import Database.Persist.Migration qualified as DPM
@@ -11,6 +12,7 @@ import Database.Persist.Postgresql (createPostgresqlPoolWithConf, defaultPostgre
 import Database.Persist.Sql (runSqlPool)
 import Foundation (
   App (..),
+  QueueCommands (Rekey),
   Route (..),
   appConfig,
   appLogger,
@@ -82,11 +84,12 @@ makeFoundation config = do
         Queue.Queue
           { Queue.queueDbPool = pool
           , Queue.queueHandler =
-              ( \_ -> do
-                  putStrLn "Hewwo"
-                  return $ Right ()
+              ( \case
+                  Rekey name parms days -> do
+                    _ <- runSqlPool (performRekey name parms days) pool
+                    return $ Right ()
               ) ::
-                () -> IO (Either () ())
+                QueueCommands -> IO (Either () ())
           , Queue.queueNodeName = config ^. nodeName'
           }
   Queue.run queue

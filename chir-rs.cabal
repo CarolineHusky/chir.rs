@@ -82,6 +82,7 @@ common shared
     , fast-logger
     , filepath
     , hjsmin
+    , jose
     , lens
     , monad-logger
     , mtl
@@ -115,6 +116,8 @@ common shared
     Config
     Config.Images
     Config.StaticFiles
+    Crypto.KeyStore
+    Crypto.KeyStore.Types
     Data.Queue
     Foundation
     Handler.Home

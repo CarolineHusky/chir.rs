@@ -10,13 +10,16 @@ module Foundation (
   Widget,
   translationUnescaped,
   translationEscaped,
+  QueueCommands (..),
 ) where
 
+import Codec.Serialise (Serialise)
 import Config (ConfigFile, logLevel', staticDir', toLogLevel, widgetFile)
 import Config.StaticFiles (main_css, main_js)
 import Control.Lens ((^.))
 import Control.Lens.TH (makeLenses)
 import Control.Monad.Logger (LogLevel, LogSource)
+import Crypto.KeyStore.Types (KeyMaterialGenParam')
 import Database.Persist.Postgresql (SqlPersistT)
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Database.Persist.SqlBackend (SqlBackend)
@@ -189,3 +192,8 @@ translationUnescaped message = translation message <&> preEscapedToHtml
 
 translationEscaped :: (MonadHandler m, RenderMessage (HandlerSite m) message) => message -> m Html
 translationEscaped message = translation message <&> toHtml
+
+data QueueCommands = Rekey Text KeyMaterialGenParam' Int
+  deriving stock (Show, Eq, Generic)
+
+instance Serialise QueueCommands

@@ -92,6 +92,19 @@ createJobs =
         ]
     }
 
+createKeys :: Operation
+createKeys =
+  CreateTable
+    { name = "keys"
+    , schema =
+        [ Column "name" SqlString [NotNull]
+        , Column "jwk" SqlBlob [NotNull]
+        ]
+    , constraints =
+        [ PrimaryKey ["name"]
+        ]
+    }
+
 migration :: Migration
 migration =
   [ 0
@@ -115,4 +128,5 @@ migration =
                   ]
             }
          ]
+  , 2 ~> 3 := [createKeys]
   ]
