@@ -70,11 +70,11 @@ runOne queue = do
 
 runThread :: (MonadUnliftIO m, Serialise a, Serialise e) => Queue m e a -> m ()
 runThread queue = do
+  secs <- liftIO $ randomRIO (10 :: Int, 30)
+  liftIO $ threadDelay (secs * 1_000_000)
   liftIO $ putStrLn "Run queue…"
   -- Run until queue is empty
   whileM $ runOne queue
-  secs <- liftIO $ randomRIO (10 :: Int, 30)
-  liftIO $ threadDelay (secs * 1_000_000)
   pass
 
 cleanupThread :: (MonadUnliftIO m, Serialise a, Serialise e) => Queue m e a -> m ()
