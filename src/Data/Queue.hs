@@ -1,15 +1,16 @@
 -- | Postgresql queue
-module Data.Queue (Queue (..), run) where
+module Data.Queue (Queue (..), run, scheduleTask, addTask, runTaskIn) where
 
 import Codec.Serialise (Serialise, deserialise, serialise)
 import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad.Trans.Resource (MonadUnliftIO)
-import Data.Time (NominalDiffTime, addUTCTime, getCurrentTime)
+import Data.ByteString qualified as BS
+import Data.Time (NominalDiffTime, UTCTime, addUTCTime, getCurrentTime)
 import Database.Persist (Entity (entityKey, entityVal), PersistEntity (Key), PersistQueryWrite (updateWhere), PersistStoreWrite (delete, update), PersistValue (PersistUTCTime), (+=.), (<=.), (=.))
 import Database.Persist qualified as P
 import Database.Persist.Sql (ConnectionPool, SqlPersistT, rawSql, runSqlPool)
 import GHC.Conc (getNumProcessors)
-import Model (EntityField (..), Jobs (jobsAttempts, jobsPayload))
+import Model (EntityField (..), Jobs (..))
 import System.Random (randomRIO)
 import Utils (repeatM, timeoutM, whileM)
 import Yesod (MonadUnliftIO (withRunInIO))
@@ -102,3 +103,19 @@ run queue = do
           pass
       )
   pass
+
+scheduleTask :: (MonadUnliftIO m, Serialise a, Serialise e) => Queue m e a -> a -> UTCTime -> m ()
+scheduleTask queue task at = do
+  now <- liftIO getCurrentTime
+  runSqlPool (P.insert_ $ Jobs now now at (toStrict $ serialise task) BS.empty 0 False Nothing Nothing) (queueDbPool queue)
+  pass
+
+addTask :: (MonadUnliftIO m, Serialise a, Serialise e) => Queue m e a -> a -> m ()
+addTask queue task = do
+  now <- liftIO getCurrentTime
+  scheduleTask queue task now
+
+runTaskIn :: (MonadUnliftIO m, Serialise a, Serialise e) => Queue m e a -> a -> NominalDiffTime -> m ()
+runTaskIn queue task in_time = do
+  now <- liftIO getCurrentTime
+  scheduleTask queue task (addUTCTime in_time now)
