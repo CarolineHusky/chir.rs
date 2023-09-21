@@ -1,13 +1,14 @@
 module Crypto.KeyStore.Types where
 
-import Codec.Serialise (Serialise)
 import Crypto.JOSE (Crv, KeyMaterialGenParam, OKPCrv)
 import Crypto.JOSE qualified as JOSE
+import Data.Aeson (FromJSON, ToJSON)
 
 data Crv' = P_256 | P_384 | P_521 | Secp256k1
   deriving stock (Show, Eq, Generic)
 
-instance Serialise Crv'
+instance FromJSON Crv'
+instance ToJSON Crv'
 
 crvToJose :: Crv' -> Crv
 crvToJose P_256 = JOSE.P_256
@@ -24,7 +25,8 @@ crvFromJose JOSE.Secp256k1 = Secp256k1
 data OKPCrv' = Ed25519 | Ed448 | X25519 | X448
   deriving stock (Show, Eq, Generic)
 
-instance Serialise OKPCrv'
+instance FromJSON OKPCrv'
+instance ToJSON OKPCrv'
 
 okpCrvToJose :: OKPCrv' -> OKPCrv
 okpCrvToJose Ed25519 = JOSE.Ed25519
@@ -45,7 +47,8 @@ data KeyMaterialGenParam'
   | OKPGenParam OKPCrv'
   deriving stock (Show, Eq, Generic)
 
-instance Serialise KeyMaterialGenParam'
+instance FromJSON KeyMaterialGenParam'
+instance ToJSON KeyMaterialGenParam'
 
 genParamToJose :: KeyMaterialGenParam' -> KeyMaterialGenParam
 genParamToJose (ECGenParam crv) = JOSE.ECGenParam $ crvToJose crv

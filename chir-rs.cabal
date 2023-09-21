@@ -95,7 +95,6 @@ common shared
     , relude                 >=1.0
     , resource-pool
     , resourcet
-    , serialise
     , shakespeare
     , shower
     , template-haskell
@@ -121,6 +120,7 @@ common shared
     Data.Queue
     Foundation
     Handler.Home
+    Handler.WebauthnChallenge
     Handler.Webfinger
     Model
     Model.Migration

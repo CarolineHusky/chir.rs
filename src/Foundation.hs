@@ -13,13 +13,13 @@ module Foundation (
   QueueCommands (..),
 ) where
 
-import Codec.Serialise (Serialise)
 import Config (ConfigFile, logLevel', staticDir', toLogLevel, widgetFile)
 import Config.StaticFiles (main_css, main_js)
 import Control.Lens ((^.))
 import Control.Lens.TH (makeLenses)
 import Control.Monad.Logger (LogLevel, LogSource)
 import Crypto.KeyStore.Types (KeyMaterialGenParam')
+import Data.Aeson (ToJSON)
 import Database.Persist.Postgresql (SqlPersistT)
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Database.Persist.SqlBackend (SqlBackend)
@@ -32,6 +32,7 @@ import Utils (headOr, (>$>))
 import Yesod (
   DBRunner,
   FormMessage,
+  FromJSON,
   Html,
   Lang,
   MonadHandler (HandlerSite),
@@ -193,7 +194,10 @@ translationUnescaped message = translation message <&> preEscapedToHtml
 translationEscaped :: (MonadHandler m, RenderMessage (HandlerSite m) message) => message -> m Html
 translationEscaped message = translation message <&> toHtml
 
-data QueueCommands = Rekey Text KeyMaterialGenParam' Int
+data QueueCommands
+  = Rekey Text KeyMaterialGenParam' Int
+  | NoOp
   deriving stock (Show, Eq, Generic)
 
-instance Serialise QueueCommands
+instance FromJSON QueueCommands
+instance ToJSON QueueCommands

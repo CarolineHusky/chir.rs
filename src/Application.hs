@@ -12,7 +12,7 @@ import Database.Persist.Postgresql (createPostgresqlPoolWithConf, defaultPostgre
 import Database.Persist.Sql (runSqlPool)
 import Foundation (
   App (..),
-  QueueCommands (Rekey),
+  QueueCommands (..),
   Route (..),
   appConfig,
   appLogger,
@@ -20,6 +20,7 @@ import Foundation (
   resourcesApp,
  )
 import Handler.Home (getHomeR)
+import Handler.WebauthnChallenge (getWebauthnChallengeR)
 import Handler.Webfinger (getWebfingerR)
 import Language.Haskell.TH.Syntax (qLocation)
 import Model (migrateAll)
@@ -88,6 +89,7 @@ makeFoundation config = do
                   Rekey name parms days -> do
                     _ <- runSqlPool (performRekey name parms days) pool
                     return $ Right ()
+                  NoOp -> return $ Right ()
               ) ::
                 QueueCommands -> IO (Either () ())
           , Queue.queueNodeName = config ^. nodeName'

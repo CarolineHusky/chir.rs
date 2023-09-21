@@ -1,3 +1,4 @@
 /static StaticR Static appStatic
 / HomeR GET
 /.well-known/webfinger WebfingerR GET
+/auth/webauthn_challenge WebauthnChallengeR GET

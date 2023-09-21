@@ -1,7 +1,7 @@
 module Crypto.KeyStore (getKeyWithRekey, performRekey) where
 
 import Control.Monad.Trans.Resource (MonadUnliftIO)
-import Crypto.JOSE (KeyMaterial, KeyMaterialGenParam, genKeyMaterial)
+import Crypto.JOSE (JWK, KeyMaterialGenParam, genJWK)
 import Crypto.KeyStore.Types (KeyMaterialGenParam', genParamFromJose, genParamToJose)
 import Data.Aeson (decode, encode)
 import Data.Queue (runTaskIn)
@@ -15,7 +15,7 @@ nameToKey name = case keyFromValues [PersistText name] of
   Left e -> error ("Code error" <> e)
   Right v -> v
 
-tryGetKey :: (MonadUnliftIO m) => Text -> SqlPersistT m (Maybe KeyMaterial)
+tryGetKey :: (MonadUnliftIO m) => Text -> SqlPersistT m (Maybe JWK)
 tryGetKey name = do
   key <- P.get $ nameToKey name
   case key of
@@ -25,15 +25,15 @@ tryGetKey name = do
 deleteKey :: (MonadUnliftIO m) => Text -> SqlPersistT m ()
 deleteKey name = P.delete $ nameToKey name
 
-insertKey :: (MonadUnliftIO m) => Text -> KeyMaterial -> SqlPersistT m ()
-insertKey name keyMaterial = do
+insertKey :: (MonadUnliftIO m) => Text -> JWK -> SqlPersistT m ()
+insertKey name jwk = do
   deleteKey name -- delete the existing key, if any
-  _ <- P.insert $ Keys name $ toStrict $ encode keyMaterial
+  _ <- P.insert $ Keys name $ toStrict $ encode jwk
   pass
 
-genKeyWithRekey :: (MonadUnliftIO m) => Text -> KeyMaterialGenParam -> Int -> SqlPersistT m KeyMaterial
+genKeyWithRekey :: (MonadUnliftIO m) => Text -> KeyMaterialGenParam -> Int -> SqlPersistT m JWK
 genKeyWithRekey name parms days = do
-  material <- liftIO $ genKeyMaterial parms
+  material <- liftIO $ genJWK parms
   insertKey name material
   if days > 0
     then do
@@ -41,7 +41,7 @@ genKeyWithRekey name parms days = do
     else pass
   return material
 
-getKeyWithRekey :: (MonadUnliftIO m) => Text -> KeyMaterialGenParam -> Int -> SqlPersistT m KeyMaterial
+getKeyWithRekey :: (MonadUnliftIO m) => Text -> KeyMaterialGenParam -> Int -> SqlPersistT m JWK
 getKeyWithRekey name parms days = do
   dbKey <- tryGetKey name
   case dbKey of
