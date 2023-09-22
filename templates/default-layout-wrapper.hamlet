@@ -1,10 +1,20 @@
 $newline never
 \<!doctype html>
-<html lang=#{lang} data-theme=#{theme}>
-    <head>
-        <meta charset="utf-8">
-        <title>#{pageTitle pc}
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        ^{pageHead pc}
-    <body>
-        ^{pageBody pc}
+$if theme == ""
+    <html lang=#{lang}>
+        <head>
+            <meta charset="utf-8">
+            <title>#{pageTitle pc}
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            ^{pageHead pc}
+        <body>
+            ^{pageBody pc}
+$else
+    <html lang=#{lang} data-theme=#{theme}>
+        <head>
+            <meta charset="utf-8">
+            <title>#{pageTitle pc}
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            ^{pageHead pc}
+        <body>
+            ^{pageBody pc}
