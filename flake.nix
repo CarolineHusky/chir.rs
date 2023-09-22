@@ -34,25 +34,14 @@
           # basePackages = pkgs.haskellPackages;
 
           # Packages to add on top of `basePackages`
-          packages = {
-            # Add source or Hackage overrides here
-            # (Local packages are added automatically)
-            /*
-            aeson.source = "1.5.0.0" # Hackage version
-            shower.source = inputs.shower; # Flake input
-            */
-          };
+          packages = {};
 
           # Add your package overrides here
           settings = {
-            /*
-            chir-rs = {
-            haddock = false;
+            webauthn = {
+              broken = false;
+              jailbreak = true;
             };
-            aeson = {
-            check = false;
-            };
-            */
           };
 
           # Development shell configuration
@@ -103,7 +92,7 @@
               installPhase = "cp -rv dist $out";
               distPhase = "true";
             };
-          chir-rs = config.haskellProjects.default.outputs.packages.chir-rs.package.overrideAttrs (super: {
+          chir-rs = pkgs.haskell.lib.justStaticExecutables (config.haskellProjects.default.outputs.packages.chir-rs.package.overrideAttrs (super: {
             postUnpack = ''
               cp -rv ${chir-rs-fe} chir-rs-0.1.0.0/static
               chmod -R +w chir-rs-0.1.0.0/static
@@ -112,7 +101,7 @@
                 ln -sv $f chir-rs-0.1.0.0/static/img
               done
             '';
-          });
+          }));
           inherit (inputs.nix-packages.packages.${system}) lotte-art;
           art-assets = pkgs.callPackage ./packages/art-encodes.nix {
             inherit (inputs.nix-packages.packages.${system}) lotte-art;

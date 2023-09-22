@@ -1,35 +1,30 @@
-module Handler.WebauthnChallenge (getWebauthnChallengeR) where
+module Handler.WebauthnChallenge (cleanupWebauthnChallenge, generateChallenge) where
 
-import Control.Lens ((?~))
-import Crypto.JOSE (JWK, KeyMaterialGenParam (OctGenParam), bestJWSAlg, encodeCompact, newJWSHeader, runJOSE)
-import Crypto.JWT (ClaimsSet, HasClaimsSet (claimExp, claimJti), JWTError, NumericDate (NumericDate), SignedJWT, emptyClaimsSet, signClaims)
-import Crypto.KeyStore (getKeyWithRekey)
+import Control.Concurrent (threadDelay)
+import Control.Monad.Trans.Resource (MonadUnliftIO)
+import Crypto.WebAuthn (Challenge)
+import Crypto.WebAuthn qualified as WA
+import Data.ByteString.Base64 qualified as B64
 import Data.Time (addUTCTime, getCurrentTime)
 import Data.Time.Clock (NominalDiffTime)
+import Database.Persist (PersistQueryWrite (deleteWhere), PersistStoreWrite (insert_), (<=.))
+import Database.Persist.Postgresql (runSqlPool)
+import Database.Persist.Sql (ConnectionPool)
 import Foundation (App)
-import System.Random (randomIO)
+import Model (EntityField (WebauthnChallengeExpiresAt), WebauthnChallenge (WebauthnChallenge))
 import Yesod (HandlerFor, YesodPersist (runDB))
 
-mkClaims :: IO ClaimsSet
-mkClaims = do
-  t <- getCurrentTime
-  let expiry = addUTCTime (60 :: NominalDiffTime) t
-  jti :: Word64 <- randomIO
-  pure $
-    emptyClaimsSet
-      & claimExp ?~ NumericDate expiry
-      & claimJti ?~ show jti
+generateChallenge :: HandlerFor App Challenge
+generateChallenge = do
+  challenge <- liftIO WA.generateChallenge
+  now <- liftIO getCurrentTime
+  let expiry = addUTCTime (300 :: NominalDiffTime) now
+  runDB $ insert_ $ WebauthnChallenge (decodeUtf8 $ B64.encode $ WA.unChallenge challenge) expiry
+  return challenge
 
-mkJWT :: JWK -> IO (Either JWTError SignedJWT)
-mkJWT jwk = runJOSE $ do
-  alg <- bestJWSAlg jwk
-  claims <- liftIO mkClaims
-  signClaims jwk (newJWSHeader ((), alg)) claims
-
-getWebauthnChallengeR :: HandlerFor App Text
-getWebauthnChallengeR = do
-  jwk <- runDB $ getKeyWithRekey "webauthnChallenge" (OctGenParam 32) 30
-  jwt' <- liftIO $ mkJWT jwk
-  case jwt' of
-    Right jwt -> return $ decodeUtf8 $ encodeCompact jwt
-    Left e -> error $ show e
+cleanupWebauthnChallenge :: (MonadUnliftIO m) => ConnectionPool -> m Void
+cleanupWebauthnChallenge pool = infinitely $ do
+  now <- liftIO getCurrentTime
+  runSqlPool (deleteWhere [WebauthnChallengeExpiresAt <=. now]) pool
+  liftIO $ threadDelay 300_000_000
+  pass

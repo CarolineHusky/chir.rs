@@ -1,5 +1,6 @@
-module Utils (fallbackAll, tailOrEmpty, capitalize, headOr, (>$>), repeatM, whileM, timeoutM) where
+module Utils (fallbackAll, tailOrEmpty, capitalize, headOr, (>$>), repeatM, whileM, timeoutM, forkM) where
 
+import Control.Concurrent (forkIO)
 import Control.Monad.Trans.Resource (MonadUnliftIO)
 import Data.Char (toUpper)
 import System.Timeout (timeout)
@@ -51,3 +52,6 @@ repeatM n m = m >> repeatM (n - 1) m
 
 timeoutM :: (MonadUnliftIO m) => Int -> m a -> m (Maybe a)
 timeoutM duration monad = withRunInIO (\run' -> timeout duration $ run' monad)
+
+forkM :: (MonadUnliftIO m) => m a -> m ()
+forkM m = withRunInIO (\run' -> forkIO $ run' m >> pass) >> pass

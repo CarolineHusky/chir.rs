@@ -11,6 +11,20 @@ packages:
       size: 1619
   original:
     hackage: persistent-migration-0.3.0
+- completed:
+    hackage: webauthn-0.7.0.0@sha256:706dfe132c3227aa1c46dba1ab93ab0fd7d7b93d8282b03aa11f2dee3819e24c,6331
+    pantry-tree:
+      sha256: 5237d5c8f7eb4259c84d852f741e550473c4d432b0fe7790a81d9d1ef87546a8
+      size: 10859
+  original:
+    hackage: webauthn-0.7.0.0
+- completed:
+    hackage: validation-1.1.3@sha256:e2496d01639d5b8ab1dcf4b1dcf93e3d1380b6f793c4eef18ffc082eead17cf0,3573
+    pantry-tree:
+      sha256: 5568b8f135d2c0a3d28813d48f254fca228b4cdec2996ff409717b6a40022164
+      size: 343
+  original:
+    hackage: validation-1.1.3
 snapshots:
 - completed:
     sha256: 64d66303f927e87ffe6b8ccf736229bf608731e80d7afdf62bdd63c59f857740

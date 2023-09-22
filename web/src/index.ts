@@ -1,3 +1,5 @@
+import "./style.scss";
+
 async function getLanguageCookie(): Promise<string | undefined> {
   const Cookies = await require("js-cookie");
   return Cookies.get("_LANG");
@@ -101,3 +103,5 @@ export async function main() {
   }
   changeTheme.addEventListener("change", updateTheme);
 }
+
+main();

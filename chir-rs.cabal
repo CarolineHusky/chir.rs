@@ -75,6 +75,7 @@ common shared
     , aeson
     , async
     , base                   >=4.13.0.0 && <4.18.0.0.0
+    , base64-bytestring
     , blaze-html
     , data-default
     , dhall
@@ -102,6 +103,7 @@ common shared
     , wai
     , wai-extra
     , warp
+    , webauthn
     , with-utf8
     , yesod
     , yesod-core
@@ -120,6 +122,8 @@ common shared
     Data.Queue
     Foundation
     Handler.Home
+    Handler.Register
+    Handler.StartRegistration
     Handler.WebauthnChallenge
     Handler.Webfinger
     Model

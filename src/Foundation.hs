@@ -14,7 +14,7 @@ module Foundation (
 ) where
 
 import Config (ConfigFile, logLevel', staticDir', toLogLevel, widgetFile)
-import Config.StaticFiles (main_css, main_js)
+import Config.StaticFiles (index_css, index_js)
 import Control.Lens ((^.))
 import Control.Lens.TH (makeLenses)
 import Control.Monad.Logger (LogLevel, LogSource)
@@ -163,8 +163,8 @@ instance Yesod App where
     langs <- languages
     let lang = headOr langs "en"
     pc <- widgetToPageContent $ do
-      addScript $ StaticR main_js
-      addStylesheet $ StaticR main_css
+      addScript $ StaticR index_js
+      addStylesheet $ StaticR index_css
       $(widgetFile "default-layout")
     withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 

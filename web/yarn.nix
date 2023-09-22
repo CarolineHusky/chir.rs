@@ -24,6 +24,14 @@
       };
     }
     {
+      name = "_github_webauthn_json___webauthn_json_2.1.1.tgz";
+      path = fetchurl {
+        name = "_github_webauthn_json___webauthn_json_2.1.1.tgz";
+        url = "https://registry.yarnpkg.com/@github/webauthn-json/-/webauthn-json-2.1.1.tgz";
+        sha512 = "XrftRn4z75SnaJOmZQbt7Mk+IIjqVHw+glDGOxuHwXkZBZh/MBoRS7MHjSZMDaLhT4RjN2VqiEU7EOYleuJWSQ==";
+      };
+    }
+    {
       name = "_jest_schemas___schemas_29.6.3.tgz";
       path = fetchurl {
         name = "_jest_schemas___schemas_29.6.3.tgz";

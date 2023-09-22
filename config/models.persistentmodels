@@ -1,6 +1,5 @@
 LocalAccount
     username Text
-    password_hash Text
     enabled Bool
     Primary username
     deriving Show
@@ -37,3 +36,7 @@ Keys
     name Text
     jwk ByteString
     Primary name
+WebauthnChallenge
+    jti Text
+    expiresAt UTCTime
+    Primary jti

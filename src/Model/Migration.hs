@@ -6,7 +6,7 @@ import Database.Persist.Migration (
   MigrateSql (MigrateSql),
   Migration,
   MigrationPath ((:=)),
-  Operation (CreateTable, RawOperation, constraints, message, name, rawOp, schema),
+  Operation (CreateTable, DropColumn, RawOperation, constraints, message, name, rawOp, schema),
   PersistValue (PersistInt64),
   SqlType (SqlBlob, SqlBool, SqlDayTime, SqlInt64, SqlString),
   TableConstraint (PrimaryKey),
@@ -105,6 +105,19 @@ createKeys =
         ]
     }
 
+createWebauthnChallenge :: Operation
+createWebauthnChallenge =
+  CreateTable
+    { name = "webauthn_challenge"
+    , schema =
+        [ Column "jti" SqlString [NotNull]
+        , Column "expires_at" SqlDayTime [NotNull]
+        ]
+    , constraints =
+        [ PrimaryKey ["jti"]
+        ]
+    }
+
 migration :: Migration
 migration =
   [ 0
@@ -129,4 +142,6 @@ migration =
             }
          ]
   , 2 ~> 3 := [createKeys]
+  , 3 ~> 4 := [createWebauthnChallenge]
+  , 4 ~> 5 := [DropColumn ("local_account", "password_hash")]
   ]

@@ -1,7 +1,7 @@
 -- | Postgresql queue
 module Data.Queue (Queue (..), run, scheduleTask, addTask, runTaskIn) where
 
-import Control.Concurrent (forkIO, threadDelay)
+import Control.Concurrent (threadDelay)
 import Control.Monad.Trans.Resource (MonadUnliftIO)
 import Data.Aeson (FromJSON, ToJSON, decode, encode)
 import Data.ByteString qualified as BS
@@ -12,8 +12,7 @@ import Database.Persist.Sql (ConnectionPool, SqlPersistT, rawSql, runSqlPool)
 import GHC.Conc (getNumProcessors)
 import Model (EntityField (..), Jobs (..))
 import System.Random (randomRIO)
-import Utils (repeatM, timeoutM, whileM)
-import Yesod (MonadUnliftIO (withRunInIO))
+import Utils (forkM, repeatM, timeoutM, whileM)
 
 data Queue m a e where
   Queue ::
@@ -90,21 +89,8 @@ cleanupThread queue = do
 run :: (MonadUnliftIO m, FromJSON a, ToJSON e) => Queue m a e -> m ()
 run queue = do
   concurrency <- liftIO getNumProcessors
-  repeatM
-    concurrency
-    ( withRunInIO
-        ( \run' -> forkIO $ do
-            _ <- infinitely $ run' $ runThread queue
-            pass
-        )
-        >> pass
-    )
-  _ <-
-    withRunInIO
-      ( \run' -> forkIO $ do
-          _ <- infinitely $ run' $ cleanupThread queue
-          pass
-      )
+  repeatM concurrency $ forkM $ infinitely $ runThread queue
+  forkM $ infinitely $ cleanupThread queue
   pass
 
 scheduleTask :: (MonadUnliftIO m, ToJSON a) => a -> UTCTime -> SqlPersistT m ()

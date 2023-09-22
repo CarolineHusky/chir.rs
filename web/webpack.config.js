@@ -5,7 +5,10 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
-  entry: "./src/index.js",
+  entry: {
+    index: "./src/index.ts",
+    register: "./src/register.ts",
+  },
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, "dist"),

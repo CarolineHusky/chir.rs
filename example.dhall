@@ -39,6 +39,7 @@ let Config =
           , staticDir : Text
           , logLevel : LogLevel.Type
           , nodeName : Text
+          , signUpKey : Text
           }
       , default =
         { databasePoolSize = 10
@@ -54,4 +55,5 @@ in  Config::{
       }
     , logLevel = LogLevel.Type.LogLevelDebug
     , nodeName = "example"
+    , signUpKey = "changeme"
     }

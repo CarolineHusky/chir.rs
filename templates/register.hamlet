@@ -1,0 +1,8 @@
+$newline never
+<form #signup-form>
+    <label for="username">Username:
+    <input type="text" #username>
+    <br>
+    <label for="signup-token">Signup Secret:
+    <input type="password" #signup-token>
+    <button type="submit">Sign up

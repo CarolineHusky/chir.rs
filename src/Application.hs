@@ -20,7 +20,9 @@ import Foundation (
   resourcesApp,
  )
 import Handler.Home (getHomeR)
-import Handler.WebauthnChallenge (getWebauthnChallengeR)
+import Handler.Register (getRegisterR)
+import Handler.StartRegistration (getStartRegistrationR)
+import Handler.WebauthnChallenge (cleanupWebauthnChallenge)
 import Handler.Webfinger (getWebfingerR)
 import Language.Haskell.TH.Syntax (qLocation)
 import Model (migrateAll)
@@ -29,6 +31,7 @@ import Network.Wai (Application, Middleware)
 import Network.Wai.Handler.Warp (Settings, defaultSettings, defaultShouldDisplayException, runSettings, setOnException, setPort)
 import Network.Wai.Middleware.RequestLogger (Destination (Logger), OutputFormat (Detailed), RequestLoggerSettings (..), mkRequestLogger)
 import System.Log.FastLogger (ToLogStr (toLogStr), defaultBufSize, newStdoutLoggerSet)
+import Utils (forkM)
 import Yesod (
   Yesod (messageLoggerSource),
   defaultMiddlewaresNoLogging,
@@ -95,6 +98,7 @@ makeFoundation config = do
           , Queue.queueNodeName = config ^. nodeName'
           }
   Queue.run queue
+  forkM $ infinitely $ cleanupWebauthnChallenge pool
   -- Return the foundation
   return $ mkFoundation pool
 
