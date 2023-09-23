@@ -58,6 +58,7 @@ data ConfigFile = ConfigFile
   , logLevel :: LogLevelConfig
   , nodeName :: Text
   , signUpKey :: Text
+  , rpId :: Text
   }
   deriving stock (Generic, Show)
 
@@ -67,6 +68,7 @@ makeLensesFor
   , ("listenPort", "listenPort'")
   , ("nodeName", "nodeName'")
   , ("signUpKey", "signUpKey'")
+  , ("rpId", "rpId'")
   ]
   ''ConfigFile
 

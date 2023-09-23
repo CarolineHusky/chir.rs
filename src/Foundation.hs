@@ -4,6 +4,7 @@ module Foundation (
   appConfig,
   appLogger,
   appStatic,
+  appHttpManager,
   resourcesApp,
   DummyMessage (..),
   AppMessage,
@@ -23,6 +24,7 @@ import Data.Aeson (ToJSON)
 import Database.Persist.Postgresql (SqlPersistT)
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Database.Persist.SqlBackend (SqlBackend)
+import Network.HTTP.Client.Conduit (Manager)
 import Text.Blaze.Html (preEscapedToHtml, toHtml)
 import Text.Hamlet (hamletFile)
 import Text.Jasmine (minifym)
@@ -75,6 +77,8 @@ data App = App
   -- ^ Static content
   , _appLogger :: Logger
   -- ^ Logger
+  , _appHttpManager :: Manager
+  -- ^ HTTP client
   }
 
 makeLenses ''App
@@ -151,7 +155,7 @@ instance Yesod App where
       genFileName lbs = "autogen-" ++ base64md5 lbs
 
   shouldLogIO :: App -> LogSource -> LogLevel -> IO Bool
-  shouldLogIO app _source level = return $ toLogLevel (app ^. (appConfig . logLevel')) >= level
+  shouldLogIO app _source level = return $ toLogLevel (app ^. (appConfig . logLevel')) <= level
 
   makeLogger :: App -> IO Logger
   makeLogger app = return $ app ^. appLogger
@@ -196,7 +200,7 @@ translationEscaped message = translation message <&> toHtml
 
 data QueueCommands
   = Rekey Text KeyMaterialGenParam' Int
-  | NoOp
+  | RefetchFidoMetadata
   deriving stock (Show, Eq, Generic)
 
 instance FromJSON QueueCommands

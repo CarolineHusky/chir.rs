@@ -1,6 +1,19 @@
-module Utils (fallbackAll, tailOrEmpty, capitalize, headOr, (>$>), repeatM, whileM, timeoutM, forkM) where
+module Utils (
+  fallbackAll,
+  tailOrEmpty,
+  capitalize,
+  headOr,
+  (>$>),
+  repeatM,
+  whileM,
+  timeoutM,
+  forkM,
+  catchM,
+  (<<<$>>>),
+) where
 
 import Control.Concurrent (forkIO)
+import Control.Exception (catch)
 import Control.Monad.Trans.Resource (MonadUnliftIO)
 import Data.Char (toUpper)
 import System.Timeout (timeout)
@@ -41,6 +54,9 @@ capitalize s = s
 (>$>) :: (Functor f) => f (a -> b) -> a -> f b
 f >$> v = (\f' -> f' v) <$> f
 
+(<<<$>>>) :: (Functor f, Functor g) => (a -> b) -> f (g a) -> f (g b)
+f <<<$>>> v = (f <$>) <$> v
+
 whileM :: (Monad m) => m Bool -> m ()
 whileM m = do
   cont <- m
@@ -55,3 +71,6 @@ timeoutM duration monad = withRunInIO (\run' -> timeout duration $ run' monad)
 
 forkM :: (MonadUnliftIO m) => m a -> m ()
 forkM m = withRunInIO (\run' -> forkIO $ run' m >> pass) >> pass
+
+catchM :: (MonadUnliftIO m, Exception e) => m a -> m (Either e a)
+catchM m = withRunInIO (\run' -> catch (Right <$> run' m) (return . Left))

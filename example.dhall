@@ -40,6 +40,7 @@ let Config =
           , logLevel : LogLevel.Type
           , nodeName : Text
           , signUpKey : Text
+          , rpId : Text
           }
       , default =
         { databasePoolSize = 10
@@ -56,4 +57,5 @@ in  Config::{
     , logLevel = LogLevel.Type.LogLevelDebug
     , nodeName = "example"
     , signUpKey = "changeme"
+    , rpId = "thinkrac.tailbab65.ts.net"
     }

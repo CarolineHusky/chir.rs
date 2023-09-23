@@ -40,3 +40,8 @@ WebauthnChallenge
     jti Text
     expiresAt UTCTime
     Primary jti
+KeyValueBlob
+    key Text
+    value ByteString
+    Primary key
+    deriving Show

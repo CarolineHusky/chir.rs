@@ -19,7 +19,25 @@ async function onSubmit(e: Event) {
 
   const credential = await webauthn.create({ publicKey: creation_options });
 
-  console.log(credential);
+  const response2 = await fetch(
+    "/auth/register/finish?" +
+      new URLSearchParams({
+        username,
+      }),
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credential),
+    },
+  );
+
+  if (response2.status === 200) {
+    window.location.href = "/";
+  } else {
+    alert("Error: " + response2.status);
+  }
 }
 
 async function main() {

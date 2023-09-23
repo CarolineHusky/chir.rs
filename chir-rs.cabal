@@ -77,12 +77,17 @@ common shared
     , base                   >=4.13.0.0 && <4.18.0.0.0
     , base64-bytestring
     , blaze-html
+    , conduit
+    , conduit-extra
+    , cryptonite
     , data-default
     , dhall
     , directory
     , fast-logger
     , filepath
     , hjsmin
+    , hourglass
+    , http-conduit
     , jose
     , lens
     , monad-logger
@@ -96,10 +101,13 @@ common shared
     , relude                 >=1.0
     , resource-pool
     , resourcet
+    , serialise
     , shakespeare
     , shower
     , template-haskell
+    , these
     , time
+    , validation
     , wai
     , wai-extra
     , warp
@@ -117,10 +125,12 @@ common shared
     Config
     Config.Images
     Config.StaticFiles
+    Crypto.FidoMetadataManager
     Crypto.KeyStore
     Crypto.KeyStore.Types
     Data.Queue
     Foundation
+    Handler.FinishRegistration
     Handler.Home
     Handler.Register
     Handler.StartRegistration

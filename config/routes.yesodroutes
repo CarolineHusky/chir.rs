@@ -3,3 +3,4 @@
 /.well-known/webfinger WebfingerR GET
 /auth/register RegisterR GET
 /auth/register/start StartRegistrationR GET
+/auth/register/finish FinishRegistrationR POST

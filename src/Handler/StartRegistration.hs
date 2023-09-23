@@ -1,4 +1,4 @@
-module Handler.StartRegistration (getStartRegistrationR) where
+module Handler.StartRegistration (getStartRegistrationR, mkCredentialOptionsRegistration) where
 
 import Crypto.WebAuthn qualified as WA
 import Data.Aeson (Value)
@@ -27,11 +27,11 @@ mkCredentialOptionsRegistration username challenge =
           }
     , WA.corChallenge = challenge
     , WA.corPubKeyCredParams =
-        [ WA.CredentialParameters
+        [ {-WA.CredentialParameters
             { WA.cpTyp = WA.CredentialTypePublicKey
             , WA.cpAlg = WA.CoseAlgorithmEdDSA
-            }
-        , WA.CredentialParameters
+            },-}
+          WA.CredentialParameters
             { WA.cpTyp = WA.CredentialTypePublicKey
             , WA.cpAlg = WA.CoseAlgorithmES512
             }

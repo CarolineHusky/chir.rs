@@ -3,6 +3,7 @@ module Application (appMain, develMain) where
 import Config (ConfigFile (database, databasePoolSize), listenPort', loadConfigAuto, nodeName', staticDir', toPostgresConf)
 import Control.Lens ((^.))
 import Control.Monad.Logger (LogLevel (LevelError), LoggingT (runLoggingT), liftLoc, runStderrLoggingT)
+import Crypto.FidoMetadataManager (deleteMetadataBlobInfo)
 import Crypto.KeyStore (performRekey)
 import Data.Default (def)
 import Data.Queue qualified as Queue
@@ -19,6 +20,7 @@ import Foundation (
   appStatic,
   resourcesApp,
  )
+import Handler.FinishRegistration (postFinishRegistrationR)
 import Handler.Home (getHomeR)
 import Handler.Register (getRegisterR)
 import Handler.StartRegistration (getStartRegistrationR)
@@ -27,6 +29,10 @@ import Handler.Webfinger (getWebfingerR)
 import Language.Haskell.TH.Syntax (qLocation)
 import Model (migrateAll)
 import Model.Migration (migration)
+import Network.HTTP.Conduit (
+  newManager,
+  tlsManagerSettings,
+ )
 import Network.Wai (Application, Middleware)
 import Network.Wai.Handler.Warp (Settings, defaultSettings, defaultShouldDisplayException, runSettings, setOnException, setPort)
 import Network.Wai.Middleware.RequestLogger (Destination (Logger), OutputFormat (Detailed), RequestLoggerSettings (..), mkRequestLogger)
@@ -56,6 +62,7 @@ makeFoundation :: ConfigFile -> IO App
 makeFoundation config = do
   appLogger' <- newStdoutLoggerSet defaultBufSize >>= makeYesodLogger
   appStatic' <- static $ toString $ config ^. staticDir'
+  appHttpManager' <- newManager tlsManagerSettings
   -- We need a log function to create a connection pool. We need a connection
   -- pool to create our foundation. And we need our foundation to get a
   -- logging function. To get out of this loop, we initially create a
@@ -67,6 +74,7 @@ makeFoundation config = do
           , _appDbPool = appConnPool
           , _appStatic' = appStatic'
           , _appLogger = appLogger'
+          , _appHttpManager = appHttpManager'
           }
       -- The App {..} syntax is an example of record wild cards. For more
       -- information, see:
@@ -92,7 +100,9 @@ makeFoundation config = do
                   Rekey name parms days -> do
                     _ <- runSqlPool (performRekey name parms days) pool
                     return $ Right ()
-                  NoOp -> return $ Right ()
+                  RefetchFidoMetadata -> do
+                    runSqlPool deleteMetadataBlobInfo pool
+                    return $ Right ()
               ) ::
                 QueueCommands -> IO (Either () ())
           , Queue.queueNodeName = config ^. nodeName'

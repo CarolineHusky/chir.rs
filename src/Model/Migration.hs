@@ -118,6 +118,17 @@ createWebauthnChallenge =
         ]
     }
 
+createKeyValueBlob :: Operation
+createKeyValueBlob =
+  CreateTable
+    { name = "key_value_blob"
+    , schema =
+        [ Column "key" SqlString [NotNull]
+        , Column "value" SqlBlob [NotNull]
+        ]
+    , constraints = [PrimaryKey ["key"]]
+    }
+
 migration :: Migration
 migration =
   [ 0
@@ -144,4 +155,5 @@ migration =
   , 2 ~> 3 := [createKeys]
   , 3 ~> 4 := [createWebauthnChallenge]
   , 4 ~> 5 := [DropColumn ("local_account", "password_hash")]
+  , 5 ~> 6 := [createKeyValueBlob]
   ]
