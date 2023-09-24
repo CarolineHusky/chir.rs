@@ -1,3 +1,5 @@
+{-# LANGUAGE FunctionalDependencies #-}
+
 module Utils (
   fallbackAll,
   tailOrEmpty,
@@ -10,12 +12,15 @@ module Utils (
   forkM,
   catchM,
   (<<<$>>>),
+  (?),
+  (?!),
 ) where
 
 import Control.Concurrent (forkIO)
 import Control.Exception (catch)
 import Control.Monad.Trans.Resource (MonadUnliftIO)
 import Data.Char (toUpper)
+import Data.Validation (Validation (..))
 import System.Timeout (timeout)
 import Yesod (MonadUnliftIO (withRunInIO))
 
@@ -74,3 +79,32 @@ forkM m = withRunInIO (\run' -> forkIO $ run' m >> pass) >> pass
 
 catchM :: (MonadUnliftIO m, Exception e) => m a -> m (Either e a)
 catchM m = withRunInIO (\run' -> catch (Right <$> run' m) (return . Left))
+
+class ToEither m a b | m -> a, m -> b where
+  toEither :: m -> Either a b
+
+instance ToEither (Maybe a) () a where
+  toEither :: Maybe a -> Either () a
+  toEither Nothing = Left ()
+  toEither (Just v) = Right v
+
+instance ToEither (Either a b) a b where
+  toEither :: Either a b -> Either a b
+  toEither = id
+
+instance ToEither (Validation a b) a b where
+  toEither :: Validation a b -> Either a b
+  toEither (Success v) = Right v
+  toEither (Failure e) = Left e
+
+(?) :: (Monad m, ToEither n a b) => m n -> (a -> m b) -> m b
+m ? n =
+  m
+    >>= ( \case
+            Left a -> n a
+            Right a -> return a
+        )
+      . toEither
+
+(?!) :: (Monad m, ToEither n a b) => m n -> m b -> m b
+m ?! n = m ? const n

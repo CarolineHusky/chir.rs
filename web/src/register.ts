@@ -13,6 +13,7 @@ async function onSubmit(e: Event) {
     "/auth/register/start?" +
       new URLSearchParams({
         username,
+        signup_token,
       }),
   );
   const creation_options = await response.json();

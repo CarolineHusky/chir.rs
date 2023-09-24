@@ -1,13 +1,17 @@
 module Handler.StartRegistration (getStartRegistrationR, mkCredentialOptionsRegistration) where
 
+import Config (signUpKey')
+import Control.Lens ((^.))
 import Crypto.WebAuthn qualified as WA
 import Data.Aeson (Value)
 import Database.Persist (PersistEntity (Key, keyFromValues), PersistValue (PersistText))
 import Database.Persist qualified as P
-import Foundation (App)
+import Foundation (App, appConfig)
 import Handler.WebauthnChallenge (generateChallenge)
 import Model (LocalAccount)
-import Yesod (HandlerFor, YesodPersist (runDB), invalidArgs, lookupGetParam, returnJson)
+import Utils ((?!))
+import Yesod (HandlerFor, YesodPersist (runDB), invalidArgs, lookupGetParam, permissionDenied, returnJson)
+import Yesod.Core (getYesod)
 
 mkCredentialOptionsRegistration :: Text -> WA.Challenge -> WA.CredentialOptions 'WA.Registration
 mkCredentialOptionsRegistration username challenge =
@@ -58,15 +62,16 @@ mkCredentialOptionsRegistration username challenge =
     }
 
 getStartRegistrationR :: HandlerFor App Value
-getStartRegistrationR =
-  lookupGetParam "username" >>= \case
-    Just username ->
-      let key :: Key LocalAccount = case keyFromValues [PersistText username] of
-            Left e -> error $ show e
-            Right k -> k
-       in runDB (P.get key) >>= \case
-            Just _ -> invalidArgs ["username"]
-            Nothing -> do
-              challenge <- generateChallenge
-              returnJson $ WA.wjEncodeCredentialOptionsRegistration $ mkCredentialOptionsRegistration username challenge
-    Nothing -> invalidArgs ["username"]
+getStartRegistrationR = do
+  app <- getYesod
+  username <- lookupGetParam "username" ?! invalidArgs ["username"]
+  signup_token <- lookupGetParam "signup_token" ?! invalidArgs ["signup_token"]
+  if signup_token == (app ^. (appConfig . signUpKey')) then pass else permissionDenied "signup_token"
+  let key :: Key LocalAccount = case keyFromValues [PersistText username] of
+        Right v -> v
+        Left e -> error $ show e
+  runDB (P.get key) >>= \case
+    Just _ -> invalidArgs ["username"]
+    Nothing -> pass
+  challenge <- generateChallenge
+  returnJson $ WA.wjEncodeCredentialOptionsRegistration $ mkCredentialOptionsRegistration username challenge
