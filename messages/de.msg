@@ -1,4 +1,5 @@
 AlternateLink: (Alt.)
+Authorize: Authorisieren
 Automatic: Automatisch
 Github: Github
 GPGKeyNote: (GPG Schlüssel)
@@ -33,3 +34,4 @@ SettingLightTheme: Heller Stil
 SettingsCookieNotice: Wir benutzen Cookies, um veränderte Einstellungen zu speichern und an dem Server zu senden.
 SettingsMenu: Einstellungen
 SettingTheme: Stil:
+Username: Nutzername:

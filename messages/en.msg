@@ -1,6 +1,7 @@
 Akkoma: Akkoma
 AlternateLink: (alt)
 AndALotMore: and a lot more…
+Authorize: Authorize
 Automatic: Automatic
 Forgejo: Forgejo
 Github: Github
@@ -38,3 +39,4 @@ SettingLightTheme: Light theme
 SettingsCookieNotice: We use cookies to store and transmit changed settings.
 SettingsMenu: Settings
 SettingTheme: Theme:
+Username: Username:

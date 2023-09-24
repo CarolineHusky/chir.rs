@@ -1,0 +1,6 @@
+$newline never
+<form #login-form>
+    <label for="username">_{MsgUsername}
+    <input type="text" name="username"
+    <br>
+    <button type="submit">_{MsgAuthorize}

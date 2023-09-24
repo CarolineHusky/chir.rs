@@ -1,6 +1,7 @@
 Akkoma: 󱤟󿫅󱦐󱦔󱤅󱦒󱤘󱦒󱥺󱦒󱤺󱦒󱤇󱦒󱦑
 AlternateLink: (󱤇)
 AndALotMore: 󱤼󱥹
+Authorize: 󱥄󱤘
 Automatic: 󱤇󱥧󱤎 (anu tan ilo)
 Forgejo: _{MyForgejo}
 Github: 󱤴󱥉󱤉󱤤󿪏󿦄󱦔󿩣󱥁󱦔󱥹
@@ -39,3 +40,4 @@ SettingLightTheme: 󱤮󱥤 (lukin suno)
 SettingsCookieNotice: 󱤴󱥌󱤉󱤪󱤨󿪏󿦄󱦔󱥞󱥧󱥁: 󱥞󱤆󱤉󱤤.
 SettingsMenu: 󱤤󱤆 (lawa ante)
 SettingTheme: 󱤮󱤧
+Username: 󱥂󿫄󱥞󱤧

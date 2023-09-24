@@ -1,6 +1,7 @@
 Akkoma:  
 AlternateLink:          
 AndALotMore:      
+Authorize:  
 Automatic:  (zmiku)
 Forgejo: _{MyForgejo}
 Github:          
@@ -39,3 +40,4 @@ SettingLightTheme:    (le blabi staile)
 SettingsCookieNotice:                  
 SettingsMenu:   (le gaftercu'a)
 SettingTheme:    
+Username:      
