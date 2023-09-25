@@ -139,6 +139,7 @@ common shared
     Handler.Webfinger
     Model
     Model.Migration
+    Network.URL.Normalize
     Network.Webfinger
     Network.Webfinger.Link
     Text.Lojban

@@ -9,6 +9,7 @@ import Database.Persist qualified as P
 import Foundation (App, appConfig)
 import Handler.WebauthnChallenge (generateChallenge)
 import Model (LocalAccount)
+import Network.URL.Normalize (normalizeURL)
 import Utils ((?!))
 import Yesod (HandlerFor, YesodPersist (runDB), invalidArgs, lookupGetParam, permissionDenied, returnJson)
 import Yesod.Core (getYesod)
@@ -64,7 +65,8 @@ mkCredentialOptionsRegistration username challenge =
 getStartRegistrationR :: HandlerFor App Value
 getStartRegistrationR = do
   app <- getYesod
-  username <- lookupGetParam "username" ?! invalidArgs ["username"]
+  username' <- lookupGetParam "username" ?! invalidArgs ["username"]
+  username <- pure (normalizeURL username') ?! invalidArgs ["username"]
   signup_token <- lookupGetParam "signup_token" ?! invalidArgs ["signup_token"]
   if signup_token == (app ^. (appConfig . signUpKey')) then pass else permissionDenied "signup_token"
   let key :: Key LocalAccount = case keyFromValues [PersistText username] of

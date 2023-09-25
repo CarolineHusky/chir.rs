@@ -16,6 +16,7 @@ import Handler.StartRegistration (mkCredentialOptionsRegistration)
 import Model (EntityField (WebauthnChallengeExpiresAt, WebauthnChallengeJti), LocalAccount (LocalAccount), LocalAccountCredentials (LocalAccountCredentials), WebFingerAccount (WebFingerAccount))
 import Network.URL (URL (URL), importURL)
 import Network.URL qualified as URL
+import Network.URL.Normalize (normalizeURL)
 import Utils ((<<<$>>>), (?), (?!))
 import Yesod (HandlerFor, YesodPersist (runDB), getYesod, invalidArgs, lookupHeader, permissionDenied, requireCheckJsonBody)
 import Yesod.Core (lookupGetParam)
@@ -27,7 +28,8 @@ metadataKey v = case keyFromValues [PersistText v] of
 
 postFinishRegistrationR :: HandlerFor App ()
 postFinishRegistrationR = do
-  username <- lookupGetParam "username" ?! invalidArgs ["username"]
+  username' <- lookupGetParam "username" ?! invalidArgs ["username"]
+  username <- pure (normalizeURL username') ?! invalidArgs ["username"]
   profile_host <- case importURL $ toString username of
     Just
       ( URL
