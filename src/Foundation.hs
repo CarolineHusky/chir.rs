@@ -46,6 +46,7 @@ import Yesod (
   Yesod (addStaticContent, defaultLayout, makeLogger, makeSessionBackend, shouldLogIO, yesodMiddleware),
   YesodPersist (runDB),
   YesodPersistRunner,
+  addHeader,
   addScript,
   addStylesheet,
   defaultFormMessage,
@@ -166,6 +167,17 @@ instance Yesod App where
     let theme = fromMaybe "" themeCookie
     langs <- languages
     let lang = headOr langs "en"
+    -- only allow local source, no embeds
+    addHeader "X-Frame-Options" "DENY"
+    addHeader "X-XSS-Protection" "0"
+    addHeader "X-Content-Type-Options" "nosniff"
+    addHeader "Referrer-Policy" "strict-origin-when-cross-origin"
+    addHeader "Content-Security-Policy" "default-src 'self'; img-src 'self', data: ; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content; disown-opener; base-uri 'self'"
+    addHeader "Cross-Origin-Opener-Policy" "same-origin"
+    addHeader "Cross-Origin-Embedder-Policy" "require-corp"
+    addHeader "Cross-Origin-Resource-Policy" "same-site"
+    addHeader "Permissions-Policy" "publickey-credentials-create=*, publickey-credentials-get=*, interest-cohort=()"
+
     pc <- widgetToPageContent $ do
       addScript $ StaticR index_js
       addStylesheet $ StaticR index_css
