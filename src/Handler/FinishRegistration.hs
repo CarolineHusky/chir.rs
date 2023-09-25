@@ -13,7 +13,9 @@ import Data.Time (getCurrentTime)
 import Database.Persist.Sql (PersistEntity (Key, keyFromValues), PersistUniqueWrite (insertUnique_), PersistValue (PersistText), deleteWhereCount, (==.), (>.))
 import Foundation (App, appConfig, appHttpManager)
 import Handler.StartRegistration (mkCredentialOptionsRegistration)
-import Model (EntityField (WebauthnChallengeExpiresAt, WebauthnChallengeJti), LocalAccount (LocalAccount), LocalAccountCredentials (LocalAccountCredentials))
+import Model (EntityField (WebauthnChallengeExpiresAt, WebauthnChallengeJti), LocalAccount (LocalAccount), LocalAccountCredentials (LocalAccountCredentials), WebFingerAccount (WebFingerAccount))
+import Network.URL (URL (URL), importURL)
+import Network.URL qualified as URL
 import Utils ((<<<$>>>), (?), (?!))
 import Yesod (HandlerFor, YesodPersist (runDB), getYesod, invalidArgs, lookupHeader, permissionDenied, requireCheckJsonBody)
 import Yesod.Core (lookupGetParam)
@@ -26,6 +28,18 @@ metadataKey v = case keyFromValues [PersistText v] of
 postFinishRegistrationR :: HandlerFor App ()
 postFinishRegistrationR = do
   username <- lookupGetParam "username" ?! invalidArgs ["username"]
+  profile_host <- case importURL $ toString username of
+    Just
+      ( URL
+          { URL.url_type =
+            URL.Absolute
+              ( URL.Host
+                  { URL.host = host
+                  }
+                )
+          }
+        ) -> pure $ toText host
+    _ -> invalidArgs ["username"]
   cred <-
     -- try to decode the registration message
     ( WA.wjDecodeCredentialRegistration
@@ -68,17 +82,17 @@ postFinishRegistrationR = do
     WA.SomeAttestationStatement {WA.asModel = WA.VerifiedAuthenticator _ _} -> do
       -- We have a valid authenticator
       runDB $ do
-        _ :: () <- insertUnique_ (LocalAccount username False) ?! permissionDenied "Registration error"
-        _ :: () <-
-          insertUnique_
-            ( LocalAccountCredentials
-                credentialId
-                (metadataKey username)
-                publicKeyBytes
-                (fromIntegral signatureCounter)
-                $ toStrict
-                $ encode transports
-            )
-            ?! permissionDenied "Registration error"
+        insertUnique_ (LocalAccount username False) ?! permissionDenied "Registration error"
+        insertUnique_
+          ( LocalAccountCredentials
+              credentialId
+              (metadataKey username)
+              publicKeyBytes
+              (fromIntegral signatureCounter)
+              $ toStrict
+              $ encode transports
+          )
+          ?! permissionDenied "Registration error"
+        insertUnique_ (WebFingerAccount ("acct:" <> profile_host <> "@" <> profile_host) username $ Just username) ?! permissionDenied "Registration error"
         pass
     _ -> permissionDenied "Failed to verify attestation"

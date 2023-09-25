@@ -107,6 +107,7 @@ common shared
     , template-haskell
     , these
     , time
+    , url
     , validation
     , wai
     , wai-extra
