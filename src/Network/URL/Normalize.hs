@@ -38,6 +38,6 @@ normalizeURL text =
                       , URL.port = Nothing
                       }
               , URL.url_path = URL.url_path url
-              , URL.url_params = []
+              , URL.url_params = URL.url_params url
               }
       pure $ exportURL new_url
