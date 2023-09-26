@@ -13,7 +13,14 @@ LocalAccountCredentials
 LocalAccountSessions
     user LocalAccountId
     jid Text
-    Primary user
+    lastAccess UTCTime
+    until UTCTime
+    Primary jid
+    deriving Show
+LocalAccountSessionScopes
+    jid Text
+    scope Text
+    UniqueLocalAccountSessionScopes jid scope
     deriving Show
 WebFingerAccount
     webfingerUsername Text

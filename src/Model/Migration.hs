@@ -1,5 +1,7 @@
 module Model.Migration (migration) where
 
+import Data.Time (getCurrentTime)
+import Data.Time.Clock (NominalDiffTime, addUTCTime)
 import Database.Persist.Migration (
   Column (Column),
   ColumnProp (AutoIncrement, Default, NotNull, References),
@@ -7,9 +9,9 @@ import Database.Persist.Migration (
   Migration,
   MigrationPath ((:=)),
   Operation (CreateTable, DropColumn, RawOperation, constraints, message, name, rawOp, schema),
-  PersistValue (PersistInt64),
+  PersistValue (PersistInt64, PersistUTCTime),
   SqlType (SqlBlob, SqlBool, SqlDayTime, SqlInt64, SqlString),
-  TableConstraint (PrimaryKey),
+  TableConstraint (PrimaryKey, Unique),
   (~>),
  )
 
@@ -129,6 +131,18 @@ createKeyValueBlob =
     , constraints = [PrimaryKey ["key"]]
     }
 
+createLocalAccountSessionScopes :: Operation
+createLocalAccountSessionScopes =
+  CreateTable
+    { name = "local_account_session_scopes"
+    , schema =
+        [ Column "id" SqlInt64 [NotNull, AutoIncrement]
+        , Column "jid" SqlString [NotNull, References ("local_account_sessions", "jid")]
+        , Column "scope" SqlString [NotNull]
+        ]
+    , constraints = [PrimaryKey ["id"], Unique "unique_local_account_session_scopes" ["jid", "scope"]]
+    }
+
 migration :: Migration
 migration =
   [ 0
@@ -156,4 +170,22 @@ migration =
   , 3 ~> 4 := [createWebauthnChallenge]
   , 4 ~> 5 := [DropColumn ("local_account", "password_hash")]
   , 5 ~> 6 := [createKeyValueBlob]
+  , 6
+      ~> 7
+      := [ RawOperation
+            { message = "change local_account_sessions pkey"
+            , rawOp = do
+                now <- liftIO getCurrentTime
+                let expTime = addUTCTime (604_800 :: NominalDiffTime) now
+                return
+                  [ MigrateSql "ALTER TABLE local_account_sessions DROP CONSTRAINT local_account_sessions_pkey, ADD PRIMARY KEY (jid)" []
+                  , MigrateSql "CREATE INDEX local_account_sessions_user ON local_account_sessions (\"user\")" []
+                  , MigrateSql "ALTER TABLE local_account_sessions ADD COLUMN last_access TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()" []
+                  , MigrateSql "ALTER TABLE local_account_sessions ADD COLUMN until TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT ?" [PersistUTCTime expTime]
+                  , MigrateSql "ALTER TABLE local_account_sessions ALTER COLUMN last_access DROP DEFAULT" []
+                  , MigrateSql "ALTER TABLE local_account_sessions ALTER COLUMN until DROP DEFAULT" []
+                  ]
+            }
+         , createLocalAccountSessionScopes
+         ]
   ]
