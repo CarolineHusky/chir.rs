@@ -5,7 +5,6 @@ module Utils (
   tailOrEmpty,
   capitalize,
   headOr,
-  (>$>),
   repeatM,
   whileM,
   timeoutM,
@@ -54,10 +53,6 @@ tailOrEmpty xs = tailOr xs []
 capitalize :: String -> String
 capitalize (c : cs) = toUpper c : cs
 capitalize s = s
-
--- | cursed map operator, like fmap but the function is a functor, and the value is not
-(>$>) :: (Functor f) => f (a -> b) -> a -> f b
-f >$> v = (\f' -> f' v) <$> f
 
 (<<<$>>>) :: (Functor f, Functor g) => (a -> b) -> f (g a) -> f (g b)
 f <<<$>>> v = (f <$>) <$> v

@@ -30,7 +30,7 @@ import Text.Hamlet (hamletFile)
 import Text.Jasmine (minifym)
 import Text.Lojban (zlrToLatin)
 import Text.TokiPona (spToEmoji, spToLatin)
-import Utils (headOr, (>$>))
+import Utils (headOr)
 import Yesod (
   DBRunner,
   FormMessage,
@@ -202,7 +202,7 @@ instance RenderMessage App FormMessage where
   renderMessage _ _ = defaultFormMessage
 
 translation :: (MonadHandler m, RenderMessage (HandlerSite m) message) => message -> m Text
-translation message = getMessageRender >$> message
+translation message = getMessageRender <*> pure message
 
 translationUnescaped :: (MonadHandler m, RenderMessage (HandlerSite m) message) => message -> m Html
 translationUnescaped message = translation message <&> preEscapedToHtml
