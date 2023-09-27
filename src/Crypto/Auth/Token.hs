@@ -2,7 +2,7 @@ module Crypto.Auth.Token where
 
 import Config (ConfigFile, rpId')
 import Control.Lens (Lens', (.~), (?~), (^.))
-import Crypto.JWT (Audience (Audience), ClaimsSet, HasClaimsSet (..), NumericDate (NumericDate), emptyClaimsSet, stringOrUri)
+import Crypto.JWT (Audience (Audience), ClaimsSet, HasClaimsSet (..), NumericDate (NumericDate), emptyClaimsSet)
 import Data.Aeson (FromJSON (parseJSON), ToJSON (toJSON), withObject, (.:))
 import Data.Aeson.KeyMap qualified as M
 import Data.Aeson.Types (Value (Object))
@@ -13,7 +13,7 @@ data Claims = Claims
   , authTime :: Maybe NumericDate
   , nonce :: Maybe Text
   , acr :: Maybe Text
-  , amr :: Maybe Text
+  , amr :: Maybe [Text]
   , azr :: Maybe Text
   }
 
@@ -26,7 +26,7 @@ claimNonce f h@Claims {nonce = a} = fmap (\a' -> h {nonce = a'}) (f a)
 claimAcr :: Lens' Claims (Maybe Text)
 claimAcr f h@Claims {acr = a} = fmap (\a' -> h {acr = a'}) (f a)
 
-claimAmr :: Lens' Claims (Maybe Text)
+claimAmr :: Lens' Claims (Maybe [Text])
 claimAmr f h@Claims {amr = a} = fmap (\a' -> h {amr = a'}) (f a)
 
 claimAzr :: Lens' Claims (Maybe Text)
@@ -41,15 +41,15 @@ instance FromJSON Claims where
     Claims
       <$> parseJSON (Object o)
       <*> o
-      .: "auth_time"
+        .: "auth_time"
       <*> o
-      .: "nonce"
+        .: "nonce"
       <*> o
-      .: "acr"
+        .: "acr"
       <*> o
-      .: "amr"
+        .: "amr"
       <*> o
-      .: "azr"
+        .: "azr"
 
 instance ToJSON Claims where
   toJSON s =
@@ -85,5 +85,5 @@ mkClaims config subject audience jti authTime nonce authParty = do
       & claimAuthTime ?~ NumericDate authTime
       & claimNonce .~ nonce
       & claimAcr ?~ "phrh"
-      & claimAmr ?~ "hwk"
+      & claimAmr ?~ ["hwk"]
       & claimAzr .~ if audience == authParty then Nothing else Just authParty

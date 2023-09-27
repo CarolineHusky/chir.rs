@@ -14,7 +14,7 @@ module Foundation (
   QueueCommands (..),
 ) where
 
-import Config (ConfigFile, logLevel', staticDir', toLogLevel, widgetFile)
+import Config (ConfigFile, logLevel', rpId', staticDir', toLogLevel, widgetFile)
 import Config.StaticFiles (index_css, index_js)
 import Control.Lens ((^.))
 import Control.Lens.TH (makeLenses)
@@ -163,6 +163,7 @@ instance Yesod App where
 
   defaultLayout :: Widget -> Handler Html
   defaultLayout widget = do
+    app <- getYesod
     themeCookie <- lookupCookie "_THEME"
     let theme = fromMaybe "" themeCookie
     langs <- languages
@@ -177,6 +178,7 @@ instance Yesod App where
     addHeader "Cross-Origin-Embedder-Policy" "require-corp"
     addHeader "Cross-Origin-Resource-Policy" "same-site"
     addHeader "Permissions-Policy" "publickey-credentials-create=*, publickey-credentials-get=*, interest-cohort=()"
+    addHeader "Link" $ "<https://" <> app ^. appConfig . rpId' <> "/.well-known/openid-configuration>; rel=\"indieauth-metadata\""
 
     pc <- widgetToPageContent $ do
       addScript $ StaticR index_js

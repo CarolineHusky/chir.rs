@@ -6,6 +6,7 @@ $if theme == ""
             <meta charset="utf-8">
             <title>#{pageTitle pc}
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="indieauth-metadata" href=@{OauthMetadataR}>
             ^{pageHead pc}
         <body>
             ^{pageBody pc}
