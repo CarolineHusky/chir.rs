@@ -1,7 +1,9 @@
 module Crypto.KeyStore (getKeyWithRekey, performRekey) where
 
+import Control.Lens ((?~))
 import Control.Monad.Trans.Resource (MonadUnliftIO)
 import Crypto.JOSE (JWK, KeyMaterialGenParam, genJWK)
+import Crypto.JOSE.JWK (jwkKid)
 import Crypto.KeyStore.Types (KeyMaterialGenParam', genParamFromJose, genParamToJose)
 import Data.Aeson (decode, encode)
 import Data.Queue (runTaskIn)
@@ -33,7 +35,8 @@ insertKey name jwk = do
 
 genKeyWithRekey :: (MonadUnliftIO m) => Text -> KeyMaterialGenParam -> Int -> SqlPersistT m JWK
 genKeyWithRekey name parms days = do
-  material <- liftIO $ genJWK parms
+  material' <- liftIO $ genJWK parms
+  let material = material' & jwkKid ?~ name
   insertKey name material
   if days > 0
     then do

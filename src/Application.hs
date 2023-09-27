@@ -22,6 +22,8 @@ import Foundation (
  )
 import Handler.FinishRegistration (postFinishRegistrationR)
 import Handler.Home (getHomeR)
+import Handler.OauthJwks (getOauthJwksR)
+import Handler.OauthMetadata (getOauthMetadataR)
 import Handler.Register (getRegisterR)
 import Handler.StartRegistration (getStartRegistrationR)
 import Handler.WebauthnChallenge (cleanupWebauthnChallenge)

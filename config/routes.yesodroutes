@@ -5,3 +5,4 @@
 /auth/register/start StartRegistrationR GET
 /auth/register/finish FinishRegistrationR POST
 /.well-known/openid-configuration OauthMetadataR GET
+/auth/jwks OauthJwksR GET

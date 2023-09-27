@@ -134,6 +134,7 @@ common shared
     Foundation
     Handler.FinishRegistration
     Handler.Home
+    Handler.OauthJwks
     Handler.OauthMetadata
     Handler.Register
     Handler.StartRegistration
