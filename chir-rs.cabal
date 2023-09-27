@@ -88,6 +88,7 @@ common shared
     , hjsmin
     , hourglass
     , http-conduit
+    , http-types
     , jose
     , lens
     , monad-logger

@@ -12,6 +12,7 @@ module Foundation (
   translationUnescaped,
   translationEscaped,
   QueueCommands (..),
+  newRequest,
 ) where
 
 import Config (ConfigFile, logLevel', rpId', staticDir', toLogLevel, widgetFile)
@@ -24,7 +25,8 @@ import Data.Aeson (ToJSON)
 import Database.Persist.Postgresql (SqlPersistT)
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Database.Persist.SqlBackend (SqlBackend)
-import Network.HTTP.Client.Conduit (Manager)
+import Network.HTTP.Client.Conduit (Manager, Request (requestHeaders), parseRequest_)
+import Network.HTTP.Types (hUserAgent)
 import Text.Blaze.Html (preEscapedToHtml, toHtml)
 import Text.Hamlet (hamletFile)
 import Text.Jasmine (minifym)
@@ -219,3 +221,8 @@ data QueueCommands
 
 instance FromJSON QueueCommands
 instance ToJSON QueueCommands
+
+newRequest :: String -> Request
+newRequest s =
+  let request = parseRequest_ s
+   in request {requestHeaders = (hUserAgent, "Mozilla/5.0 (Compatible; chir.rs)") : requestHeaders request}

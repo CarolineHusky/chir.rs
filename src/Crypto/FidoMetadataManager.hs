@@ -17,14 +17,13 @@ import Database.Persist (
  )
 import Database.Persist qualified as P
 import Database.Persist.Postgresql (PersistEntity (Key), SqlPersistT)
-import Foundation (QueueCommands (RefetchFidoMetadata))
+import Foundation (QueueCommands (RefetchFidoMetadata), newRequest)
 import Model (KeyValueBlob (KeyValueBlob, keyValueBlobValue))
 import Network.HTTP.Conduit (
   HttpException,
   Manager,
   Response (responseBody),
   httpLbs,
-  parseRequest_,
  )
 import Utils (catchM, (<<<$>>>))
 
@@ -55,7 +54,7 @@ deleteMetadataBlobInfo = P.delete metadataKey
 fetchMetadataBlobInfo :: (MonadLogger m, MonadUnliftIO m) => Manager -> m (Maybe MetadataBlobInfo)
 fetchMetadataBlobInfo manager = do
   res <- runResourceT $ do
-    let req = parseRequest_ "https://mds.fidoalliance.org/"
+    let req = newRequest "https://mds.fidoalliance.org/"
     res' :: Either HttpException (Response L.ByteString) <- catchM (httpLbs req manager)
     now <- liftIO getCurrentTime
     return ((\blob -> MetadataBlobInfo {blob = blob, fetchedAt = now}) . toStrict . responseBody <$> res')
