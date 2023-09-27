@@ -144,8 +144,6 @@ common shared
     Model
     Model.Migration
     Network.URL.Normalize
-    Network.Webfinger
-    Network.Webfinger.Link
     Text.Lojban
     Text.TokiPona
     Utils

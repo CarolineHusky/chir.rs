@@ -1,45 +1,34 @@
 module Handler.Webfinger (getWebfingerR) where
 
-import Data.Aeson (Value)
+import Data.Aeson (Value, object, (.=))
 import Database.Persist (Entity (entityVal), (==.))
 import Foundation (App)
 import Model (EntityField (WebFingerAccountWebfingerUsername), WebFingerAccount (webFingerAccountIndieUsername, webFingerAccountOidcIssuer, webFingerAccountWebfingerUsername))
-import Network.Webfinger qualified as WF
-import Network.Webfinger.Link qualified as WFL
-import Yesod (HandlerFor, PersistQueryRead (selectFirst), YesodPersist (runDB), lookupGetParam, notFound, returnJson)
+import Yesod (HandlerFor, PersistQueryRead (selectFirst), YesodPersist (runDB), lookupGetParam, notFound)
 import Yesod.Core (invalidArgs)
 
-mkWebfinger :: WebFingerAccount -> WF.Webfinger
+mkWebfinger :: WebFingerAccount -> Value
 mkWebfinger account =
   let
     oidcIssuer = case webFingerAccountOidcIssuer account of
       Just iss ->
-        [ WFL.WebfingerLink
-            { -- openid connect
-              WFL._rel = "http://openid.net/specs/connect/1.0/issuer"
-            , WFL._type = Nothing
-            , WFL._href = iss
-            , WFL._titles = Nothing
-            , WFL._properties = Nothing
-            }
+        [ object
+            [ "rel" .= ("http://openid.net/specs/connect/1.0/issuer" :: Text)
+            , "href" .= iss
+            ]
         ]
       Nothing -> []
     links =
-      WFL.WebfingerLink
-        { WFL._rel = "http://webfinger.net/rel/profile-page"
-        , WFL._type = Nothing
-        , WFL._href = webFingerAccountIndieUsername account
-        , WFL._titles = Nothing
-        , WFL._properties = Nothing
-        }
+      object
+        [ "rel" .= ("http://webfinger.net/rel/profile-page" :: Text)
+        , "href" .= webFingerAccountIndieUsername account
+        ]
         : oidcIssuer
    in
-    WF.Webfinger
-      { WF._subject = webFingerAccountWebfingerUsername account
-      , WF._aliases = Nothing
-      , WF._properties = Nothing
-      , WF._links = Just links
-      }
+    object
+      [ "subject" .= webFingerAccountWebfingerUsername account
+      , "links" .= links
+      ]
 
 getWebfingerR :: HandlerFor App Value
 getWebfingerR = do
@@ -51,4 +40,4 @@ getWebfingerR = do
         user <- selectFirst [WebFingerAccountWebfingerUsername ==. acct] []
         case user of
           Nothing -> notFound
-          Just value -> returnJson $ mkWebfinger $ entityVal value
+          Just value -> return $ mkWebfinger $ entityVal value
