@@ -126,6 +126,7 @@ common shared
     Config
     Config.Images
     Config.StaticFiles
+    Crypto.Auth.Token
     Crypto.FidoMetadataManager
     Crypto.KeyStore
     Crypto.KeyStore.Types
