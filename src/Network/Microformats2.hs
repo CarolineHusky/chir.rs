@@ -87,10 +87,14 @@ linkInfoToRelUrls = KM.fromList . map linkInfoToRelUrl
 
 transmuteToRel' :: LinkInfo -> Map Text [Text] -> Map Text [Text]
 transmuteToRel' LinkInfo {_rel = []} links = links
-transmuteToRel' LinkInfo {_url = url', _rel = rels} links =
-  links
-    & at url' %~ Just . fromMaybe []
-    & at url' %~ ((rels ++) <$>)
+transmuteToRel' LinkInfo {_url = url', _rel = r} l =
+  transmuteToRel'' l url' r
+  where
+    transmuteToRel'' links _ [] = links
+    transmuteToRel'' links u (rel' : rels) =
+      transmuteToRel'' links u rels
+        & at rel' %~ Just . fromMaybe []
+        & at rel' %~ ((u :) <$>)
 
 transmuteToRel :: [LinkInfo] -> Map Text [Text]
 transmuteToRel = foldr transmuteToRel' Map.empty
