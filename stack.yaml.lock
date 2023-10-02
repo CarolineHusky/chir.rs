@@ -25,6 +25,17 @@ packages:
       size: 343
   original:
     hackage: validation-1.1.3
+- completed:
+    commit: 4e6b3aac8f5af3306261ef2782f7df990e96f429
+    git: https://github.com/DarkKirb/microformats2-parser
+    name: microformats2-parser
+    pantry-tree:
+      sha256: 2e6494234e54b0239cab56cbe3b9deea20bdf9d0891610107e225595ca61d773
+      size: 1768
+    version: 1.0.2.2
+  original:
+    commit: 4e6b3aac8f5af3306261ef2782f7df990e96f429
+    git: https://github.com/DarkKirb/microformats2-parser
 snapshots:
 - completed:
     sha256: 64d66303f927e87ffe6b8ccf736229bf608731e80d7afdf62bdd63c59f857740

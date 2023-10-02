@@ -154,6 +154,22 @@
         "type": "github"
       }
     },
+    "microformats2-parser": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1695821315,
+        "narHash": "sha256-Et4yYDiIcIeMsEkZI9Y0Unh51fnuMQzScE4dxgXCGzo=",
+        "owner": "darkkirb",
+        "repo": "microformats2-parser",
+        "rev": "4e6b3aac8f5af3306261ef2782f7df990e96f429",
+        "type": "github"
+      },
+      "original": {
+        "owner": "darkkirb",
+        "repo": "microformats2-parser",
+        "type": "github"
+      }
+    },
     "nix": {
       "inputs": {
         "lowdown-src": "lowdown-src",
@@ -269,6 +285,7 @@
       "inputs": {
         "flake-parts": "flake-parts",
         "haskell-flake": "haskell-flake",
+        "microformats2-parser": "microformats2-parser",
         "nix-packages": "nix-packages",
         "nixpkgs": "nixpkgs_2",
         "systems": "systems",

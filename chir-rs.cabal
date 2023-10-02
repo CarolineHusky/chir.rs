@@ -79,6 +79,7 @@ common shared
     , blaze-html
     , conduit
     , conduit-extra
+    , containers
     , cryptonite
     , data-default
     , dhall
@@ -88,11 +89,15 @@ common shared
     , hjsmin
     , hourglass
     , http-conduit
+    , http-link-header
     , http-types
     , jose
     , lens
+    , lens-aeson
+    , microformats2-parser
     , monad-logger
     , mtl
+    , network-uri
     , parsec
     , persistent
     , persistent-migration
@@ -110,6 +115,7 @@ common shared
     , time
     , url
     , validation
+    , vector
     , wai
     , wai-extra
     , warp
@@ -143,6 +149,7 @@ common shared
     Handler.Webfinger
     Model
     Model.Migration
+    Network.Microformats2
     Network.URL.Normalize
     Text.Lojban
     Text.TokiPona

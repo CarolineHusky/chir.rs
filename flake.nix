@@ -9,6 +9,8 @@
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     nix-packages.url = "github:DarkKirb/nix-packages";
     nix-packages.inputs.nixpkgs.follows = "nixpkgs";
+    microformats2-parser.url = "github:darkkirb/microformats2-parser";
+    microformats2-parser.flake = false;
   };
 
   outputs = inputs:
@@ -34,7 +36,9 @@
           # basePackages = pkgs.haskellPackages;
 
           # Packages to add on top of `basePackages`
-          packages = {};
+          packages = {
+            microformats2-parser.source = inputs.microformats2-parser;
+          };
 
           # Add your package overrides here
           settings = {
@@ -125,6 +129,8 @@
             nodejs
             yarn
             yarn2nix
+            pcre
+            zlib
           ];
         };
         formatter = pkgs.alejandra;

@@ -39,6 +39,8 @@ extra-deps:
   - persistent-migration-0.3.0
   - webauthn-0.7.0.0
   - validation-1.1.3
+  - git: https://github.com/DarkKirb/microformats2-parser
+    commit: 4e6b3aac8f5af3306261ef2782f7df990e96f429
 # - acme-missiles-0.3
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
