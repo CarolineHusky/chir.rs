@@ -86,6 +86,7 @@ common shared
     , directory
     , fast-logger
     , filepath
+    , haskell-src-meta
     , hjsmin
     , hourglass
     , http-conduit
@@ -152,6 +153,7 @@ common shared
     Network.Microformats2
     Network.URL.Normalize
     Text.Lojban
+    Text.PUA.TH
     Text.TokiPona
     Utils
 

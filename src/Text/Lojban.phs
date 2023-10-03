@@ -1,0 +1,65 @@
+-- | Converts a zbalermorna character into a latin character.
+zlrToLatinChar :: Char -> String
+zlrToLatinChar '' = "p"
+zlrToLatinChar '' = "t"
+zlrToLatinChar '' = "k"
+zlrToLatinChar '' = "f"
+zlrToLatinChar '' = "l"
+zlrToLatinChar '' = "s"
+zlrToLatinChar '' = "c"
+zlrToLatinChar '' = "m"
+zlrToLatinChar '' = "x"
+zlrToLatinChar '' = "."
+zlrToLatinChar '' = "'"
+zlrToLatinChar '\xED8B' = "[cnima'o bu]"
+zlrToLatinChar '\xED8C' = "\x0317" -- accent up
+zlrToLatinChar '\xED8D' = "\x0316" -- accent down
+zlrToLatinChar '\xED8E' = "\x032D" -- accent up-down
+zlrToLatinChar '\xED8F' = "\x032C" -- accent down-up
+zlrToLatinChar '' = "b"
+zlrToLatinChar '' = "d"
+zlrToLatinChar '' = "g"
+zlrToLatinChar '' = "v"
+zlrToLatinChar '' = "r"
+zlrToLatinChar '' = "z"
+zlrToLatinChar '' = "j"
+zlrToLatinChar '' = "n"
+zlrToLatinChar '\xED98' = "\x0300" -- manual stress
+zlrToLatinChar '' = "…" -- Pause
+zlrToLatinChar '\xED9A' = ","
+zlrToLatinChar '\xED9B' = "~" -- stretch mark
+zlrToLatinChar '\xEDA0' = "a"
+zlrToLatinChar '\xEDA1' = "e"
+zlrToLatinChar '\xEDA2' = "i"
+zlrToLatinChar '\xEDA3' = "o"
+zlrToLatinChar '\xEDA4' = "u"
+zlrToLatinChar '\xEDA5' = "y"
+zlrToLatinChar '\xEDA6' = "ai"
+zlrToLatinChar '\xEDA7' = "ei"
+zlrToLatinChar '\xEDA8' = "oi"
+zlrToLatinChar '\xEDA9' = "au"
+zlrToLatinChar '' = "ǐ"
+zlrToLatinChar '' = "ǔ"
+zlrToLatinChar '' = "a,"
+zlrToLatinChar '' = "e,"
+zlrToLatinChar '' = "i,"
+zlrToLatinChar '' = "o,"
+zlrToLatinChar '' = "u,"
+zlrToLatinChar '' = "y,"
+zlrToLatinChar '' = "ai,"
+zlrToLatinChar '' = "ei,"
+zlrToLatinChar '' = "oi,"
+zlrToLatinChar '' = "au,"
+zlrToLatinChar c = [c]
+
+formatDigit :: Char -> String
+formatDigit '+' = ""
+formatDigit '-' = ""
+formatDigit ',' = ""
+formatDigit 'e' = ""
+formatDigit c = one c
+
+formatDate :: Day -> Text
+formatDate date = " " <> formatNumber day <> "  " <> formatNumber month <> "  " <> formatNumber year
+  where
+    (year, month, day) = toGregorian date
