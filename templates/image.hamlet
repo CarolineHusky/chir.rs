@@ -5,4 +5,4 @@
     <source srcset=@{webpImg} type="image/webp">
     <source srcset=@{jpgImg} type="image/jpeg">
     <source srcset=@{pngImg} type="image/png">
-    <img src=@{pngImg} type="image/png" alt=_{alt}>
+    <img src=@{pngImg} type="image/png" alt=^{__ alt}>

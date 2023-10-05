@@ -6,11 +6,7 @@ module Foundation (
   appStatic,
   appHttpManager,
   resourcesApp,
-  DummyMessage (..),
-  AppMessage,
   Widget,
-  translationUnescaped,
-  translationEscaped,
   QueueCommands (..),
   newRequest,
 ) where
@@ -27,11 +23,9 @@ import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Database.Persist.SqlBackend (SqlBackend)
 import Network.HTTP.Client.Conduit (Manager, Request (requestHeaders), parseRequest_)
 import Network.HTTP.Types (hUserAgent)
-import Text.Blaze.Html (preEscapedToHtml, toHtml)
 import Text.Hamlet (hamletFile)
+import Text.Internationalisation
 import Text.Jasmine (minifym)
-import Text.Lojban (zlrToLatin)
-import Text.TokiPona (spToEmoji, spToLatin)
 import Utils (headOr)
 import Yesod (
   DBRunner,
@@ -39,7 +33,6 @@ import Yesod (
   FromJSON,
   Html,
   Lang,
-  MonadHandler (HandlerSite),
   PageContent (pageBody, pageHead, pageTitle),
   RenderMessage,
   RenderRoute (Route, renderRoute),
@@ -54,11 +47,9 @@ import Yesod (
   defaultFormMessage,
   defaultGetDBRunner,
   defaultYesodMiddleware,
-  getMessageRender,
   getYesod,
   languages,
   lookupCookie,
-  mkMessage,
   mkYesodData,
   parseRoutesFile,
   widgetToPageContent,
@@ -102,26 +93,6 @@ appStatic = flip (^.) appStatic'
 -- type Handler = HandlerFor App
 -- type Widget = WidgetFor App ()
 mkYesodData "App" $(parseRoutesFile "config/routes.yesodroutes")
-
-data Dummy = Dummy
-
-mkMessage "Dummy" "messages" "en"
-
-type AppMessage = DummyMessage
-
-instance RenderMessage App AppMessage where
-  renderMessage app (lang : langs) msg
-    | lang == "de" = renderMessage Dummy (lang : langs) msg
-    | lang == "en" = renderMessage Dummy (lang : langs) msg
-    | lang == "fr" = renderMessage Dummy (lang : langs) msg
-    | lang == "jbo@ZLR" = renderMessage Dummy (lang : langs) msg
-    | lang == "nl" = renderMessage Dummy (lang : langs) msg
-    | lang == "tok@SP" = renderMessage Dummy (lang : langs) msg
-    | lang == "jbo" = zlrToLatin $ renderMessage Dummy ("jbo@ZLR" : langs) msg
-    | lang == "tok" = spToLatin $ renderMessage Dummy ("tok@SP" : langs) msg
-    | lang == "tok@SE" = spToEmoji $ renderMessage Dummy ("tok@SP" : langs) msg
-    | otherwise = renderMessage app langs msg
-  renderMessage _ [] msg = renderMessage Dummy [] msg
 
 instance Yesod App where
   makeSessionBackend :: App -> IO (Maybe SessionBackend)
@@ -204,15 +175,6 @@ instance YesodPersistRunner App where
 instance RenderMessage App FormMessage where
   renderMessage :: App -> [Lang] -> FormMessage -> Text
   renderMessage _ _ = defaultFormMessage
-
-translation :: (MonadHandler m, RenderMessage (HandlerSite m) message) => message -> m Text
-translation message = getMessageRender <*> pure message
-
-translationUnescaped :: (MonadHandler m, RenderMessage (HandlerSite m) message) => message -> m Html
-translationUnescaped message = translation message <&> preEscapedToHtml
-
-translationEscaped :: (MonadHandler m, RenderMessage (HandlerSite m) message) => message -> m Html
-translationEscaped message = translation message <&> toHtml
 
 data QueueCommands
   = Rekey Text KeyMaterialGenParam' Int

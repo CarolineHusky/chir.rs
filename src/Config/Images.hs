@@ -2,7 +2,8 @@ module Config.Images where
 
 import Config.StaticFiles
 import Control.Lens (makeLenses)
-import Foundation (App, AppMessage, DummyMessage (MsgImgVintagecoyotePrideicon), Route (StaticR))
+import Foundation (App, Route (StaticR))
+import Text.Internationalisation (Message (MsgImgVintagecoyotePrideicon))
 
 data Image = Image
   { _jxl :: Route App
@@ -11,7 +12,7 @@ data Image = Image
   , _webp :: Route App
   , _jpg :: Route App
   , _png :: Route App
-  , _altText :: AppMessage
+  , _altText :: Message
   }
 
 makeLenses ''Image

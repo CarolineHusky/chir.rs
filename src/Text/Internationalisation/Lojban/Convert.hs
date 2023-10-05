@@ -1,9 +1,9 @@
-module Text.Lojban where
+module Text.Internationalisation.Lojban.Convert where
 
 import Data.Time (Day, toGregorian)
 import Text.PUA.TH (includePUAHS)
 
-includePUAHS "src/Text/Lojban.phs"
+includePUAHS "src/Text/Internationalisation/Lojban/Convert.phs"
 
 zlrToLatinStr :: String -> String
 zlrToLatinStr = concatMap zlrToLatinChar

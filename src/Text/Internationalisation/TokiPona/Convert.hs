@@ -1,13 +1,13 @@
-module Text.TokiPona (spToLatin, spToEmoji, ShowNum (..), formatDate) where
+module Text.Internationalisation.TokiPona.Convert where
 
 import Data.Time (Day, toGregorian)
 import Text.PUA.TH (includePUAHS)
 import Text.Parsec (anyChar, char, choice, lookAhead, many1, parse, skipMany, try)
-import Text.Parsec.Text (Parser)
-import Utils (capitalize)
+import Text.Parsec.String (Parser)
+import Utils (capitalize, intersperseAfter)
 import Prelude hiding (unwords)
 
-includePUAHS "src/Text/TokiPona.phs"
+includePUAHS "src/Text/Internationalisation/TokiPona/Convert.phs"
 
 matchLogogram :: Parser Char
 matchLogogram = do
@@ -19,13 +19,8 @@ matchLogogram = do
 parseLogogram :: (Char -> String) -> Parser String
 parseLogogram p = p <$> matchLogogram
 
-parseLogogramFirst :: Parser Char
-parseLogogramFirst = do
-  ignoreChars
-  transliterated <- parseLogogram logogramToText
-  case uncons transliterated of
-    Just (c, _) -> return c
-    Nothing -> fail "Program bug: parseLogogram returned empty string"
+cartoucheCharacters :: Parser Char
+cartoucheCharacters = try matchLogogram <|> try (char '\xF199C') <|> char '\xF199D'
 
 matchChar :: Char -> Parser ()
 matchChar c = char c >> pass
@@ -39,9 +34,9 @@ withOptionalSeparator parser separator = do
 parseCartouche :: Parser String
 parseCartouche = do
   _ <- char '\xF1990'
-  cartoucheChars <- many1 $ withOptionalSeparator parseLogogramFirst $ matchChar '\xF1992'
+  cartoucheChars <- many1 $ withOptionalSeparator cartoucheCharacters $ matchChar '\xF1992'
   _ <- char '\xF1991'
-  return $ ' ' : capitalize cartoucheChars
+  return $ ' ' : capitalize (fromCartouche cartoucheChars)
 
 ignoredChars :: Parser Char
 ignoredChars = choice (map char "\xF1994\xF1995\xF1996\xF1997\xF1998\xF1999\xF199A\xF199B\xF199C\xF199D")
@@ -58,26 +53,26 @@ parseWord space p = do
   ignoreChars
   try parseCartouche <|> try (withOptSpace space $ parseLogogram p) <|> (one <$> anyChar)
 
-parseText :: Bool -> (Char -> String) -> Parser Text
-parseText space p = toText . concat <$> many (parseWord space p)
+parseText :: Bool -> (Char -> String) -> Parser String
+parseText space p = concat <$> many (parseWord space p)
 
-spToText :: Bool -> (Char -> String) -> Text -> Text
-spToText space p t = case parse (parseText space p) "" t of
+spToString :: Bool -> (Char -> String) -> String -> String
+spToString space p t = case parse (parseText space p) "" t of
   Left e -> show e
   Right v -> v
 
-spToLatin :: Text -> Text
-spToLatin = spToText True logogramToText
+spToLatin :: String -> String
+spToLatin = spToString True logogramToText
 
-spToEmoji :: Text -> Text
-spToEmoji = spToText False logogramToEmoji
+spToEmoji :: String -> String
+spToEmoji = spToString False logogramToEmoji
 
 class (Num a) => ShowNum a where
-  formatNum :: a -> Text
+  formatNum :: a -> String
 
 instance {-# OVERLAPPING #-} ShowNum Integer where
-  formatNum :: Integer -> Text
-  formatNum = toText . reverse . formatInteger'
+  formatNum :: Integer -> String
+  formatNum = reverse . formatInteger'
     where
       formatInteger' n
         | n < 0 = '\x0F1976' : formatInteger' (-n)
@@ -85,9 +80,14 @@ instance {-# OVERLAPPING #-} ShowNum Integer where
         | otherwise = formatDigit (n `mod` 6) : formatInteger' (n `div` 6)
 
 instance (Integral a, ShowNum a) => ShowNum (Ratio a) where
-  formatNum :: Ratio a -> Text
+  formatNum :: Ratio a -> String
   formatNum v = formatNum (numerator v) <> "\x0F197B" <> formatNum (denominator v)
 
 instance (Integral a, Num a) => ShowNum a where
-  formatNum :: a -> Text
+  formatNum :: a -> String
   formatNum = formatNum . (fromIntegral :: a -> Integer)
+
+mkCartouche :: Text -> Text
+mkCartouche t =
+  let cartouche = intersperseAfter '\xF1992' $ toCartouche $ toString t
+   in toText $ '\xF1990' : cartouche ++ "\xF1991"

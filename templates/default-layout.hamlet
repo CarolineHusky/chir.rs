@@ -1,24 +1,24 @@
 $newline never
-<a .visually-hidden-focusable href="#main">_{MsgJumpToContent}
+<a .visually-hidden-focusable href="#main">^{__ MsgJumpToContent}
 <header .container>
     <hgroup>
-        <h1>_{MsgPageTitle}
-        <p>_{MsgPageSubtitle}
+        <h1>^{__ MsgPageTitle}
+        <p>^{__ MsgPageSubtitle}
 <nav .container .no-flex>
     <input .visually-hidden type="checkbox" #settings-menu-checkbox aria-hidden=true>
-    <label .hamburger .fa-solid .fa-gear for="settings-menu-checkbox" title="_{MsgSettingsMenu}" aria-hidden=true>
+    <label .hamburger .fa-solid .fa-gear for="settings-menu-checkbox" title="^{__ MsgSettingsMenu}" aria-hidden=true>
     <ul .flex>
         <li>
-            <a href="@{HomeR}">_{MsgPageHome}
+            <a href="@{HomeR}">^{__ MsgPageHome}
         <li>
-            <a>_{MsgPageBlog}
+            <a>^{__ MsgPageBlog}
         <li>
-            <a>_{MsgPageChat}
+            <a>^{__ MsgPageChat}
     <div #settings-menu>
-        <p>_{MsgSettingsCookieNotice}
-        <label for="change-language">_{MsgSettingLanguage}
+        <p>^{__ MsgSettingsCookieNotice}
+        <label for="change-language">^{__ MsgSettingLanguage}
         <select #change-language>
-            <option value="auto">_{MsgAutomatic}
+            <option value="auto">^{__ MsgAutomatic}
             <option value="de">Deutsch (Deutschland)
             <option value="en">English (Usonia)
             <option value="fr">Français (France)
@@ -28,12 +28,12 @@ $newline never
             <option value="tok">toki pona
             <option value="tok@SE">🗣️👍
             <option value="tok@SP">󱥬󱦖󱥔 (toki pona, sitelen pona)
-        <label for="change-theme">_{MsgSettingTheme}
+        <label for="change-theme">^{__ MsgSettingTheme}
         <select #change-theme>
-            <option value="auto">_{MsgAutomatic}
-            <option value="dark">_{MsgSettingDarkTheme}
-            <option value="light">_{MsgSettingLightTheme}
+            <option value="auto">^{__ MsgAutomatic}
+            <option value="dark">^{__ MsgSettingDarkTheme}
+            <option value="light">^{__ MsgSettingLightTheme}
 <main #main .container role="main" id="main">
     ^{widget}
 <footer .container>
-    _{MsgFooterText}
+    ^{__ MsgFooterText}

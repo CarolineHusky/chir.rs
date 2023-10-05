@@ -20,9 +20,9 @@ extra-source-files:
   config/**/*.persistentmodels
   config/**/*.yesodroutes
   LICENSE
-  messages/**/*.msg
   README.md
   templates/**/*.hamlet
+  src/**/*.phs
 
 flag library-only
   description: Build for use with "yesod devel"
@@ -152,9 +152,17 @@ common shared
     Model.Migration
     Network.Microformats2
     Network.URL.Normalize
-    Text.Lojban
+    Text.Internationalisation
+    Text.Internationalisation.Deutsch
+    Text.Internationalisation.English
+    Text.Internationalisation.Francais
+    Text.Internationalisation.Lojban
+    Text.Internationalisation.Lojban.Convert
+    Text.Internationalisation.Nederlands
+    Text.Internationalisation.TokiPona
+    Text.Internationalisation.TokiPona.Convert
+    Text.Internationalisation.Types
     Text.PUA.TH
-    Text.TokiPona
     Utils
 
 library

@@ -2,57 +2,57 @@ $newline never
 <div .h-card>
     <figure .u-photo .pfpfig>
         ^{image img_2023_06_02_vintagecoyote_prideicon}
-        <figcaption>^{figcaption}
+        <figcaption>^{__ MsgImgVintagecoyotePrideiconFigcaption}
     <p .p-note>
-        ^{selfIntro1}&nbsp;
-        ^{selfIntro2}&nbsp;
-        ^{selfIntro3}&nbsp;
-        ^{selfIntro4}
+        ^{__ MsgSelfIntroPart1}&nbsp;
+        ^{__ MsgSelfIntroPart2}&nbsp;
+        ^{__ MsgSelfIntroPart3}&nbsp;
+        ^{__ MsgSelfIntroPart4}
     <div .container .flex>
         <div .flex-item>
             <hgroup>
-                <h2>_{MsgReportedSightings}
-                <p>_{MsgReportedSightingsSubtitle}
+                <h2>^{__ MsgReportedSightings}
+                <p>^{__ MsgReportedSightingsSubtitle}
             <ul>
                 <li>
-                    <a href="https://akko.chir.rs/users/charlotte" rel="me">_{MsgMyFediverse}
+                    <a href="https://akko.chir.rs/users/charlotte" rel="me">^{__ MsgMyFediverse}
                 <li>
-                    <a href="matrix:u/lotte:chir.rs" rel="me">_{MsgMyMatrixChat}
-                    <a href="https://matrix.to/#/@lotte:chir.rs"> _{MsgAlternateLink}
+                    <a href="matrix:u/lotte:chir.rs" rel="me">^{__ MsgMyMatrixChat}
+                    <a href="https://matrix.to/#/@lotte:chir.rs"> ^{__ MsgAlternateLink}
                 <li>
-                    <a href="mailto:lotte@chir.rs" rel="me">_{MsgMyEmail}
-                    <a href="https://keys.openpgp.org/vks/v1/by-fingerprint/EF5F367A95E0BFA63902D86AB4E3D4801C49EC5E" rel="pgpkey"> _{MsgGPGKeyNote}
+                    <a href="mailto:lotte@chir.rs" rel="me">^{__ MsgMyEmail}
+                    <a href="https://keys.openpgp.org/vks/v1/by-fingerprint/EF5F367A95E0BFA63902D86AB4E3D4801C49EC5E" rel="pgpkey"> ^{__ MsgGPGKeyNote}
                 <li>
-                    <a href="https://git.chir.rs/darkkirb" rel="me">_{MsgMyForgejo}
+                    <a href="https://git.chir.rs/darkkirb" rel="me">^{__ MsgMyForgejo}
                 <li>
-                    <a href="https://peertube.chir.rs/c/lotte_channel/videos" rel="me">_{MsgPeertube}
+                    <a href="https://peertube.chir.rs/c/lotte_channel/videos" rel="me">^{__ MsgPeertube}
                 <li>
-                    <a href="https://keybase.io/darkkirb" rel="me">_{MsgMyKeybase}
+                    <a href="https://keybase.io/darkkirb" rel="me">^{__ MsgMyKeybase}
                 <li>
-                    <a href="https://github.com/DarkKirb" rel="me">_{MsgGithub}
+                    <a href="https://github.com/DarkKirb" rel="me">^{__ MsgGithub}
                 <li>
-                    _{MsgMyDiscord}
+                    ^{__ MsgMyDiscord}
                     <sup>1
                 <li>
-                    <a href="https://t.me/darkkirb">_{MsgMyTelegram}
+                    <a href="https://t.me/darkkirb">^{__ MsgMyTelegram}
                     <sup>1
                 <li>
-                    _{MsgMySignalWhatsapp}
+                    ^{__ MsgMySignalWhatsapp}
                     <sup>1
             <p>
                 <sup>1
-                : _{MsgFootnoteBridgedMatrix}
+                : ^{__ MsgFootnoteBridgedMatrix}
         <div .flex-item>
-            <h2>_{MsgSiteIndex}
+            <h2>^{__ MsgSiteIndex}
             <ul>
                 <li .hidden>
                     <a .u-url .u-uid href="@{HomeR}">@{HomeR}
                 <li>
-                    <a .u-url>_{MsgPageBlog}
+                    <a .u-url>^{__ MsgPageBlog}
                 <li>
-                    <a .u-url href="https://akko.chir.rs/">_{MsgAkkoma}
+                    <a .u-url href="https://akko.chir.rs/">^{__ MsgAkkoma}
                 <li>
-                    <a .u-url href="https://cloud.chir.rs">_{MsgNextcloud}
-                <li>_{MsgAndALotMore}
+                    <a .u-url href="https://cloud.chir.rs">^{__ MsgNextcloud}
+                <li>^{__ MsgAndALotMore}
             <button>
-                _{MsgPageChat}
+                ^{__ MsgPageChat}

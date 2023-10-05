@@ -13,6 +13,7 @@ module Utils (
   (<<<$>>>),
   (?),
   (?!),
+  intersperseAfter,
 ) where
 
 import Control.Concurrent (forkIO)
@@ -103,3 +104,7 @@ m ? n =
 
 (?!) :: (Monad m, ToEither n a b) => m n -> m b -> m b
 m ?! n = m ? const n
+
+intersperseAfter :: a -> [a] -> [a]
+intersperseAfter _ [] = []
+intersperseAfter x (y : ys) = y : x : intersperseAfter x ys

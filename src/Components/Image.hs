@@ -4,6 +4,7 @@ import Config (widgetFile)
 import Config.Images (Image, altText, avif, heif, jpg, jxl, png, webp)
 import Control.Lens ((^.))
 import Foundation (App)
+import Text.Internationalisation (__)
 import Yesod.Core (WidgetFor)
 
 image :: Image -> WidgetFor App ()
