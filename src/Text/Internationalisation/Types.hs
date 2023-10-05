@@ -110,6 +110,8 @@ data TokiPonaScripts
     SitelenPona
   | -- | Emoji pictographic script
     SitelenEmosi
+  | -- | Classical chinese styled script using Hanzi
+    SitelenMunjan
   deriving stock (Show)
 
 -- | Lojban scripts
@@ -144,6 +146,7 @@ parseLanguage "jbo@ZLR" = Lojban LojbanZbalermorna
 parseLanguage ('j' : 'b' : 'o' : _) = Lojban LojbanLatin
 parseLanguage ('n' : 'l' : _) = Nederlands
 parseLanguage "tok@SP" = TokiPona SitelenPona
+parseLanguage "tok@SM" = TokiPona SitelenMunjan
 parseLanguage "tok@SE" = TokiPona SitelenEmosi
 parseLanguage ('t' : 'o' : 'k' : _) = TokiPona SitelenLasina
 parseLanguage _ = English

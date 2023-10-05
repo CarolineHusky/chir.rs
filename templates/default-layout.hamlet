@@ -27,6 +27,7 @@ $newline never
             <option value="nl">Nederlands (Netherland)
             <option value="tok">toki pona
             <option value="tok@SE">🗣️👍
+            <option value="tok@SM">言善
             <option value="tok@SP">󱥬󱦖󱥔 (toki pona, sitelen pona)
         <label for="change-theme">^{__ MsgSettingTheme}
         <select #change-theme>

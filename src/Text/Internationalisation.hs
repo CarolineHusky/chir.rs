@@ -25,6 +25,7 @@ translateMessageToLang Nederlands = Nederlands.translate
 translateMessageToLang (TokiPona SitelenPona) = TokiPona.translateSp
 translateMessageToLang (TokiPona SitelenEmosi) = TokiPona.translateSe
 translateMessageToLang (TokiPona SitelenLasina) = TokiPona.translateSl
+translateMessageToLang (TokiPona SitelenMunjan) = TokiPona.translateSm
 
 translateMessage :: [Language] -> Message -> WidgetFor a Html
 translateMessage ls msg =
