@@ -21,8 +21,8 @@ extra-source-files:
   config/**/*.yesodroutes
   LICENSE
   README.md
-  templates/**/*.hamlet
   src/**/*.phs
+  templates/**/*.hamlet
 
 flag library-only
   description: Build for use with "yesod devel"
