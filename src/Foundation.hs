@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 module Foundation (
   App (..),
   Route (..),
@@ -11,13 +13,17 @@ module Foundation (
   newRequest,
 ) where
 
+import Codec.Serialise (Serialise (encode))
+import Codec.Serialise.Class (Serialise (decode))
+import Codec.Serialise.Decoding (Decoder, decodeInt, decodeListLen, decodeWord, decodeWord8)
+import Codec.Serialise.Encoding (Encoding, encodeInt, encodeListLen, encodeString, encodeWord, encodeWord8)
 import Config (ConfigFile, logLevel', rpId', staticDir', toLogLevel, widgetFile)
 import Config.StaticFiles (index_css, index_js)
 import Control.Lens ((^.))
 import Control.Lens.TH (makeLenses)
 import Control.Monad.Logger (LogLevel, LogSource)
-import Crypto.KeyStore.Types (KeyMaterialGenParam')
-import Data.Aeson (ToJSON)
+import Crypto.JOSE (Crv (..), KeyMaterialGenParam (..))
+import Crypto.JOSE.JWA.JWK (OKPCrv (..))
 import Database.Persist.Postgresql (SqlPersistT)
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Database.Persist.SqlBackend (SqlBackend)
@@ -30,7 +36,6 @@ import Utils (headOr)
 import Yesod (
   DBRunner,
   FormMessage,
-  FromJSON,
   Html,
   Lang,
   PageContent (pageBody, pageHead, pageTitle),
@@ -177,14 +182,55 @@ instance RenderMessage App FormMessage where
   renderMessage _ _ = defaultFormMessage
 
 data QueueCommands
-  = Rekey Text KeyMaterialGenParam' Int
+  = Rekey Text KeyMaterialGenParam Int
   | RefetchFidoMetadata
-  deriving stock (Show, Eq, Generic)
+  deriving stock (Show, Eq)
 
-instance FromJSON QueueCommands
-instance ToJSON QueueCommands
+instance Serialise QueueCommands where
+  encode :: QueueCommands -> Encoding
+  encode (Rekey name param nextRekey) = encodeListLen 4 <> encodeWord 0 <> encodeString name <> encode param <> encodeInt nextRekey
+  encode RefetchFidoMetadata = encodeListLen 1 <> encodeWord 1
+
+  decode :: Decoder s QueueCommands
+  decode = do
+    length' <- decodeListLen
+    tag <- decodeWord
+    case (length', tag) of
+      (4, 0) -> Rekey <$> decode <*> decode <*> decode
+      (1, 1) -> pure RefetchFidoMetadata
+      _ -> fail "Invalid QueueCommands encoding"
 
 newRequest :: String -> Request
 newRequest s =
   let request = parseRequest_ s
    in request {requestHeaders = (hUserAgent, "Mozilla/5.0 (Compatible; chir.rs)") : requestHeaders request}
+
+instance Serialise KeyMaterialGenParam where
+  encode :: KeyMaterialGenParam -> Encoding
+  encode (ECGenParam P_256) = encodeListLen 1 <> encodeWord8 0
+  encode (ECGenParam P_384) = encodeListLen 1 <> encodeWord8 1
+  encode (ECGenParam P_521) = encodeListLen 1 <> encodeWord8 2
+  encode (ECGenParam Secp256k1) = encodeListLen 1 <> encodeWord8 3
+  encode (RSAGenParam len) = encodeListLen 2 <> encodeWord8 4 <> encodeInt len
+  encode (OctGenParam len) = encodeListLen 2 <> encodeWord8 5 <> encodeInt len
+  encode (OKPGenParam Ed25519) = encodeListLen 1 <> encodeWord8 6
+  encode (OKPGenParam Ed448) = encodeListLen 1 <> encodeWord8 7
+  encode (OKPGenParam X25519) = encodeListLen 1 <> encodeWord8 8
+  encode (OKPGenParam X448) = encodeListLen 1 <> encodeWord8 9
+
+  decode :: Decoder s KeyMaterialGenParam
+  decode = do
+    length' <- decodeListLen
+    tag <- decodeWord8
+    case (length', tag) of
+      (1, 0) -> pure $ ECGenParam P_256
+      (1, 1) -> pure $ ECGenParam P_384
+      (1, 2) -> pure $ ECGenParam P_521
+      (1, 3) -> pure $ ECGenParam Secp256k1
+      (2, 4) -> decodeInt <&> RSAGenParam
+      (2, 5) -> decodeInt <&> OctGenParam
+      (1, 6) -> pure $ OKPGenParam Ed25519
+      (1, 7) -> pure $ OKPGenParam Ed448
+      (1, 8) -> pure $ OKPGenParam X25519
+      (1, 9) -> pure $ OKPGenParam X448
+      _ -> fail "Invalid KeyMaterialGenParam encoding"

@@ -106,10 +106,10 @@ makeFoundation config = do
                     runSqlPool deleteMetadataBlobInfo pool
                     return $ Right ()
               ) ::
-                QueueCommands -> IO (Either () ())
+                QueueCommands -> (LoggingT IO) (Either () ())
           , Queue.queueNodeName = config ^. nodeName'
           }
-  Queue.run queue
+  flip runLoggingT logFunc $ Queue.run queue
   forkM $ infinitely $ cleanupWebauthnChallenge pool
   -- Return the foundation
   return $ mkFoundation pool

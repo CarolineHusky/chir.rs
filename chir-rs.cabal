@@ -137,7 +137,6 @@ common shared
     Crypto.Auth.Token
     Crypto.FidoMetadataManager
     Crypto.KeyStore
-    Crypto.KeyStore.Types
     Data.Queue
     Foundation
     Handler.FinishRegistration

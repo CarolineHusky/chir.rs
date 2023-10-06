@@ -4,7 +4,6 @@ import Control.Lens ((?~))
 import Control.Monad.Trans.Resource (MonadUnliftIO)
 import Crypto.JOSE (JWK, KeyMaterialGenParam, genJWK)
 import Crypto.JOSE.JWK (jwkKid)
-import Crypto.KeyStore.Types (KeyMaterialGenParam', genParamFromJose, genParamToJose)
 import Data.Aeson (decode, encode)
 import Data.Queue (runTaskIn)
 import Database.Persist qualified as P
@@ -40,7 +39,7 @@ genKeyWithRekey name parms days = do
   insertKey name material
   if days > 0
     then do
-      runTaskIn (Rekey name (genParamFromJose parms) days) (fromIntegral (days * 86_400))
+      runTaskIn (Rekey name parms days) (fromIntegral (days * 86_400))
     else pass
   return material
 
@@ -51,5 +50,5 @@ getKeyWithRekey name parms days = do
     Just key -> return key
     Nothing -> genKeyWithRekey name parms days
 
-performRekey :: (MonadUnliftIO m) => Text -> KeyMaterialGenParam' -> Int -> SqlPersistT m ()
-performRekey name parms days = genKeyWithRekey name (genParamToJose parms) days >> pass
+performRekey :: (MonadUnliftIO m) => Text -> KeyMaterialGenParam -> Int -> SqlPersistT m ()
+performRekey name parms days = genKeyWithRekey name parms days >> pass

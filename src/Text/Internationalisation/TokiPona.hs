@@ -13,7 +13,6 @@ import Text.Internationalisation.Types (
   untranslated,
  )
 import Text.PUA.TH (escapePUA, includeWithFunctionRename)
-import Utils (capitalize)
 import Yesod (Html, WidgetFor)
 
 includeWithFunctionRename [(mkName "translate", mkName "translateSp'")] (concatMap escapePUA . SitelenPona.fromSitelenPona) "./src/Text/Internationalisation/TokiPona.phs"
