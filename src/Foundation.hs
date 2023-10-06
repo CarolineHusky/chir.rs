@@ -1,4 +1,7 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use fmap" #-}
 
 module Foundation (
   App (..),
@@ -11,19 +14,29 @@ module Foundation (
   Widget,
   QueueCommands (..),
   newRequest,
+  returnJSON,
+  requireJSONBody,
 ) where
 
+import Codec.CBOR.JSON (decodeValue, encodeValue)
+import Codec.CBOR.Read (deserialiseFromBytes)
+import Codec.CBOR.Write (toLazyByteString)
 import Codec.Serialise (Serialise (encode))
 import Codec.Serialise.Class (Serialise (decode))
 import Codec.Serialise.Decoding (Decoder, decodeInt, decodeListLen, decodeWord, decodeWord8)
 import Codec.Serialise.Encoding (Encoding, encodeInt, encodeListLen, encodeString, encodeWord, encodeWord8)
+import Conduit (connect, sinkLazy)
 import Config (ConfigFile, logLevel', rpId', staticDir', toLogLevel, widgetFile)
 import Config.StaticFiles (index_css, index_js)
 import Control.Lens ((^.))
 import Control.Lens.TH (makeLenses)
+import Control.Monad (liftM)
 import Control.Monad.Logger (LogLevel, LogSource)
 import Crypto.JOSE (Crv (..), KeyMaterialGenParam (..))
 import Crypto.JOSE.JWA.JWK (OKPCrv (..))
+import Data.Aeson (ToJSON)
+import Data.Aeson qualified as A
+import Data.ByteString qualified as B8
 import Database.Persist.Postgresql (SqlPersistT)
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Database.Persist.SqlBackend (SqlBackend)
@@ -38,25 +51,40 @@ import Yesod (
   FormMessage,
   Html,
   Lang,
+  MonadHandler,
   PageContent (pageBody, pageHead, pageTitle),
   RenderMessage,
   RenderRoute (Route, renderRoute),
   SessionBackend,
+  ToContent (toContent),
   ToTypedContent,
-  Yesod (addStaticContent, defaultLayout, makeLogger, makeSessionBackend, shouldLogIO, yesodMiddleware),
+  TypedContent (TypedContent),
+  Yesod (
+    addStaticContent,
+    defaultLayout,
+    makeLogger,
+    makeSessionBackend,
+    shouldLogIO,
+    yesodMiddleware
+  ),
   YesodPersist (runDB),
   YesodPersistRunner,
+  YesodRequest (reqAccept),
   addHeader,
   addScript,
   addStylesheet,
   defaultFormMessage,
   defaultGetDBRunner,
-  defaultYesodMiddleware,
+  getRequest,
   getYesod,
+  invalidArgs,
   languages,
   lookupCookie,
+  lookupHeader,
   mkYesodData,
   parseRoutesFile,
+  rawRequestBody,
+  requireCheckJsonBody,
   widgetToPageContent,
   withUrlRenderer,
  )
@@ -104,7 +132,20 @@ instance Yesod App where
   makeSessionBackend _ = return Nothing
 
   yesodMiddleware :: (ToTypedContent res) => Handler res -> Handler res
-  yesodMiddleware = defaultYesodMiddleware
+  yesodMiddleware handler = do
+    app <- getYesod
+    -- only allow local source, no embeds
+    addHeader "X-Frame-Options" "DENY"
+    addHeader "X-XSS-Protection" "0"
+    addHeader "X-Content-Type-Options" "nosniff"
+    addHeader "Referrer-Policy" "strict-origin-when-cross-origin"
+    addHeader "Content-Security-Policy" "default-src 'self'; img-src 'self', data: ; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content; disown-opener; base-uri 'self'"
+    addHeader "Cross-Origin-Opener-Policy" "same-origin"
+    addHeader "Cross-Origin-Embedder-Policy" "require-corp"
+    addHeader "Cross-Origin-Resource-Policy" "same-site"
+    addHeader "Permissions-Policy" "publickey-credentials-create=*, publickey-credentials-get=*, interest-cohort=()"
+    addHeader "Link" $ "<https://" <> app ^. appConfig . rpId' <> "/.well-known/openid-configuration>; rel=\"indieauth-metadata\""
+    handler
 
   -- This function creates static content files in the static folder
   -- and names them based on a hash of their content. This allows
@@ -141,22 +182,10 @@ instance Yesod App where
 
   defaultLayout :: Widget -> Handler Html
   defaultLayout widget = do
-    app <- getYesod
     themeCookie <- lookupCookie "_THEME"
     let theme = fromMaybe "" themeCookie
     langs <- languages
     let lang = headOr langs "en"
-    -- only allow local source, no embeds
-    addHeader "X-Frame-Options" "DENY"
-    addHeader "X-XSS-Protection" "0"
-    addHeader "X-Content-Type-Options" "nosniff"
-    addHeader "Referrer-Policy" "strict-origin-when-cross-origin"
-    addHeader "Content-Security-Policy" "default-src 'self'; img-src 'self', data: ; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content; disown-opener; base-uri 'self'"
-    addHeader "Cross-Origin-Opener-Policy" "same-origin"
-    addHeader "Cross-Origin-Embedder-Policy" "require-corp"
-    addHeader "Cross-Origin-Resource-Policy" "same-site"
-    addHeader "Permissions-Policy" "publickey-credentials-create=*, publickey-credentials-get=*, interest-cohort=()"
-    addHeader "Link" $ "<https://" <> app ^. appConfig . rpId' <> "/.well-known/openid-configuration>; rel=\"indieauth-metadata\""
 
     pc <- widgetToPageContent $ do
       addScript $ StaticR index_js
@@ -234,3 +263,31 @@ instance Serialise KeyMaterialGenParam where
       (1, 8) -> pure $ OKPGenParam X25519
       (1, 9) -> pure $ OKPGenParam X448
       _ -> fail "Invalid KeyMaterialGenParam encoding"
+
+acceptsCbor :: (MonadHandler m) => m Bool
+acceptsCbor =
+  ( maybe False ((== "application/cbor") . B8.takeWhile (/= 0x3b))
+      . listToMaybe
+      . reqAccept
+  )
+    `liftM` getRequest
+
+returnJSON :: (MonadHandler m, A.ToJSON a) => a -> m TypedContent
+returnJSON a =
+  acceptsCbor >>= \case
+    False -> return $ TypedContent "application/json" $ toContent $ A.encode a
+    True -> return $ TypedContent "application/cbor" $ toContent $ toLazyByteString $ encodeValue $ A.toJSON a
+
+requireJSONBody :: (MonadHandler m, A.FromJSON a) => m a
+requireJSONBody = do
+  mct <- fromMaybe "" <$> lookupHeader "content-type"
+  case mct of
+    "application/json" -> requireCheckJsonBody
+    "application/cbor" -> do
+      bodyLBS <- connect rawRequestBody sinkLazy
+      case deserialiseFromBytes (decodeValue False) bodyLBS of
+        Left _ -> invalidArgs ["body"]
+        Right (_, v) -> case A.fromJSON v of
+          A.Error _ -> invalidArgs ["body"]
+          A.Success v' -> return v'
+    _ -> invalidArgs ["body"]

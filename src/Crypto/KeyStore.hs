@@ -1,11 +1,12 @@
 module Crypto.KeyStore (getKeyWithRekey, performRekey) where
 
-import Control.Lens ((?~))
+import Control.Lens (re, (?~), (^.))
 import Control.Monad.Trans.Resource (MonadUnliftIO)
-import Crypto.JOSE (JWK, KeyMaterialGenParam, genJWK)
+import Crypto.JOSE (Digest, JWK, KeyMaterialGenParam, SHA256, base64url, digest, genJWK, thumbprint)
 import Crypto.JOSE.JWK (jwkKid)
 import Data.Aeson (decode, encode)
 import Data.Queue (runTaskIn)
+import Data.Text.Strict.Lens (utf8)
 import Database.Persist qualified as P
 import Database.Persist.Postgresql (PersistEntity (Key, keyFromValues), PersistValue (PersistText), SqlPersistT)
 import Foundation (QueueCommands (Rekey))
@@ -35,7 +36,9 @@ insertKey name jwk = do
 genKeyWithRekey :: (MonadUnliftIO m) => Text -> KeyMaterialGenParam -> Int -> SqlPersistT m JWK
 genKeyWithRekey name parms days = do
   material' <- liftIO $ genJWK parms
-  let material = material' & jwkKid ?~ name
+  let h :: Digest SHA256 = material' ^. thumbprint
+  let kid = h ^. re (base64url . digest) . utf8
+  let material = material' & jwkKid ?~ kid
   insertKey name material
   if days > 0
     then do

@@ -3,14 +3,14 @@ module Handler.OauthMetadata where
 import Config (rpId')
 import Control.Lens ((^.))
 import Data.Aeson (KeyValue ((.=)), Value)
-import Foundation (App, appConfig)
-import Yesod (HandlerFor, array, getYesod, object)
+import Foundation (App, appConfig, returnJSON)
+import Yesod (HandlerFor, TypedContent, array, getYesod, object)
 
-getOauthMetadataR :: HandlerFor App Value
+getOauthMetadataR :: HandlerFor App TypedContent
 getOauthMetadataR = do
   app <- getYesod
   let sysUrl = "https://" <> app ^. appConfig . rpId'
-  return $
+  returnJSON $
     object
       [ "issuer" .= sysUrl
       , "authorization_endpoint" .= (sysUrl <> "/auth/login")

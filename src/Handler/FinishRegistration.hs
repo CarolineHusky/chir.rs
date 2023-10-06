@@ -11,7 +11,7 @@ import Data.ByteString.Base64 qualified as B64
 import Data.Hourglass (timeGetDateTimeOfDay)
 import Data.Time (getCurrentTime)
 import Database.Persist.Sql (PersistEntity (Key, keyFromValues), PersistUniqueWrite (insertUnique_), PersistValue (PersistText), deleteWhereCount, (==.), (>.))
-import Foundation (App, appConfig, appHttpManager)
+import Foundation (App, appConfig, appHttpManager, requireJSONBody)
 import Handler.StartRegistration (mkCredentialOptionsRegistration)
 import Model (EntityField (WebauthnChallengeExpiresAt, WebauthnChallengeJti), LocalAccount (LocalAccount), LocalAccountCredentials (LocalAccountCredentials), WebFingerAccount (WebFingerAccount))
 import Network.URL (URL (URL), importURL)
@@ -45,7 +45,7 @@ postFinishRegistrationR = do
   cred <-
     -- try to decode the registration message
     ( WA.wjDecodeCredentialRegistration
-        <$> requireCheckJsonBody
+        <$> requireJSONBody
       ) -- or return error
       ? ( \e -> do
             $(logError) $ "Invalid body: " <> e

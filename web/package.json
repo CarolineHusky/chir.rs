@@ -8,6 +8,7 @@
     "build": "webpack"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.4",
     "css-loader": "^6.8.1",
     "css-minimizer-webpack-plugin": "^5.0.1",
     "html-webpack-plugin": "^5.5.3",
@@ -25,6 +26,8 @@
     "@github/webauthn-json": "^2.1.1",
     "@picocss/pico": "^1.5.10",
     "bulma": "^0.9.4",
-    "js-cookie": "^3.0.5"
+    "cbor-x": "^1.5.4",
+    "js-cookie": "^3.0.5",
+    "tslib": "^2.6.2"
   }
 }

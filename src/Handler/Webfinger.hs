@@ -2,9 +2,9 @@ module Handler.Webfinger (getWebfingerR) where
 
 import Data.Aeson (Value, object, (.=))
 import Database.Persist (Entity (entityVal), (==.))
-import Foundation (App)
+import Foundation (App, returnJSON)
 import Model (EntityField (WebFingerAccountWebfingerUsername), WebFingerAccount (webFingerAccountIndieUsername, webFingerAccountOidcIssuer, webFingerAccountWebfingerUsername))
-import Yesod (HandlerFor, PersistQueryRead (selectFirst), YesodPersist (runDB), lookupGetParam, notFound)
+import Yesod (HandlerFor, PersistQueryRead (selectFirst), TypedContent, YesodPersist (runDB), lookupGetParam, notFound)
 import Yesod.Core (invalidArgs)
 
 mkWebfinger :: WebFingerAccount -> Value
@@ -30,7 +30,7 @@ mkWebfinger account =
       , "links" .= links
       ]
 
-getWebfingerR :: HandlerFor App Value
+getWebfingerR :: HandlerFor App TypedContent
 getWebfingerR = do
   maybeAcct <- lookupGetParam "resource"
   case maybeAcct of
@@ -40,4 +40,4 @@ getWebfingerR = do
         user <- selectFirst [WebFingerAccountWebfingerUsername ==. acct] []
         case user of
           Nothing -> notFound
-          Just value -> return $ mkWebfinger $ entityVal value
+          Just value -> returnJSON $ mkWebfinger $ entityVal value

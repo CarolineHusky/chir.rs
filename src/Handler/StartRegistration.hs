@@ -3,15 +3,14 @@ module Handler.StartRegistration (getStartRegistrationR, mkCredentialOptionsRegi
 import Config (signUpKey')
 import Control.Lens ((^.))
 import Crypto.WebAuthn qualified as WA
-import Data.Aeson (Value)
 import Database.Persist (PersistEntity (Key, keyFromValues), PersistValue (PersistText))
 import Database.Persist qualified as P
-import Foundation (App, appConfig)
+import Foundation (App, appConfig, returnJSON)
 import Handler.WebauthnChallenge (generateChallenge)
 import Model (LocalAccount)
 import Network.URL.Normalize (normalizeURL)
 import Utils ((?!))
-import Yesod (HandlerFor, YesodPersist (runDB), invalidArgs, lookupGetParam, permissionDenied, returnJson)
+import Yesod (HandlerFor, TypedContent, YesodPersist (runDB), invalidArgs, lookupGetParam, permissionDenied)
 import Yesod.Core (getYesod)
 
 mkCredentialOptionsRegistration :: Text -> WA.Challenge -> WA.CredentialOptions 'WA.Registration
@@ -62,7 +61,7 @@ mkCredentialOptionsRegistration username challenge =
     , WA.corExtensions = Nothing
     }
 
-getStartRegistrationR :: HandlerFor App Value
+getStartRegistrationR :: HandlerFor App TypedContent
 getStartRegistrationR = do
   app <- getYesod
   username' <- lookupGetParam "username" ?! invalidArgs ["username"]
@@ -76,4 +75,4 @@ getStartRegistrationR = do
     Just _ -> invalidArgs ["username"]
     Nothing -> pass
   challenge <- generateChallenge
-  returnJson $ WA.wjEncodeCredentialOptionsRegistration $ mkCredentialOptionsRegistration username challenge
+  returnJSON $ WA.wjEncodeCredentialOptionsRegistration $ mkCredentialOptionsRegistration username challenge

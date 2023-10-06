@@ -8,6 +8,54 @@
   offline_cache = linkFarm "offline" packages;
   packages = [
     {
+      name = "_cbor_extract_cbor_extract_darwin_arm64___cbor_extract_darwin_arm64_2.1.1.tgz";
+      path = fetchurl {
+        name = "_cbor_extract_cbor_extract_darwin_arm64___cbor_extract_darwin_arm64_2.1.1.tgz";
+        url = "https://registry.yarnpkg.com/@cbor-extract/cbor-extract-darwin-arm64/-/cbor-extract-darwin-arm64-2.1.1.tgz";
+        sha512 = "blVBy5MXz6m36Vx0DfLd7PChOQKEs8lK2bD1WJn/vVgG4FXZiZmZb2GECHFvVPA5T7OnODd9xZiL3nMCv6QUhA==";
+      };
+    }
+    {
+      name = "_cbor_extract_cbor_extract_darwin_x64___cbor_extract_darwin_x64_2.1.1.tgz";
+      path = fetchurl {
+        name = "_cbor_extract_cbor_extract_darwin_x64___cbor_extract_darwin_x64_2.1.1.tgz";
+        url = "https://registry.yarnpkg.com/@cbor-extract/cbor-extract-darwin-x64/-/cbor-extract-darwin-x64-2.1.1.tgz";
+        sha512 = "h6KFOzqk8jXTvkOftyRIWGrd7sKQzQv2jVdTL9nKSf3D2drCvQB/LHUxAOpPXo3pv2clDtKs3xnHalpEh3rDsw==";
+      };
+    }
+    {
+      name = "_cbor_extract_cbor_extract_linux_arm64___cbor_extract_linux_arm64_2.1.1.tgz";
+      path = fetchurl {
+        name = "_cbor_extract_cbor_extract_linux_arm64___cbor_extract_linux_arm64_2.1.1.tgz";
+        url = "https://registry.yarnpkg.com/@cbor-extract/cbor-extract-linux-arm64/-/cbor-extract-linux-arm64-2.1.1.tgz";
+        sha512 = "SxAaRcYf8S0QHaMc7gvRSiTSr7nUYMqbUdErBEu+HYA4Q6UNydx1VwFE68hGcp1qvxcy9yT5U7gA+a5XikfwSQ==";
+      };
+    }
+    {
+      name = "_cbor_extract_cbor_extract_linux_arm___cbor_extract_linux_arm_2.1.1.tgz";
+      path = fetchurl {
+        name = "_cbor_extract_cbor_extract_linux_arm___cbor_extract_linux_arm_2.1.1.tgz";
+        url = "https://registry.yarnpkg.com/@cbor-extract/cbor-extract-linux-arm/-/cbor-extract-linux-arm-2.1.1.tgz";
+        sha512 = "ds0uikdcIGUjPyraV4oJqyVE5gl/qYBpa/Wnh6l6xLE2lj/hwnjT2XcZCChdXwW/YFZ1LUHs6waoYN8PmK0nKQ==";
+      };
+    }
+    {
+      name = "_cbor_extract_cbor_extract_linux_x64___cbor_extract_linux_x64_2.1.1.tgz";
+      path = fetchurl {
+        name = "_cbor_extract_cbor_extract_linux_x64___cbor_extract_linux_x64_2.1.1.tgz";
+        url = "https://registry.yarnpkg.com/@cbor-extract/cbor-extract-linux-x64/-/cbor-extract-linux-x64-2.1.1.tgz";
+        sha512 = "GVK+8fNIE9lJQHAlhOROYiI0Yd4bAZ4u++C2ZjlkS3YmO6hi+FUxe6Dqm+OKWTcMpL/l71N6CQAmaRcb4zyJuA==";
+      };
+    }
+    {
+      name = "_cbor_extract_cbor_extract_win32_x64___cbor_extract_win32_x64_2.1.1.tgz";
+      path = fetchurl {
+        name = "_cbor_extract_cbor_extract_win32_x64___cbor_extract_win32_x64_2.1.1.tgz";
+        url = "https://registry.yarnpkg.com/@cbor-extract/cbor-extract-win32-x64/-/cbor-extract-win32-x64-2.1.1.tgz";
+        sha512 = "2Niq1C41dCRIDeD8LddiH+mxGlO7HJ612Ll3D/E73ZWBmycued+8ghTr/Ho3CMOWPUEr08XtyBMVXAjqF+TcKw==";
+      };
+    }
+    {
       name = "_discoveryjs_json_ext___json_ext_0.5.7.tgz";
       path = fetchurl {
         name = "_discoveryjs_json_ext___json_ext_0.5.7.tgz";
@@ -173,6 +221,14 @@
         name = "_types_istanbul_reports___istanbul_reports_3.0.2.tgz";
         url = "https://registry.yarnpkg.com/@types/istanbul-reports/-/istanbul-reports-3.0.2.tgz";
         sha512 = "kv43F9eb3Lhj+lr/Hn6OcLCs/sSM8bt+fIaP11rCYngfV6NVjzWXJ17owQtDQTL9tQ8WSLUrGsSJ6rJz0F1w1A==";
+      };
+    }
+    {
+      name = "_types_js_cookie___js_cookie_3.0.4.tgz";
+      path = fetchurl {
+        name = "_types_js_cookie___js_cookie_3.0.4.tgz";
+        url = "https://registry.yarnpkg.com/@types/js-cookie/-/js-cookie-3.0.4.tgz";
+        sha512 = "vMMnFF+H5KYqdd/myCzq6wLDlPpteJK+jGFgBus3Da7lw+YsDmx2C8feGTzY2M3Fo823yON+HC2CL240j4OV+w==";
       };
     }
     {
@@ -517,6 +573,22 @@
         name = "caniuse_lite___caniuse_lite_1.0.30001542.tgz";
         url = "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001542.tgz";
         sha512 = "UrtAXVcj1mvPBFQ4sKd38daP8dEcXXr5sQe6QNNinaPd0iA/cxg9/l3VrSdL73jgw5sKyuQ6jNgiKO12W3SsVA==";
+      };
+    }
+    {
+      name = "cbor_extract___cbor_extract_2.1.1.tgz";
+      path = fetchurl {
+        name = "cbor_extract___cbor_extract_2.1.1.tgz";
+        url = "https://registry.yarnpkg.com/cbor-extract/-/cbor-extract-2.1.1.tgz";
+        sha512 = "1UX977+L+zOJHsp0mWFG13GLwO6ucKgSmSW6JTl8B9GUvACvHeIVpFqhU92299Z6PfD09aTXDell5p+lp1rUFA==";
+      };
+    }
+    {
+      name = "cbor_x___cbor_x_1.5.4.tgz";
+      path = fetchurl {
+        name = "cbor_x___cbor_x_1.5.4.tgz";
+        url = "https://registry.yarnpkg.com/cbor-x/-/cbor-x-1.5.4.tgz";
+        sha512 = "PVKILDn+Rf6MRhhcyzGXi5eizn1i0i3F8Fe6UMMxXBnWkalq9+C5+VTmlIjAYM4iF2IYF2N+zToqAfYOp+3rfw==";
       };
     }
     {
@@ -1341,6 +1413,14 @@
         name = "no_case___no_case_3.0.4.tgz";
         url = "https://registry.yarnpkg.com/no-case/-/no-case-3.0.4.tgz";
         sha512 = "fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==";
+      };
+    }
+    {
+      name = "node_gyp_build_optional_packages___node_gyp_build_optional_packages_5.0.3.tgz";
+      path = fetchurl {
+        name = "node_gyp_build_optional_packages___node_gyp_build_optional_packages_5.0.3.tgz";
+        url = "https://registry.yarnpkg.com/node-gyp-build-optional-packages/-/node-gyp-build-optional-packages-5.0.3.tgz";
+        sha512 = "k75jcVzk5wnnc/FMxsf4udAoTEUv2jY3ycfdSd3yWu6Cnd1oee6/CfZJApyscA4FJOmdoixWwiwOyf16RzD5JA==";
       };
     }
     {

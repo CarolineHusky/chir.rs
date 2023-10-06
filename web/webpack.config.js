@@ -15,7 +15,6 @@ module.exports = {
     clean: true,
   },
   plugins: [
-    new HtmlWebpackPlugin({}),
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].[contenthash].css",
@@ -44,7 +43,7 @@ module.exports = {
   optimization: {
     moduleIds: "deterministic",
     splitChunks: {
-      chunks: "all",
+      chunks: "async",
     },
     minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
   },

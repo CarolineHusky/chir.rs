@@ -6,8 +6,6 @@ async function onSubmit(e: Event) {
     document.getElementById("signup-token") as HTMLInputElement
   ).value;
 
-  const webauthn = await require("@github/webauthn-json");
-
   // fetch creation options
   const response = await fetch(
     "/auth/register/start?" +
@@ -15,8 +13,19 @@ async function onSubmit(e: Event) {
         username,
         signup_token,
       }),
+    {
+      headers: {
+        Accept: "application/cbor",
+      },
+    },
   );
-  const creation_options = await response.json();
+  const creation_options_cbor = await response.arrayBuffer();
+
+  const cbor = await import("cbor-x");
+
+  const creation_options = cbor.decode(new Uint8Array(creation_options_cbor));
+
+  const webauthn = await import("@github/webauthn-json");
 
   const credential = await webauthn.create({ publicKey: creation_options });
 
@@ -28,9 +37,9 @@ async function onSubmit(e: Event) {
     {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/cbor",
       },
-      body: JSON.stringify(credential),
+      body: cbor.encode(credential),
     },
   );
 

@@ -1,13 +1,13 @@
 import "./style.scss";
 
 async function getLanguageCookie(): Promise<string | undefined> {
-  const Cookies = await require("js-cookie");
-  return Cookies.get("_LANG");
+  const Cookies = await import("js-cookie");
+  return Cookies.default.get("_LANG");
 }
 
 async function getThemeCookie(): Promise<string | undefined> {
-  const Cookies = await require("js-cookie");
-  return Cookies.get("_THEME");
+  const Cookies = await import("js-cookie");
+  return Cookies.default.get("_THEME");
 }
 
 async function getTheme(): Promise<string> {
@@ -48,25 +48,25 @@ async function getLanguage(): Promise<string> {
 }
 
 async function setLanguageCookie(language: string): Promise<void> {
-  const Cookies = await require("js-cookie");
+  const Cookies = await import("js-cookie");
   if (language !== "auto")
-    Cookies.set("_LANG", language, {
+    Cookies.default.set("_LANG", language, {
       expires: 365,
       secure: true,
       sameSite: "Strict",
     });
-  else Cookies.remove("_LANG");
+  else Cookies.default.remove("_LANG");
 }
 
 async function setThemeCookie(theme: string): Promise<void> {
-  const Cookies = await require("js-cookie");
+  const Cookies = await import("js-cookie");
   if (theme !== "auto")
-    Cookies.set("_THEME", theme, {
+    Cookies.default.set("_THEME", theme, {
       expires: 365,
       secure: true,
       sameSite: "Strict",
     });
-  else Cookies.remove("_THEME");
+  else Cookies.default.remove("_THEME");
 }
 
 async function updateLanguage(e: Event): Promise<void> {
