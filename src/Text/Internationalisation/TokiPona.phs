@@ -1,4 +1,4 @@
-translate :: (Text -> Text) -> Message -> WidgetFor a (Either TranslationError Html)
+translate :: (String -> Text) -> Message -> WidgetFor a (Either TranslationError Html)
 translate f MsgAkkoma = text $ "󱤟󿫅" <> f "akoma"
 translate _ MsgAlternateLink = text "(󱤇)"
 translate _ MsgAndALotMore = text "󱤼󱥹"

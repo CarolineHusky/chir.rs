@@ -160,7 +160,11 @@ common shared
     Text.Internationalisation.Lojban.Convert
     Text.Internationalisation.Nederlands
     Text.Internationalisation.TokiPona
-    Text.Internationalisation.TokiPona.Convert
+    Text.Internationalisation.TokiPona.Common
+    Text.Internationalisation.TokiPona.SitelenEmosi
+    Text.Internationalisation.TokiPona.SitelenLasina
+    Text.Internationalisation.TokiPona.SitelenMunjan
+    Text.Internationalisation.TokiPona.SitelenPona
     Text.Internationalisation.Types
     Text.PUA.TH
     Utils
