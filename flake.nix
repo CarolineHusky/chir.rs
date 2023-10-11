@@ -135,7 +135,8 @@
         };
         formatter = pkgs.alejandra;
       };
-    }) // {
+    })
+    // {
       hydraJobs = {
         inherit (inputs.self) packages devShells checks formatter;
       };
