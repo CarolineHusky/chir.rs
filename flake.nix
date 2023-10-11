@@ -14,7 +14,7 @@
   };
 
   outputs = inputs:
-    inputs.flake-parts.lib.mkFlake {inherit inputs;} {
+    (inputs.flake-parts.lib.mkFlake {inherit inputs;} {
       systems = import inputs.systems;
       imports = [
         inputs.haskell-flake.flakeModule
@@ -134,6 +134,10 @@
           ];
         };
         formatter = pkgs.alejandra;
+      };
+    }) // {
+      hydraJobs = {
+        inherit (inputs.self) packages devShells checks formatter;
       };
     };
 }
