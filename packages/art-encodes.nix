@@ -1,9 +1,6 @@
 {
-  parallel,
   stdenv,
   imagemagick,
-  oxipng,
-  jpegoptim,
   lotte-art,
   emptyDirectory,
   lib,
@@ -15,7 +12,7 @@
       inherit (lotte-art) version;
       src = emptyDirectory;
 
-      nativeBuildInputs = [imagemagick oxipng];
+      nativeBuildInputs = [imagemagick];
 
       unpackPhase = ''
         ln -sv ${lotte-art}/${name}.jxl in.jxl
@@ -23,7 +20,6 @@
 
       buildPhase = ''
         convert in.jxl out.png
-        oxipng out.png
       '';
 
       installPhase = ''
