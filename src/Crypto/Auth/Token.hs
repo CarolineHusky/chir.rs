@@ -75,15 +75,27 @@ mkClaims config subject audience jti authTime nonce authParty = do
   let expires = addUTCTime 300 now
   pure $
     emptyClaims
-      & claimIss ?~ stringConvert ("https://" <> config ^. rpId' <> "/")
-      & claimSub ?~ stringConvert subject
-      & claimAud ?~ Audience [stringConvert audience]
-      & claimExp ?~ NumericDate expires
-      & claimNbf ?~ NumericDate now
-      & claimIat ?~ NumericDate now
-      & claimJti ?~ jti
-      & claimAuthTime ?~ NumericDate authTime
-      & claimNonce .~ nonce
-      & claimAcr ?~ "phrh"
-      & claimAmr ?~ ["hwk"]
-      & claimAzr .~ if audience == authParty then Nothing else Just authParty
+      & claimIss
+      ?~ stringConvert ("https://" <> config ^. rpId' <> "/")
+        & claimSub
+      ?~ stringConvert subject
+        & claimAud
+      ?~ Audience [stringConvert audience]
+        & claimExp
+      ?~ NumericDate expires
+        & claimNbf
+      ?~ NumericDate now
+        & claimIat
+      ?~ NumericDate now
+        & claimJti
+      ?~ jti
+        & claimAuthTime
+      ?~ NumericDate authTime
+        & claimNonce
+      .~ nonce
+        & claimAcr
+      ?~ "phrh"
+        & claimAmr
+      ?~ ["hwk"]
+        & claimAzr
+      .~ if audience == authParty then Nothing else Just authParty

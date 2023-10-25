@@ -36,10 +36,14 @@ instance Semigroup LinkInfo where
   (<>) :: LinkInfo -> LinkInfo -> LinkInfo
   a <> b =
     a
-      & url .~ (b ^. url)
-      & rel %~ (<> b ^. rel)
-      & hreflang %~ (<> b ^. hreflang)
-      & media %~ (<> b ^. media)
+      & url
+      .~ (b ^. url)
+        & rel
+      %~ (<> b ^. rel)
+        & hreflang
+      %~ (<> b ^. hreflang)
+        & media
+      %~ (<> b ^. media)
 
 instance Monoid LinkInfo where
   mempty :: LinkInfo
@@ -65,7 +69,7 @@ parseLink :: ByteString -> [LinkInfo]
 parseLink = (parseLinkInfo <$>) . fromMaybe [] . parseLinkHeaderBS
 
 parseLinkHeaders :: [Header] -> [LinkInfo]
-parseLinkHeaders = concatMap parseLink . (snd <$>) . filter ((== "Link") . fst)
+parseLinkHeaders = concatMap (parseLink . snd) . filter ((== "Link") . fst)
 
 (.=?) :: (Data.Aeson.KeyValue kv, Data.Aeson.ToJSON a) => Data.Aeson.Key -> [a] -> Maybe kv
 _ .=? [] = Nothing
@@ -93,8 +97,11 @@ transmuteToRel' LinkInfo {_url = url', _rel = r} l =
     transmuteToRel'' links _ [] = links
     transmuteToRel'' links u (rel' : rels) =
       transmuteToRel'' links u rels
-        & at rel' %~ Just . fromMaybe []
-        & at rel' %~ ((u :) <$>)
+        & at rel'
+        %~ Just
+          . fromMaybe []
+          & at rel'
+        %~ ((u :) <$>)
 
 transmuteToRel :: [LinkInfo] -> Map Text [Text]
 transmuteToRel = foldr transmuteToRel' Map.empty
@@ -123,7 +130,15 @@ fetchMF2 manager url' = runResourceTChecked $ do
 
   return $
     mf2'
-      & atKey "rels" %~ Just . fromMaybe (object [])
-      & key "rels" . _Object <>~ rels
-      & atKey "rel-urls" %~ Just . fromMaybe (object [])
-      & key "rel-urls" . _Object <>~ relUrls
+      & atKey "rels"
+      %~ Just
+        . fromMaybe (object [])
+        & key "rels"
+        . _Object
+      <>~ rels
+        & atKey "rel-urls"
+      %~ Just
+        . fromMaybe (object [])
+        & key "rel-urls"
+        . _Object
+      <>~ relUrls

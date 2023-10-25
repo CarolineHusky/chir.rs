@@ -77,11 +77,11 @@
     },
     "haskell-flake": {
       "locked": {
-        "lastModified": 1695739356,
-        "narHash": "sha256-GhpmzMW4n+wNDsK9A8QdUP48/Q5aHuA4mNPuW474f08=",
+        "lastModified": 1698155710,
+        "narHash": "sha256-WuAVmR0EP/DJDpx0p2wrmijL4sYYhqTixHPDPFXMOXI=",
         "owner": "srid",
         "repo": "haskell-flake",
-        "rev": "63a160879e6700b1c9385852043b162183063e9a",
+        "rev": "4f6a2cbe4ee9024ffebb834473592db6c6b2c943",
         "type": "github"
       },
       "original": {
@@ -101,11 +101,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1685431783,
-        "narHash": "sha256-NriQMCsRiB7fYJ9v+3Tw3/jshB8y/tNsHwgqz24cxO4=",
+        "lastModified": 1697704332,
+        "narHash": "sha256-XDDllf7VLpSuQcBxv4v2BGoeKhbqDqISAu8r48eqc3Y=",
         "ref": "refs/heads/master",
-        "rev": "51c2319f653df748adfbc7a5fa7440205ad884df",
-        "revCount": 4066,
+        "rev": "30ba162924d53d4daafb09414b86241e7ecaa9ab",
+        "revCount": 4073,
         "type": "git",
         "url": "https://git.chir.rs/darkkirb/hydra"
       },
@@ -204,11 +204,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1696947922,
-        "narHash": "sha256-sAteiaGt+usRQoe6E1jhTzbzoae5MuBQMSpjN3HUui4=",
+        "lastModified": 1698211393,
+        "narHash": "sha256-/2+BdtBKNKHGwxuamdyu1OpuAUM8SId/oYD9R23dhjw=",
         "owner": "DarkKirb",
         "repo": "nix-packages",
-        "rev": "53515d0db380175297a10c6d4065197b932267ed",
+        "rev": "00bc80844ff2bb7a0727207100465e1a0f52939b",
         "type": "github"
       },
       "original": {
@@ -269,11 +269,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1697010211,
-        "narHash": "sha256-DYcFpsw7VgH1HRAKkjV7ueri/pDupkUY15ZI4bVV+3A=",
+        "lastModified": 1698251719,
+        "narHash": "sha256-3QIYGUtApacdtCw/3F8GzObh1ex7DPeCdUZ7leUUlcw=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "8eae9c99bebc83f13f7cab48ea983d61b16cffd9",
+        "rev": "ab26fa7c77406becdb1c858b480727a30d1cc7b5",
         "type": "github"
       },
       "original": {
@@ -315,11 +315,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1695822946,
-        "narHash": "sha256-IQU3fYo0H+oGlqX5YrgZU3VRhbt2Oqe6KmslQKUO4II=",
+        "lastModified": 1697388351,
+        "narHash": "sha256-63N2eBpKaziIy4R44vjpUu8Nz5fCJY7okKrkixvDQmY=",
         "owner": "numtide",
         "repo": "treefmt-nix",
-        "rev": "720bd006d855b08e60664e4683ccddb7a9ff614a",
+        "rev": "aae39f64f5ecbe89792d05eacea5cb241891292a",
         "type": "github"
       },
       "original": {
