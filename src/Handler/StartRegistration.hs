@@ -1,6 +1,7 @@
 module Handler.StartRegistration (getStartRegistrationR, mkCredentialOptionsRegistration) where
 
 import Config (signUpKey')
+import Control.Alternative ((?!))
 import Control.Lens ((^.))
 import Crypto.WebAuthn qualified as WA
 import Database.Persist (PersistEntity (Key, keyFromValues), PersistValue (PersistText))
@@ -9,7 +10,6 @@ import Foundation (App, appConfig, returnJSON)
 import Handler.WebauthnChallenge (generateChallenge)
 import Model (LocalAccount)
 import Network.URL.Normalize (normalizeURL)
-import Utils ((?!))
 import Yesod (HandlerFor, TypedContent, YesodPersist (runDB), invalidArgs, lookupGetParam, permissionDenied)
 import Yesod.Core (getYesod)
 

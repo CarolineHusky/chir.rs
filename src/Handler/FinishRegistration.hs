@@ -1,6 +1,7 @@
 module Handler.FinishRegistration (postFinishRegistrationR) where
 
 import Config (rpId')
+import Control.Alternative ((?), (?!))
 import Control.Lens ((^.))
 import Control.Monad.Logger (logError)
 import Crypto.FidoMetadataManager (getMatadataBlobRegistry)
@@ -17,8 +18,8 @@ import Model (EntityField (WebauthnChallengeExpiresAt, WebauthnChallengeJti), Lo
 import Network.URL (URL (URL), importURL)
 import Network.URL qualified as URL
 import Network.URL.Normalize (normalizeURL)
-import Utils ((<<<$>>>), (?), (?!))
-import Yesod (HandlerFor, YesodPersist (runDB), getYesod, invalidArgs, lookupHeader, permissionDenied, requireCheckJsonBody)
+import Utils ((<<<$>>>))
+import Yesod (HandlerFor, YesodPersist (runDB), getYesod, invalidArgs, lookupHeader, permissionDenied)
 import Yesod.Core (lookupGetParam)
 
 metadataKey :: Text -> Key LocalAccount
@@ -65,7 +66,8 @@ postFinishRegistrationR = do
   -- open the FIDO metadata registry
   registry <-
     runDB $
-      getMatadataBlobRegistry (site ^. appHttpManager) ?! error "Can’t fetch metadata blob"
+      getMatadataBlobRegistry (site ^. appHttpManager)
+        ?! error "Can’t fetch metadata blob"
   -- try to verify
   result@WA.RegistrationResult
     { WA.rrEntry =

@@ -60,6 +60,7 @@ common shared
     DataKinds
     DerivingStrategies
     DerivingVia
+    FunctionalDependencies
     GADTs
     LambdaCase
     MultiWayIf
@@ -136,6 +137,8 @@ common shared
     Config
     Config.Images
     Config.StaticFiles
+    Control.Alternative
+    Control.ToEither
     Crypto.Auth.Token
     Crypto.FidoMetadataManager
     Crypto.KeyStore

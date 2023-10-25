@@ -34,7 +34,6 @@ import Control.Monad (liftM)
 import Control.Monad.Logger (LogLevel, LogSource)
 import Crypto.JOSE (Crv (..), KeyMaterialGenParam (..))
 import Crypto.JOSE.JWA.JWK (OKPCrv (..))
-import Data.Aeson (ToJSON)
 import Data.Aeson qualified as A
 import Data.ByteString qualified as B8
 import Database.Persist.Postgresql (SqlPersistT)

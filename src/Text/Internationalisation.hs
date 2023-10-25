@@ -4,6 +4,7 @@ module Text.Internationalisation (
   getTranslation,
 ) where
 
+import Control.Alternative ((?!))
 import Text.Internationalisation.Deutsch qualified as Deutsch
 import Text.Internationalisation.English qualified as English
 import Text.Internationalisation.Francais qualified as Français
@@ -11,7 +12,6 @@ import Text.Internationalisation.Lojban qualified as Lojban
 import Text.Internationalisation.Nederlands qualified as Nederlands
 import Text.Internationalisation.TokiPona qualified as TokiPona
 import Text.Internationalisation.Types
-import Utils ((?!))
 import Yesod (Html, languages, toHtml, toWidget)
 import Yesod.Core (WidgetFor)
 

@@ -2,7 +2,7 @@ module Handler.OauthMetadata where
 
 import Config (rpId')
 import Control.Lens ((^.))
-import Data.Aeson (KeyValue ((.=)), Value)
+import Data.Aeson (KeyValue ((.=)))
 import Foundation (App, appConfig, returnJSON)
 import Yesod (HandlerFor, TypedContent, array, getYesod, object)
 
