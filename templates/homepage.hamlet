@@ -1,8 +1,8 @@
 $newline never
 <div .h-card>
     <figure .u-photo .pfpfig>
-        ^{image img_2023_06_02_vintagecoyote_prideicon}
-        <figcaption>^{__ MsgImgVintagecoyotePrideiconFigcaption}
+        ^{image img_2023_10_26_sammythetanuki_babylottepfp}
+        <figcaption>^{__ MsgImgSammyTheTanukiBabyLottePFPFigcaption}
     <p .p-note>
         ^{__ MsgSelfIntroPart1}&nbsp;
         ^{__ MsgSelfIntroPart2}&nbsp;

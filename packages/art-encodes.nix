@@ -6,9 +6,13 @@
   lib,
   lndir,
 }: let
-  mkPng = name:
+  mkPng = {
+    name,
+    size,
+    ...
+  }:
     stdenv.mkDerivation {
-      name = name + ".png";
+      name = "${name}-${toString size}.png";
       inherit (lotte-art) version;
       src = emptyDirectory;
 
@@ -19,7 +23,7 @@
       '';
 
       buildPhase = ''
-        convert in.jxl out.png
+        convert in.jxl -resize ${toString size}x${toString size} out.png
       '';
 
       installPhase = ''
@@ -36,17 +40,21 @@
     jxl = "70";
   };
 
-  mkImg' = name: ext:
+  mkImg' = {
+    name,
+    ext,
+    size,
+  }:
     stdenv.mkDerivation {
-      name = name + ".${ext}";
+      name = "${name}-${toString size}.${ext}";
       inherit (lotte-art) version;
       src = emptyDirectory;
 
       nativeBuildInputs = [imagemagick];
-      input = mkPng name;
+      input = mkPng {inherit name size;};
 
       unpackPhase = ''
-        ln -sv $input/${name}.png in.png
+        ln -sv $input/${name}-${toString size}.png in.png
       '';
 
       buildPhase = ''
@@ -59,16 +67,26 @@
       '';
     };
 
-  mkImg = name: ext:
-    if ext == "png"
-    then mkPng name
-    else mkImg' name ext;
-
-  mkImgs = name: map (i: mkImg name i) ["png" "jpg" "webp" "heif" "avif" "jxl"];
+  mkImg = args:
+    if args.ext == "png"
+    then mkPng args
+    else mkImg' args;
 
   flatmap = f: xs: lib.flatten (map f xs);
 
-  imgSet = flatmap mkImgs ["2023-06-02-vintagecoyote-prideicon"];
+  mkImgs = {
+    name,
+    sizes,
+  }:
+    flatmap (ext:
+      map (size: mkImg {inherit name size ext;}) sizes) ["png" "jpg" "webp" "heif" "avif" "jxl"];
+
+  imgSet = flatmap mkImgs [
+    {
+      name = "2023-10-26-sammythetanuki-babylottepfp";
+      sizes = [128 256];
+    }
+  ];
 in
   stdenv.mkDerivation {
     pname = "art-encode";

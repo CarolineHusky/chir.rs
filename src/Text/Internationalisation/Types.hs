@@ -34,10 +34,6 @@ data Message
     MsgFooterText
   | -- | Homepage footnote about certain chats being bridged to matrix
     MsgFootnoteBridgedMatrix
-  | -- | Alt text to the image on the homepage
-    MsgImgVintagecoyotePrideicon
-  | -- | Image credits to the image on the homepage
-    MsgImgVintagecoyotePrideiconFigcaption
   | -- | Screenreader link that jumps to the main content on the page
     MsgJumpToContent
   | -- | My discord username
@@ -98,6 +94,10 @@ data Message
     MsgSettingTheme
   | -- | Username label for login
     MsgUsername
+  | -- | Alt text to the image on the homepage
+    MsgImgSammyTheTanukiBabyLottePFP
+  | -- | Image credits to the image on the homepage
+    MsgImgSammyTheTanukiBabyLottePFPFigcaption
   deriving stock (Show)
 
 -- language specific labels below
