@@ -133,6 +133,7 @@ common shared
   hs-source-dirs:     src
   default-language:   GHC2021
   other-modules:
+    Codec.CBOR.Class
     Components.Image
     Config
     Config.Images
