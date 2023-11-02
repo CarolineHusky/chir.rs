@@ -106,20 +106,16 @@ instance Serialise Double where
   encode = encodeDouble
   decode = decodeDouble
 
-instance (Serialise a, Serialise b) => Serialise (a, b) where
-  encode (a, b) = encode a <> encode b
-  decode = do
-    a <- decode
-    b <- decode
-    pure (a, b)
+decodeTuple :: (Serialise a, Serialise b) => Decoder s (a, b)
+decodeTuple = decode >>= \a -> decode <&> (a,)
 
 instance (Ord a, Serialise a, Serialise b) => Serialise (Map a b) where
   encode m = encodeMapLenIndef <> Map.foldrWithKey (\a b r -> r <> encode a <> encode b) mempty m <> encodeBreak
   decode = do
     mn <- decodeMapLenOrIndef
     kvList <- case mn of
-      Nothing -> decodeSequenceLenIndef (flip (:)) [] reverse decode
-      Just n -> decodeSequenceLenN (flip (:)) [] reverse n decode
+      Nothing -> decodeSequenceLenIndef (flip (:)) [] reverse decodeTuple
+      Just n -> decodeSequenceLenN (flip (:)) [] reverse n decodeTuple
     pure $ Map.fromList kvList
 
 serialise :: (Serialise a) => a -> ByteString
