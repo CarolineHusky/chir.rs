@@ -207,12 +207,12 @@ instance (GSerialiseProd f, GSerialiseProd g) => GSerialiseDecode (f :*: g) wher
     let nF = nFields (Proxy :: Proxy (f :*: g))
     n <- decodeListLen
     -- TODO FIXME: signedness of list length
-    when (fromIntegral n /= nF)
-      $ fail
-      $ "Wrong number of fields: expected="
-      ++ show (nF + 1)
-      ++ " got="
-      ++ show n
+    when (fromIntegral n /= nF) $
+      fail $
+        "Wrong number of fields: expected="
+          ++ show (nF + 1)
+          ++ " got="
+          ++ show n
     !f <- gdecodeSeq
     !g <- gdecodeSeq
     return $ f :*: g
@@ -307,14 +307,14 @@ instance (GSerialiseSum f, GSerialiseSum g) => GSerialiseDecode (f :+: g) where
         then pure 1
         else decodeListLen
     -- TODO FIXME: Again signedness
-    when (n == 0)
-      $ fail "Empty list encountered for sum type"
+    when (n == 0) $
+      fail "Empty list encountered for sum type"
     nCon <- decodeWord
     trueN <- fieldsForCon (Proxy :: Proxy (f :+: g)) nCon
-    when (n - 1 /= fromIntegral trueN)
-      $ fail
-      $ "Number of fields mismatch: expected="
-      ++ show trueN
-      ++ " got="
-      ++ show n
+    when (n - 1 /= fromIntegral trueN) $
+      fail $
+        "Number of fields mismatch: expected="
+          ++ show trueN
+          ++ " got="
+          ++ show n
     decodeSum nCon

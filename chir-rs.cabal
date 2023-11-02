@@ -132,7 +132,6 @@ library chir-rs-lib
 
   hs-source-dirs:     src
   default-language:   GHC2021
-
   exposed-modules:
     Application
     Codec.CBOR.Class
@@ -177,18 +176,20 @@ library chir-rs-lib
     Utils
 
 executable chir-rs
-  main-is:       Main.hs
-
-  hs-source-dirs:     app
-
+  main-is:          Main.hs
+  hs-source-dirs:   app
   mixins:
     base hiding (Prelude),
     relude (Relude as Prelude, Relude.Container.One),
     relude
 
-  build-depends: chir-rs-lib, base >=4.13.0.0 && <4.18.0.0.0, relude, with-utf8
+  build-depends:
+    , base         >=4.13.0.0 && <4.18.0.0.0
+    , chir-rs-lib
+    , relude
+    , with-utf8
 
-  default-language:   GHC2021
+  default-language: GHC2021
 
   if flag(library-only)
     buildable: False
