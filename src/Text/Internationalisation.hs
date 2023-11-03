@@ -7,6 +7,7 @@ module Text.Internationalisation (
 import Control.Alternative ((?!))
 import Text.Internationalisation.Deutsch qualified as Deutsch
 import Text.Internationalisation.English qualified as English
+import Text.Internationalisation.EnglishSteno qualified as EnglishSteno
 import Text.Internationalisation.Francais qualified as Français
 import Text.Internationalisation.Lojban qualified as Lojban
 import Text.Internationalisation.Nederlands qualified as Nederlands
@@ -17,6 +18,7 @@ import Yesod.Core (WidgetFor)
 
 translateMessageToLang :: Language -> Message -> WidgetFor a (Either TranslationError Html)
 translateMessageToLang English = English.translate
+translateMessageToLang EnglishSteno = EnglishSteno.translate
 translateMessageToLang Français = Français.translate
 translateMessageToLang Deutsch = Deutsch.translate
 translateMessageToLang (Lojban LojbanLatin) = Lojban.translateLtn

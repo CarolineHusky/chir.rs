@@ -20,12 +20,34 @@
   unicode-range: U+ED80-EDBF;
 }
 
+@font-face {
+  font-family: "stenodisplay";
+  src: local("Stenodisplay ClassicLarge"), url("../webfonts/Stenodisplay-ClassicLarge.ttf");
+}
+
+@font-face {
+  font-family: "stenorunes";
+  src: url("../webfonts/steno-runes.woff2");
+}
+
 $primary-hue: 285;
 
 @import "~@picocss/pico/scss/pico.scss";
 
 :root {
   --font-family: system-ui, -apple-system, "Segoe UI", "Roboto", "Ubuntu",
+    "Cantarell", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji", "fairfax-hd", "crisa";
+}
+
+html[lang="en@STN-DISP"] {
+  --font-family: "stenodisplay", system-ui, -apple-system, "Segoe UI", "Roboto", "Ubuntu",
+    "Cantarell", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji", "fairfax-hd", "crisa";
+}
+
+html[lang="en@STN-RUNE"] {
+  --font-family: "stenorunes", system-ui, -apple-system, "Segoe UI", "Roboto", "Ubuntu",
     "Cantarell", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
     "Segoe UI Symbol", "Noto Color Emoji", "fairfax-hd", "crisa";
 }

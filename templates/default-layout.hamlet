@@ -21,6 +21,9 @@ $newline never
             <option value="auto">^{__ MsgAutomatic}
             <option value="de">Deutsch (Deutschland)
             <option value="en">English (Usonia)
+            <option value="en@STN">TKPWHREURB
+            <option value="en@STN-DISP">TKPWHREURB/SKWHAFPL/SRAOEURB/WAL/AOEUZ/-D/SKWHORBG
+            <option value="en@STN-RUNE">TKPWHREURB/SKWHAFPL/RAO*UPB/SKWHORBG
             <option value="fr">Français (France)
             <option value="jbo">la .lojban.
             <option value="jbo@ZLR">  (la .lojban., zbalermorna)

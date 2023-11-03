@@ -128,6 +128,8 @@ data Language
     Deutsch
   | -- | en_US, fallback language
     English
+  | -- | en_US stenography, Plover theory with emily symbols
+    EnglishSteno
   | -- | fr_FR
     Français
   | -- | jbo
@@ -140,6 +142,7 @@ data Language
 
 parseLanguage :: String -> Language
 parseLanguage ('d' : 'e' : _) = Deutsch
+parseLanguage ('e' : 'n' : '@' : 'S' : 'T' : 'N' : _) = EnglishSteno
 parseLanguage ('e' : 'n' : _) = English
 parseLanguage ('f' : 'r' : _) = Français
 parseLanguage "jbo@ZLR" = Lojban LojbanZbalermorna

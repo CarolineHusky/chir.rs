@@ -34,7 +34,7 @@ flag dev
   manual:      False
   default:     False
 
-library chir-rs-lib
+library
   if (flag(dev) || flag(library-only))
     ghc-options:
       -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
@@ -161,6 +161,7 @@ library chir-rs-lib
     Text.Internationalisation
     Text.Internationalisation.Deutsch
     Text.Internationalisation.English
+    Text.Internationalisation.EnglishSteno
     Text.Internationalisation.Francais
     Text.Internationalisation.Lojban
     Text.Internationalisation.Lojban.Convert
@@ -185,7 +186,7 @@ executable chir-rs
 
   build-depends:
     , base         >=4.13.0.0 && <4.18.0.0.0
-    , chir-rs-lib
+    , chir-rs
     , relude
     , with-utf8
 
@@ -206,7 +207,7 @@ test-suite unit-test
 
   build-depends:
     , base              >=4.13.0.0 && <4.18.0.0.0
-    , chir-rs-lib
+    , chir-rs
     , relude
     , tasty
     , tasty-quickcheck
