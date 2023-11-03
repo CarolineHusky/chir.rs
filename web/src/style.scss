@@ -22,7 +22,8 @@
 
 @font-face {
   font-family: "stenodisplay";
-  src: local("Stenodisplay ClassicLarge"), url("../webfonts/Stenodisplay-ClassicLarge.ttf");
+  src: local("Stenodisplay ClassicLarge"),
+    url("../webfonts/Stenodisplay-ClassicLarge.ttf");
 }
 
 @font-face {
@@ -41,15 +42,17 @@ $primary-hue: 285;
 }
 
 html[lang="en@STN-DISP"] {
-  --font-family: "stenodisplay", system-ui, -apple-system, "Segoe UI", "Roboto", "Ubuntu",
-    "Cantarell", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-    "Segoe UI Symbol", "Noto Color Emoji", "fairfax-hd", "crisa";
+  --font-family: "stenodisplay", system-ui, -apple-system, "Segoe UI", "Roboto",
+    "Ubuntu", "Cantarell", "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "fairfax-hd",
+    "crisa";
 }
 
 html[lang="en@STN-RUNE"] {
-  --font-family: "stenorunes", system-ui, -apple-system, "Segoe UI", "Roboto", "Ubuntu",
-    "Cantarell", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-    "Segoe UI Symbol", "Noto Color Emoji", "fairfax-hd", "crisa";
+  --font-family: "stenorunes", system-ui, -apple-system, "Segoe UI", "Roboto",
+    "Ubuntu", "Cantarell", "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "fairfax-hd",
+    "crisa";
   text-underline-offset: 8px;
 }
 

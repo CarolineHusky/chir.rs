@@ -185,7 +185,7 @@ executable chir-rs
     relude
 
   build-depends:
-    , base         >=4.13.0.0 && <4.18.0.0.0
+    , base       >=4.13.0.0 && <4.18.0.0.0
     , chir-rs
     , relude
     , with-utf8
